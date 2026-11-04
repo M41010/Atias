@@ -1,0 +1,29 @@
+# Pruebas de la API contra una PostgreSQL desechable:
+#   docker compose -f compose.test.yaml run --rm --build api-test
+name: atias-test
+
+services:
+  db-test:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: atias_test
+      POSTGRES_USER: atias
+      POSTGRES_PASSWORD: solo_pruebas
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atias -d atias_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  api-test:
+    build:
+      context: ./api
+      target: desarrollo
+    command: ["npm", "test"]
+    environment:
+      TEST_DATABASE_URL: postgres://atias:solo_pruebas@db-test:5432/atias_test
+    depends_on:
+      db-test:
+        condition: service_healthy

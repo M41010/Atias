@@ -1,0 +1,7 @@
+# Abre SOLO la web a tu red local, para probarla desde el móvil. Úsalo mientras haga falta:
+#   docker compose -f compose.yaml -f compose.red-local.yaml up --build
+# Cualquier equipo de la misma red podrá entrar mientras esté activo, y la app no tiene contraseña.
+services:
+  web:
+    ports: !override
+      - "${WEB_PORT:-3000}:3000"

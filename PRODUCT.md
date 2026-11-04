@@ -38,12 +38,14 @@ La estimación sale de la propia fruta filmada en cada hilera, no de medias hist
 
 - Cultivos iniciales: tomate cherry y pimiento (madurez por color) y pepino (madurez por calibre).
 - Cada resultado distingue dos cifras que nunca se mezclan: **kg maduros observados** en la captura y **previsión de la semana siguiente**, rotulada como experimental.
-- La cifra de kg se destaca como valor central con su rango.
+- La cifra para planificar la venta es la previsión, destacada como valor central con su rango, mientras esté sin validar se rotula como experimental. Lo observado queda como dato de apoyo.
 - Temporeros: kg previstos ÷ (kg por jornal × días disponibles), por cultivo y ajustable por la cooperativa.
 - Desglose por cultivo, invernadero, hilera y tramo de hilera. No se da detalle por planta exacta porque no hay marcadores físicos.
 - Muestra fecha y hora de captura, estado del análisis, advertencias y comparación con la cosecha real cuando exista.
 - La maduración inicial la indica el agricultor o agrónomo, y se corrige cada semana con lo cosechado.
-- El agricultor entra con un enlace personal que le da la cooperativa, sin contraseña. Quien tenga el enlace puede subir vídeos.
+- El agricultor entra con un enlace personal que le da la cooperativa, sin contraseña. Quien tenga el enlace puede subir vídeos. El servidor valida cada enlace y lo limita a su invernadero y recolección.
+- Las subidas son reanudables. Un vídeo sustituido o quitado se conserva 7 días antes de borrarse.
+- La cooperativa ve en «Vídeos recibidos» lo enviado realmente. Mientras no haya detector, esos vídeos no alimentan los kilos, que siguen simulados.
 - La cooperativa ve los resultados nuevos marcados dentro de la app. No hay avisos externos en el prototipo.
 - Sin decidir: cómo entra la cooperativa y qué permisos tiene.
 
