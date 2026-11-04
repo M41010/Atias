@@ -33,7 +33,7 @@ Para ver el estado: `docker compose ps`, `http://localhost:4000/salud` y `http:/
 ## Probar desde el móvil
 
 1. Arranca con `compose.red-local.yaml`.
-2. Busca la IPv4 de este equipo con `ipconfig`.
+2. Busca con `ipconfig` la IPv4 de tu adaptador wifi o Ethernet. Ignora las de VirtualBox, WSL o Docker, que el móvil no puede alcanzar.
 3. Abre en el móvil `http://<esa-ip>:3000/subir/demo-invernadero-1`, conectado a la misma wifi.
 4. Si no carga, revisa si el Firewall de Windows bloquea el puerto 3000.
 
