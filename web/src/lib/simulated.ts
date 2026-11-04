@@ -227,10 +227,3 @@ export const HARVESTS: Harvest[] = [
 ];
 
 export const LATEST_HARVEST_ID = current.id;
-
-/** Enlaces personales de ejemplo. Los reales los generará la cooperativa. */
-export const UPLOAD_LINKS: Record<string, { greenhouseId: string; harvestId: string }> = {
-  "demo-invernadero-1": { greenhouseId: inv1.id, harvestId: "2026-W46" },
-  "demo-invernadero-2": { greenhouseId: inv2.id, harvestId: "2026-W46" },
-  "demo-invernadero-3": { greenhouseId: inv3.id, harvestId: "2026-W46" },
-};

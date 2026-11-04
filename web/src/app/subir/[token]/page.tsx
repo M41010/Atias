@@ -1,12 +1,13 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
-import { EmptyState, Skeleton } from "@/components/ui";
+import { EmptyState, ErrorState, Skeleton } from "@/components/ui";
 import { useDocumentTitle } from "@/lib/hooks";
-import { GREENHOUSES, HARVESTS, UPLOAD_LINKS } from "@/lib/simulated";
+import { ApiError, fetchLink } from "@/lib/serverApi";
 
-// Solo en cliente: el estado de la subida se lee del almacenamiento del móvil al iniciarse.
+// Solo en cliente: la biblioteca de subida necesita las API del navegador.
 const UploadScreen = dynamic(() => import("@/components/UploadScreen").then((m) => m.UploadScreen), {
   ssr: false,
   loading: () => <Skeleton />,
@@ -15,16 +16,24 @@ const UploadScreen = dynamic(() => import("@/components/UploadScreen").then((m) 
 export default function SubirPage() {
   useDocumentTitle("Subir vídeos");
   const { token } = useParams<{ token: string }>();
-  const link = UPLOAD_LINKS[token];
-  const greenhouse = GREENHOUSES.find((g) => g.id === link?.greenhouseId);
-  const harvest = HARVESTS.find((h) => h.id === link?.harvestId);
+  const { data, error, isPending, refetch } = useQuery({
+    queryKey: ["enlace", token],
+    queryFn: () => fetchLink(token),
+    // El estado de esta pantalla vive en la sesión: no se recarga al volver a la pestaña.
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: (count, e) => !(e instanceof ApiError && e.status === 404) && count < 2,
+  });
 
-  if (!greenhouse || !harvest) {
+  if (isPending) return <Skeleton />;
+  if (error instanceof ApiError && error.status === 404) {
     return (
       <EmptyState title="Este enlace no es válido">
         Puede estar incompleto o haber caducado. Pide a la cooperativa que te envíe uno nuevo.
       </EmptyState>
     );
   }
-  return <UploadScreen token={token} greenhouse={greenhouse} harvestLabel={harvest.label} />;
+  if (error) return <ErrorState message={error.message} onRetry={refetch} />;
+  return <UploadScreen token={token} link={data} />;
 }

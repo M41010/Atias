@@ -29,16 +29,41 @@ services:
     environment:
       PORT: "4000"
       ANALISIS_URL: http://analisis:8000
+      DATABASE_URL: postgres://atias:${POSTGRES_PASSWORD:-atias_local}@db:5432/atias
+      VIDEO_DIR: /data/videos
+      # Crea los invernaderos y enlaces de prueba. Debe desactivarse fuera del entorno local.
+      ATIAS_DATOS_DEMO: "${ATIAS_DATOS_DEMO:-1}"
+    volumes:
+      - videos:/data/videos
     ports:
       - "127.0.0.1:${API_PORT:-4000}:4000"
     depends_on:
       analisis:
+        condition: service_healthy
+      db:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/salud').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 6
+      start_period: 10s
+
+  # Sin puerto publicado: solo la API puede hablar con la base de datos.
+  db:
+    image: postgres:17.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: atias
+      POSTGRES_USER: atias
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-atias_local}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atias -d atias"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
       start_period: 10s
 
   # Sin puerto publicado: solo la API puede hablar con este servicio.
@@ -57,3 +82,7 @@ services:
       timeout: 5s
       retries: 6
       start_period: 20s
+
+volumes:
+  postgres:
+  videos:

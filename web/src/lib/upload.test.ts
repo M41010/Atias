@@ -4,18 +4,37 @@ import {
   cancelUpload,
   type FarmerData,
   formatSize,
+  fromServer,
   highestHileraWithVideo,
+  markError,
+  markReconnecting,
+  markReceived,
   MAX_VIDEO_BYTES,
   missingData,
   nextPending,
-  restoreAfterReload,
+  nextToStart,
+  requeue,
+  type ServerVideo,
+  setProgress,
   summarize,
-  tick,
   uploadKey,
   validateVideo,
 } from "./upload";
 
 const MB = 1024 ** 2;
+const file = { name: "a.mp4", size: MB };
+const always = () => true;
+
+const serverVideo = (overrides: Partial<ServerVideo> = {}): ServerVideo => ({
+  id: "v1",
+  hilera: 1,
+  lado: "A",
+  fileName: "a.mp4",
+  sizeBytes: MB,
+  status: "recibido",
+  receivedAt: null,
+  ...overrides,
+});
 
 describe("validateVideo", () => {
   it("acepta vídeos", () => {
@@ -30,75 +49,94 @@ describe("validateVideo", () => {
   });
 });
 
-describe("tick", () => {
-  const file = { name: "a.mp4", size: 40 * MB };
-
-  it("sube de uno en uno y deja el resto en cola", () => {
-    const uploads = addUpload(addUpload({}, 1, "A", file), 1, "B", file);
-    const next = tick(uploads, 1, true);
-    expect(next[uploadKey(1, "A")].status).toBe("subiendo");
-    expect(next[uploadKey(1, "A")].progress).toBeGreaterThan(0);
-    expect(next[uploadKey(1, "B")].status).toBe("en_cola");
-    expect(next[uploadKey(1, "B")].progress).toBe(0);
+describe("fromServer", () => {
+  it("lo recibido queda recibido y lo que estaba subiendo, interrumpido", () => {
+    const uploads = fromServer([
+      serverVideo(),
+      serverVideo({ id: "v2", lado: "B", status: "subiendo" }),
+    ]);
+    expect(uploads["1-A"].status).toBe("recibido");
+    expect(uploads["1-A"].videoId).toBe("v1");
+    expect(uploads["1-B"].status).toBe("interrumpido");
+    expect(uploads["1-B"].progress).toBe(0);
   });
 
-  it("se pausa sin conexión y sigue por donde iba al volver", () => {
-    const uploads = tick(addUpload({}, 1, "A", file), 1, true);
-    const before = uploads[uploadKey(1, "A")].progress;
-    const paused = tick(uploads, 100, false);
-    expect(paused[uploadKey(1, "A")].progress).toBe(before);
-    expect(tick(paused, 1, true)[uploadKey(1, "A")].progress).toBeGreaterThan(before);
-  });
-
-  it("marca recibido al terminar y pasa al siguiente", () => {
-    const uploads = addUpload(addUpload({}, 1, "A", file), 1, "B", file);
-    const done = tick(uploads, 1000, true);
-    expect(done[uploadKey(1, "A")].status).toBe("recibido");
-    expect(done[uploadKey(1, "A")].progress).toBe(1);
-    expect(tick(done, 1, true)[uploadKey(1, "B")].status).toBe("subiendo");
-  });
-
-  it("no hace nada si no hay subidas", () => {
-    const uploads = {};
-    expect(tick(uploads, 1, true)).toBe(uploads);
+  it("si una sustitución quedó a medias, vale el vídeo vigente", () => {
+    const uploads = fromServer([serverVideo(), serverVideo({ id: "v2", status: "subiendo", fileName: "nuevo.mp4" })]);
+    expect(uploads["1-A"].status).toBe("recibido");
+    expect(uploads["1-A"].fileName).toBe("a.mp4");
   });
 });
 
-describe("addUpload", () => {
-  it("sustituye el vídeo de ese lado y lo vuelve a subir", () => {
-    const received = tick(addUpload({}, 1, "A", { name: "viejo.mp4", size: MB }), 1000, true);
-    const replaced = addUpload(received, 1, "A", { name: "nuevo.mp4", size: MB })[uploadKey(1, "A")];
-    expect(replaced.fileName).toBe("nuevo.mp4");
-    expect(replaced.status).toBe("en_cola");
-    expect(replaced.progress).toBe(0);
+describe("cola", () => {
+  it("sigue primero con la que estaba en curso y después por la cola", () => {
+    let uploads = addUpload(addUpload({}, 1, "A", file), 1, "B", file);
+    expect(nextToStart(uploads, always)).toBe("1-A");
+    uploads = setProgress(uploads, "1-B", 0.5);
+    expect(nextToStart(uploads, always)).toBe("1-B");
+  });
+
+  it("no arranca lo que no tiene archivo en memoria", () => {
+    const uploads = addUpload({}, 1, "A", file);
+    expect(nextToStart(uploads, () => false)).toBeNull();
+  });
+
+  it("no arranca lo recibido ni lo fallido", () => {
+    let uploads = markReceived(addUpload({}, 1, "A", file), "1-A", "v1");
+    uploads = markError(addUpload(uploads, 1, "B", file), "1-B", "fallo");
+    expect(nextToStart(uploads, always)).toBeNull();
+  });
+
+  it("reintentar devuelve a la cola y limpia el error", () => {
+    const uploads = requeue(markError(addUpload({}, 1, "A", file), "1-A", "fallo"), "1-A");
+    expect(uploads["1-A"].status).toBe("en_cola");
+    expect(uploads["1-A"].errorMessage).toBeUndefined();
+  });
+
+  it("ignora actualizaciones de una subida ya cancelada", () => {
+    expect(setProgress({}, "1-A", 0.5)).toEqual({});
+    expect(markReceived({}, "1-A", "v1")).toEqual({});
+    expect(markError({}, "1-A", "x")).toEqual({});
+  });
+
+  it("reconectar se indica y se limpia al volver a avanzar", () => {
+    const uploads = markReconnecting(setProgress(addUpload({}, 1, "A", file), "1-A", 0.2), "1-A");
+    expect(uploads["1-A"].reconnecting).toBe(true);
+    expect(uploads["1-A"].progress).toBe(0.2);
+    expect(setProgress(uploads, "1-A", 0.3)["1-A"].reconnecting).toBe(false);
+  });
+
+  it("el progreso no supera el 100 %", () => {
+    expect(setProgress(addUpload({}, 1, "A", file), "1-A", 1.2)["1-A"].progress).toBe(1);
   });
 });
 
 describe("sustituir un vídeo recibido", () => {
-  const received = tick(addUpload({}, 1, "A", { name: "viejo.mp4", size: MB }), 1000, true);
+  const received = markReceived(addUpload({}, 1, "A", { name: "viejo.mp4", size: MB }), "1-A", "v1");
   const replacing = addUpload(received, 1, "A", { name: "nuevo.mp4", size: MB });
 
-  it("al cancelar vuelve el vídeo anterior", () => {
-    const restored = cancelUpload(replacing, 1, "A")[uploadKey(1, "A")];
+  it("al cancelar vuelve el vídeo anterior, con su identificador", () => {
+    const restored = cancelUpload(replacing, "1-A")["1-A"];
     expect(restored.fileName).toBe("viejo.mp4");
     expect(restored.status).toBe("recibido");
-  });
-
-  it("al recargar se conserva el vídeo anterior", () => {
-    const restored = restoreAfterReload(replacing)[uploadKey(1, "A")];
-    expect(restored.fileName).toBe("viejo.mp4");
-    expect(restored.status).toBe("recibido");
+    expect(restored.videoId).toBe("v1");
   });
 
   it("al terminar queda solo el nuevo", () => {
-    const done = tick(replacing, 1000, true)[uploadKey(1, "A")];
+    const done = markReceived(replacing, "1-A", "v2")["1-A"];
     expect(done.fileName).toBe("nuevo.mp4");
+    expect(done.videoId).toBe("v2");
     expect(done.previous).toBeUndefined();
   });
 
   it("cambiar varias veces conserva el recibido original", () => {
     const twice = addUpload(replacing, 1, "A", { name: "otro.mp4", size: MB });
-    expect(cancelUpload(twice, 1, "A")[uploadKey(1, "A")].fileName).toBe("viejo.mp4");
+    expect(cancelUpload(twice, "1-A")["1-A"].fileName).toBe("viejo.mp4");
+  });
+
+  it("si falla, el vídeo anterior sigue disponible al cancelar", () => {
+    const failed = markError(replacing, "1-A", "fallo");
+    expect(cancelUpload(failed, "1-A")["1-A"].fileName).toBe("viejo.mp4");
   });
 
   it("mientras se sustituye sigue contando como recibido, pero no como terminado", () => {
@@ -108,46 +146,35 @@ describe("sustituir un vídeo recibido", () => {
   });
 
   it("cancelar sin vídeo anterior deja el lado pendiente", () => {
-    expect(cancelUpload(addUpload({}, 1, "A", { name: "a", size: MB }), 1, "A")).toEqual({});
+    expect(cancelUpload(addUpload({}, 1, "A", file), "1-A")).toEqual({});
   });
 });
 
 describe("nextPending", () => {
   it("propone el primer lado sin vídeo o interrumpido", () => {
     expect(nextPending({}, 2)).toBe("1-A");
-    const first = tick(addUpload({}, 1, "A", { name: "a", size: MB }), 1000, true);
+    const first = markReceived(addUpload({}, 1, "A", file), "1-A", "v1");
     expect(nextPending(first, 2)).toBe("1-B");
-    const interrupted = restoreAfterReload(addUpload(first, 1, "B", { name: "b", size: MB }));
-    expect(nextPending(interrupted, 2)).toBe("1-B");
+    expect(nextPending(fromServer([serverVideo({ status: "subiendo" })]), 2)).toBe("1-A");
   });
 
   it("no propone nada si todo está recibido o en curso", () => {
-    const first = addUpload({}, 1, "A", { name: "a", size: MB });
-    expect(nextPending(addUpload(first, 1, "B", { name: "b", size: MB }), 1)).toBeNull();
-  });
-});
-
-describe("restoreAfterReload", () => {
-  it("no da por subido lo que estaba en curso, y conserva lo recibido", () => {
-    const uploads = tick(addUpload(addUpload({}, 1, "A", { name: "a", size: MB }), 1, "B", { name: "b", size: MB }), 1000, true);
-    const restored = restoreAfterReload(uploads);
-    expect(restored[uploadKey(1, "A")].status).toBe("recibido");
-    expect(restored[uploadKey(1, "B")].status).toBe("interrumpido");
-    expect(restored[uploadKey(1, "B")].progress).toBe(0);
+    const first = addUpload({}, 1, "A", file);
+    expect(nextPending(addUpload(first, 1, "B", file), 1)).toBeNull();
   });
 });
 
 describe("summarize", () => {
   it("cuenta dos vídeos por hilera y detecta cuándo está todo", () => {
-    let uploads = addUpload({}, 1, "A", { name: "a", size: MB });
+    let uploads = addUpload({}, 1, "A", file);
     expect(summarize(uploads, 1)).toEqual({ total: 2, received: 0, active: 1, complete: false });
-    uploads = tick(uploads, 1000, true);
-    uploads = tick(addUpload(uploads, 1, "B", { name: "b", size: MB }), 1000, true);
+    uploads = markReceived(uploads, "1-A", "v1");
+    uploads = markReceived(addUpload(uploads, 1, "B", file), "1-B", "v2");
     expect(summarize(uploads, 1)).toEqual({ total: 2, received: 2, active: 0, complete: true });
   });
 
   it("ignora vídeos de hileras que ya no existen", () => {
-    const uploads = tick(addUpload({}, 3, "A", { name: "a", size: MB }), 1000, true);
+    const uploads = markReceived(addUpload({}, 3, "A", file), uploadKey(3, "A"), "v1");
     expect(summarize(uploads, 2).received).toBe(0);
     expect(highestHileraWithVideo(uploads)).toBe(3);
   });
