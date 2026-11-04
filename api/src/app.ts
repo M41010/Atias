@@ -176,7 +176,7 @@ export function createApp({
   app.use("/api/enlace", linkRoutes);
 
   app.use("/api/auth", createAuthRouter(pool, limiter, secureCookies));
-  app.use("/api/cooperativa", createCooperativeRouter(pool));
+  app.use("/api/cooperativa", createCooperativeRouter(pool, store.directory));
 
   app.use((_req, res) => {
     res.status(404).json({ error: "Ruta no encontrada" });

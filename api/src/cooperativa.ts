@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { resolve } from "node:path";
 import express, { type Router } from "express";
 import { requireSession, type SessionUser } from "./auth.js";
 import { hashToken, type Pool } from "./db.js";
@@ -9,7 +10,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const CROPS = new Set(["tomate_cherry", "pimiento", "pepino"]);
 
 /** Rutas de la cooperativa. Todas exigen haber iniciado sesión. */
-export function createCooperativeRouter(pool: Pool): Router {
+export function createCooperativeRouter(pool: Pool, videoDir: string): Router {
   const router = express.Router();
   router.use(requireSession(pool));
 
@@ -45,6 +46,35 @@ export function createCooperativeRouter(pool: Pool): Router {
         datos: weeklyData(g),
         videos: videos.rows.filter((v) => v.greenhouse_id === g.id).map(videoDto),
       })),
+    });
+  });
+
+  // ---- Vídeos ----
+  // Admite peticiones parciales: el navegador las usa para avanzar en el vídeo sin descargarlo entero.
+  router.get("/videos/:id/contenido", async (req, res, next) => {
+    if (!UUID.test(req.params.id)) {
+      res.status(404).json({ error: "Vídeo no encontrado" });
+      return;
+    }
+    const { rows } = await pool.query(
+      "SELECT mime_type FROM videos WHERE id = $1 AND status = 'recibido'",
+      [req.params.id],
+    );
+    if (!rows[0]) {
+      res.status(404).json({ error: "Vídeo no encontrado" });
+      return;
+    }
+    res.setHeader("Content-Type", rows[0].mime_type);
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Cache-Control", "private, no-store");
+    res.sendFile(req.params.id, { root: resolve(videoDir) }, (error?: Error & { status?: number }) => {
+      if (!error) return;
+      if (res.headersSent) {
+        res.destroy();
+        return;
+      }
+      if (error.status === 404) res.status(404).json({ error: "Archivo no encontrado" });
+      else next(error);
     });
   });
 

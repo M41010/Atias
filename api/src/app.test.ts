@@ -440,6 +440,7 @@ describe("API", () => {
         ["GET", "/recolecciones"], ["GET", `/recolecciones/${HARVEST}`], ["GET", "/invernaderos"],
         ["POST", "/invernaderos"], ["GET", "/proximas-recolecciones"], ["GET", "/enlaces"],
         ["POST", "/enlaces"], ["POST", "/enlaces/x/revocar"],
+        ["GET", "/videos/00000000-0000-0000-0000-000000000000/contenido"],
       ]) {
         const response = await fetch(`${api}/api/cooperativa${path}`, { method });
         assert.equal(response.status, 401, `${method} ${path}`);
@@ -448,6 +449,51 @@ describe("API", () => {
 
     it("el enlace del agricultor no da acceso a la cooperativa", async () => {
       const response = await fetch(`${api}/api/cooperativa/invernaderos`, { headers: { "x-atias-enlace": TOKEN } });
+      assert.equal(response.status, 401);
+    });
+  });
+
+  describe("ver vídeos", () => {
+    const content = (id: string, headers: Record<string, string> = {}) =>
+      coop(`/videos/${id}/contenido`, { headers });
+
+    it("sirve el vídeo recibido con su tipo y sin dejar que el navegador lo reinterprete", async () => {
+      const id = await uploadComplete({ size: 100 });
+      const response = await content(id);
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get("content-type"), "video/mp4");
+      assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+      assert.equal((await response.arrayBuffer()).byteLength, 100);
+    });
+
+    it("admite peticiones parciales para avanzar en el vídeo", async () => {
+      const id = await uploadComplete({ size: 100 });
+      const response = await content(id, { range: "bytes=10-19" });
+      assert.equal(response.status, 206);
+      assert.equal(response.headers.get("content-range"), "bytes 10-19/100");
+      assert.equal((await response.arrayBuffer()).byteLength, 10);
+    });
+
+    it("no sirve subidas a medias, vídeos quitados ni identificadores inválidos", async () => {
+      const created = await createUpload();
+      assert.equal((await content((created.headers.get("location") as string).split("/").at(-1) as string)).status, 404);
+      const id = await uploadComplete({ lado: "B" });
+      await link(`/videos/${id}`, { method: "DELETE" });
+      assert.equal((await content(id)).status, 404);
+      assert.equal((await content("..%2F..%2Fetc%2Fpasswd")).status, 404);
+    });
+
+    it("responde 404 si falta el archivo, sin detalles internos", async () => {
+      const id = await uploadComplete();
+      await rm(join(videoDir, id), { force: true });
+      const response = await content(id);
+      assert.equal(response.status, 404);
+      assert.deepEqual(await response.json(), { error: "Archivo no encontrado" });
+    });
+
+    it("el enlace del agricultor no permite ver vídeos", async () => {
+      const id = await uploadComplete();
+      const response = await fetch(`${api}/api/cooperativa/videos/${id}/contenido`, { headers: { "x-atias-enlace": TOKEN } });
       assert.equal(response.status, 401);
     });
   });

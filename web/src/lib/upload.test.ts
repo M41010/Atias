@@ -207,5 +207,6 @@ describe("formatSize", () => {
   it("usa MB y GB", () => {
     expect(formatSize(1.5 * 1024 ** 3)).toBe("1,5 GB");
     expect(formatSize(250 * MB)).toBe("250 MB");
+    expect(formatSize(26_000)).toBe("menos de 1 MB");
   });
 });

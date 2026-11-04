@@ -170,7 +170,8 @@ export function summarize(uploads: Uploads, hileras: number) {
 export function formatSize(bytes: number): string {
   const format = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1 });
   if (bytes >= 1024 ** 3) return `${format.format(bytes / 1024 ** 3)} GB`;
-  return `${format.format(Math.max(bytes, 1024 * 1024) / 1024 ** 2)} MB`;
+  if (bytes < 1024 ** 2) return "menos de 1 MB";
+  return `${format.format(bytes / 1024 ** 2)} MB`;
 }
 
 export type FarmerData = {
