@@ -3,10 +3,20 @@
 import { Home, Link2, LogOut, Scale, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { type ReactNode, Suspense, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { type ReactNode, Suspense, useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthGate } from "@/components/AuthGate";
+import { fmtDate } from "@/lib/format";
 import { useOnline } from "@/lib/hooks";
+import {
+  clearOfflineCopy,
+  copyStatus,
+  type CopyStatus,
+  harvestListQuery,
+  harvestOverviewQuery,
+  harvestRecordsQuery,
+  registerOfflineScreens,
+} from "@/lib/offlineCopy";
 import { fetchCurrentUser, signOut } from "@/lib/serverApi";
 
 const NAV = [
@@ -30,6 +40,7 @@ function UserMenu() {
         type="button"
         onClick={() => {
           signOut()
+            .then(clearOfflineCopy)
             // Carga completa a propósito: no debe quedar en memoria nada de la sesión cerrada.
             // eslint-disable-next-line @next/next/no-location-assign-relative-destination
             .then(() => window.location.assign("/acceder"))
@@ -40,7 +51,7 @@ function UserMenu() {
         <LogOut size={16} aria-hidden />
         Salir
       </button>
-      {failed && <p role="alert" className="text-xs text-bad-ink">No se ha podido cerrar la sesión.</p>}
+      {failed && <p role="alert" className="text-xs text-bad-ink">Cerrar la sesión necesita conexión.</p>}
     </div>
   );
 }
@@ -85,8 +96,51 @@ function DataNotice() {
   return <>{real ? "Prototipo: vídeos y datos reales de esta prueba. Aún no se cuentan frutos." : SIMULATED_NOTICE}</>;
 }
 
+/** Lo que hay en pantalla de la copia local, al día con cada cambio en las consultas. */
+function useShownCopy(): CopyStatus {
+  const client = useQueryClient();
+  const [status, setStatus] = useState<CopyStatus>({ savedAt: null, failing: false });
+  useEffect(() => {
+    const cache = client.getQueryCache();
+    const update = () => {
+      const next = copyStatus(cache.getAll().filter((query) => query.isActive()));
+      setStatus((value) => (value.savedAt === next.savedAt && value.failing === next.failing ? value : next));
+    };
+    update();
+    return cache.subscribe(update);
+  }, [client]);
+  return status;
+}
+
+const COPY_REFRESH_MS = 5 * 60 * 1000;
+
+/** Mantiene al día la copia de la última recolección, aunque no se hayan abierto sus pantallas. */
+function OfflineCopyKeeper() {
+  const client = useQueryClient();
+  const online = useOnline();
+  useEffect(registerOfflineScreens, []);
+  useEffect(() => {
+    if (!online) return;
+    const refresh = async () => {
+      const harvests = await client.fetchQuery(harvestListQuery()).catch(() => null);
+      const latest = harvests?.[0]?.id;
+      if (!latest) return;
+      await Promise.all([
+        client.prefetchQuery(harvestOverviewQuery(latest)),
+        client.prefetchQuery(harvestRecordsQuery(latest)),
+      ]);
+    };
+    void refresh();
+    const timer = setInterval(() => void refresh(), COPY_REFRESH_MS);
+    return () => clearInterval(timer);
+  }, [client, online]);
+  return null;
+}
+
 function Notices() {
   const online = useOnline();
+  const { savedAt, failing } = useShownCopy();
+  const saved = savedAt ? `Datos guardados: ${fmtDate(new Date(savedAt).toISOString())}. Pueden no estar actualizados.` : "Los datos pueden no estar actualizados.";
   return (
     <div className="sticky top-0 z-10">
       <p role="status" className="border-b border-warn-line bg-warn-soft px-4 py-2 text-center text-sm font-medium text-warn-ink">
@@ -94,10 +148,10 @@ function Notices() {
           <DataNotice />
         </Suspense>
       </p>
-      {!online && (
+      {(!online || failing) && (
         <p role="status" className="flex items-center justify-center gap-2 border-b border-line bg-sunken px-4 py-2 text-sm text-ink">
-          <WifiOff size={15} aria-hidden />
-          Sin conexión: se muestran los últimos datos cargados, que pueden no estar actualizados.
+          <WifiOff size={15} className="shrink-0" aria-hidden />
+          {online ? "No se puede conectar con el servidor." : "Sin conexión."} {saved}
         </p>
       )}
     </div>
@@ -139,6 +193,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <Notices />
         <main className="mx-auto max-w-[1160px] px-4 py-6 md:px-8 md:py-7">
           <AuthGate>
+            <OfflineCopyKeeper />
             <Suspense fallback={null}>{children}</Suspense>
           </AuthGate>
         </main>

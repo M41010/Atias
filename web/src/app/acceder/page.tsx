@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, Suspense, useEffect, useState } from "react";
 import { useDocumentTitle } from "@/lib/hooks";
+import { clearOfflineCopy } from "@/lib/offlineCopy";
 import { safeRedirect } from "@/lib/safeRedirect";
 import { ApiError, fetchCurrentUser, signIn } from "@/lib/serverApi";
 
@@ -23,7 +24,8 @@ function AccessForm() {
   const submit = useMutation({
     mutationFn: () => signIn(correo, contrasena),
     // Carga completa: así ninguna pantalla parte de datos de una sesión anterior.
-    onSuccess: () => window.location.assign(target),
+    // Y sin la copia de quien usara antes este dispositivo.
+    onSuccess: () => clearOfflineCopy().finally(() => window.location.assign(target)),
   });
 
   const message = submit.error

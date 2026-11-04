@@ -46,6 +46,7 @@ La estimación sale de la propia fruta filmada en cada hilera, no de medias hist
 - El agricultor entra con un enlace personal que le da la cooperativa, sin contraseña. Quien tenga el enlace puede subir vídeos. El servidor valida cada enlace y lo limita a su invernadero y recolección.
 - La cooperativa registra la cosecha real por invernadero y recolección, separando la recolección de lunes a jueves de la cosecha de control.
 - Cada vídeo recibido se revisa automáticamente: poca luz, exceso de luz, desenfoque, duración muy corta o archivo ilegible. Es un aviso orientativo, con umbrales provisionales; no cuenta frutos.
+- La cooperativa conserva una copia de solo lectura de la última recolección en su dispositivo, durante 7 días como máximo. Se borra al cerrar sesión. Sin conexión no se pueden guardar cambios ni ver vídeos, y la pantalla indica la fecha de los datos.
 - Las subidas son reanudables. Un vídeo sustituido o quitado se conserva 7 días antes de borrarse.
 - La cooperativa ve en «Vídeos recibidos» lo enviado realmente. Mientras no haya detector, esos vídeos no alimentan los kilos, que siguen simulados.
 - La cooperativa ve los resultados nuevos marcados dentro de la app. No hay avisos externos en el prototipo.

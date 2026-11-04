@@ -22,6 +22,9 @@ async function request(path: string, init: RequestInit = {}, token?: string): Pr
       ...(init.body ? { "content-type": "application/json" } : {}),
       ...(token ? { [LINK_HEADER]: token } : {}),
     },
+  }).catch(() => {
+    // El navegador da este error en inglés, y las pantallas lo muestran.
+    throw new Error("No se ha podido conectar con el servidor.");
   });
   if (!response.ok) {
     const body = await response.json().catch(() => null) as { error?: string } | null;

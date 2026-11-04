@@ -6,8 +6,9 @@ import { useState } from "react";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
 import { fmtDate } from "@/lib/format";
 import { qualityMessages } from "@/lib/quality";
-import { useDocumentTitle } from "@/lib/hooks";
-import { fetchHarvestList, fetchHarvestOverview, type HarvestOverview } from "@/lib/serverApi";
+import { useDocumentTitle, useOnline } from "@/lib/hooks";
+import { harvestListQuery, harvestOverviewQuery } from "@/lib/offlineCopy";
+import type { HarvestOverview } from "@/lib/serverApi";
 import { CROPS } from "@/lib/simulated";
 import { formatSize, missingData, type ServerVideo, type Side } from "@/lib/upload";
 
@@ -16,6 +17,7 @@ const SIDES: Side[] = ["A", "B"];
 
 function VideoPlayer({ video, hilera, onClose }: { video: ServerVideo; hilera: number; onClose: () => void }) {
   const [failed, setFailed] = useState(false);
+  const online = useOnline();
   const src = `/api/cooperativa/videos/${encodeURIComponent(video.id)}/contenido`;
   return (
     <div className="border-t border-line px-5 py-4">
@@ -26,7 +28,11 @@ function VideoPlayer({ video, hilera, onClose }: { video: ServerVideo; hilera: n
           Cerrar
         </button>
       </div>
-      {failed ? (
+      {!online ? (
+        <p role="alert" className="text-sm text-warn-ink">
+          Sin conexión: los vídeos no se guardan en este dispositivo.
+        </p>
+      ) : failed ? (
         <p role="alert" className="text-sm text-warn-ink">
           Este navegador no puede reproducir el formato de este vídeo.{" "}
           <a href={src} download={video.fileName} className="font-medium underline underline-offset-3">Descargarlo</a>
@@ -150,12 +156,11 @@ function GreenhousePanel({ greenhouse }: { greenhouse: HarvestOverview["invernad
 
 export default function VideosPage() {
   useDocumentTitle("Vídeos recibidos");
-  const harvests = useQuery({ queryKey: ["recolecciones-reales"], queryFn: fetchHarvestList });
+  const harvests = useQuery(harvestListQuery());
   const [selected, setSelected] = useState<string | null>(null);
   const harvestId = selected ?? harvests.data?.[0]?.id ?? null;
   const overview = useQuery({
-    queryKey: ["videos-recibidos", harvestId],
-    queryFn: () => fetchHarvestOverview(harvestId as string),
+    ...harvestOverviewQuery(harvestId as string),
     enabled: harvestId !== null,
     refetchInterval: REFRESH_MS,
   });
@@ -181,7 +186,7 @@ export default function VideosPage() {
     />
   );
 
-  if (harvests.isError) return <>{header}<ErrorState message={harvests.error.message} onRetry={harvests.refetch} /></>;
+  if (harvests.isError && !harvests.data) return <>{header}<ErrorState message={harvests.error.message} onRetry={harvests.refetch} /></>;
   if (overview.isError && !overview.data) {
     return <>{header}<ErrorState message={overview.error.message} onRetry={overview.refetch} /></>;
   }
@@ -193,11 +198,6 @@ export default function VideosPage() {
   return (
     <>
       {header}
-      {overview.isError && (
-        <p role="status" className="mb-4 text-sm text-warn-ink">
-          No se ha podido actualizar. Se muestra la última información recibida.
-        </p>
-      )}
       <div className="grid gap-5">
         {overview.data.invernaderos.map((greenhouse) => (
           <GreenhousePanel key={greenhouse.id} greenhouse={greenhouse} />

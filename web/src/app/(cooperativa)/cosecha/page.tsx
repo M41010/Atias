@@ -5,9 +5,8 @@ import { useId, useState } from "react";
 import { EmptyState, ErrorState, PageHeader, Panel, Skeleton } from "@/components/ui";
 import { fmtDate } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/hooks";
+import { harvestListQuery, harvestRecordsQuery } from "@/lib/offlineCopy";
 import {
-  fetchHarvestList,
-  fetchHarvestRecords,
   type HarvestRecord,
   type HarvestScope,
   saveHarvestRecord,
@@ -94,12 +93,11 @@ function RecordCell({
 
 export default function CosechaPage() {
   useDocumentTitle("Cosecha real");
-  const harvests = useQuery({ queryKey: ["recolecciones-reales"], queryFn: fetchHarvestList });
+  const harvests = useQuery(harvestListQuery());
   const [selected, setSelected] = useState<string | null>(null);
   const harvestId = selected ?? harvests.data?.[0]?.id ?? null;
   const records = useQuery({
-    queryKey: ["cosecha", harvestId],
-    queryFn: () => fetchHarvestRecords(harvestId as string),
+    ...harvestRecordsQuery(harvestId as string),
     enabled: harvestId !== null,
   });
 
@@ -122,8 +120,8 @@ export default function CosechaPage() {
     />
   );
 
-  if (harvests.isError) return <>{header}<ErrorState message={harvests.error.message} onRetry={harvests.refetch} /></>;
-  if (records.isError) return <>{header}<ErrorState message={records.error.message} onRetry={records.refetch} /></>;
+  if (harvests.isError && !harvests.data) return <>{header}<ErrorState message={harvests.error.message} onRetry={harvests.refetch} /></>;
+  if (records.isError && !records.data) return <>{header}<ErrorState message={records.error.message} onRetry={records.refetch} /></>;
   if (harvests.data?.length === 0) {
     return <>{header}<EmptyState title="Todavía no hay recolecciones">Aparecerán aquí cuando crees el primer enlace para un agricultor.</EmptyState></>;
   }
