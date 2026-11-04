@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+
+# Datos y vídeos: nunca al repositorio (pesados y potencialmente confidenciales).
+data/
+*.mp4
+*.mov
+*.sqlite
+*.db

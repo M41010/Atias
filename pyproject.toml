@@ -1,0 +1,38 @@
+[project]
+name = "atias"
+version = "0.1.0"
+description = "Estimación de kg de fruta madura en invernaderos a partir de vídeo (prototipo de piloto)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+dependencies = [
+  "numpy>=1.26",
+  "opencv-python-headless>=4.8",
+  "pandas>=2.1",
+  "openpyxl>=3.1",
+  "fastapi>=0.110",
+  "uvicorn>=0.27",
+]
+
+[project.scripts]
+atias = "atias.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.5"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/atias"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
