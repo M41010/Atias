@@ -94,6 +94,11 @@ components:
   panel-header:
     typography: "{typography.title}"
     padding: "14px 20px"
+  button-primary:
+    backgroundColor: "{colors.brand-ink}"
+    textColor: "#ffffff"
+    rounded: 6px
+    height: 44px
   button-secondary:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
@@ -212,7 +217,7 @@ Neutros de matiz verdoso muy leve, con tres familias semánticas que nunca se us
 
 ### Tertiary
 - **Rojo Fallo** (#a42b1a): texto e icono de error. Advertencias de severidad alta, «Revisar hilera», campo inválido y fallos de carga o guardado.
-- **Verde Estado Tinta** (#1a6836) y **Verde Estado Suave** (#e5f4e9): exclusivos de la pastilla «Analizado».
+- **Verde Estado Tinta** (#1a6836) y **Verde Estado Suave** (#e5f4e9): exclusivos de lo terminado: «Analizado», y en la pantalla del agricultor, «Recibido», «Completos» y «Todo recibido».
 
 ### Neutral
 - **Lienzo** (#f7f8f6): fondo de la aplicación, cabecera de tabla, hover de fila y filas de tramo desplegadas.
@@ -290,12 +295,12 @@ Discretos y utilitarios; acompañan a una tarea de edición sin competir con la 
 - **Secondary:** Superficie con borde Línea Fuerte y texto Label. Se usa en Reintentar, Restablecer y Deshacer.
 - **Hover / Focus:** fondo Hundido en 150 ms; al pulsar, borde Gris Texto; foco con anillo Verde Hoja de 2 px y separación de 2 px.
 - **Disabled:** opacidad 0,55 y cursor no permitido.
-- **Primary:** no existe un botón relleno. La acción principal, abrir invernadero, es la fila entera de la tabla.
+- **Primary:** relleno de Verde Hoja oscuro con texto blanco. Solo existe en la pantalla del agricultor y solo en el siguiente lado pendiente, para grabar, con altura de 44 px para usarlo en el móvil. En la cooperativa no hay botón relleno: la acción principal, abrir invernadero, es la fila entera de la tabla.
 
 ### Chips
 Pastillas de estado de una línea, nunca interactivas.
 - **Style:** cápsula sin borde, Label Small, fondo suave y tinta de su misma familia; icono de 12 px cuando indica estado de análisis.
-- **State:** «Analizado» en Verde Estado; «Analizando» neutra con icono giratorio; «Con advertencias» en ámbar; «Con problema» en Rojo Fallo; «Experimental», «Parcial» y «Simuladas» en ámbar; «Nuevo» en Verde Hoja. En cabecera de columna, la previsión lleva la forma abreviada «Exp.» con su explicación accesible.
+- **State:** «Analizado» en Verde Estado; «Analizando» neutra con icono giratorio; «Con advertencias» en ámbar; «Con problema» y «Revisar» (un dato inválido) en Rojo Fallo; «Experimental», «Parcial» y «Simuladas» en ámbar; «Nuevo» en Verde Hoja. En cabecera de columna, la previsión lleva la forma abreviada «Exp.» con su explicación accesible.
 
 ### Cards / Containers
 El panel es el único contenedor.
@@ -330,6 +335,9 @@ La pieza característica del sistema, en orden: rótulo con su pastilla, cifra, 
 
 ### Franja de datos simulados
 Banda fija de una frase, en Ámbar Suave con borde Ámbar Línea y texto Label centrado, presente en todas las pantallas mientras los datos sean simulados. El aviso sin conexión se apila debajo en Hundido.
+
+### Barra de progreso
+Línea de 6 px sobre Hundido con relleno Verde Hoja. En pausa, sin conexión, el relleno pasa a Ámbar Tinta y el texto lo dice con un icono. No se usa para datos, solo para subidas en curso.
 
 ### Lista de advertencias
 Filas separadas por línea con icono de 17 px, ámbito en Label, mensaje y acción en Gris Texto, y enlace «Ver hilera». Triángulo Rojo Fallo para severidad alta; icono de información Ámbar Tinta para el resto.
