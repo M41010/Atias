@@ -1,0 +1,39 @@
+# Desarrollo: los cambios se aplican al guardar, sin reconstruir.
+#   docker compose -f compose.yaml -f compose.dev.yaml up --build --watch
+services:
+  web:
+    build:
+      target: desarrollo
+    image: atias-web:dev
+    develop:
+      watch:
+        - action: sync
+          path: ./web/src
+          target: /app/src
+        - action: sync
+          path: ./web/public
+          target: /app/public
+        - action: rebuild
+          path: ./web/package-lock.json
+
+  api:
+    build:
+      target: desarrollo
+    image: atias-api:dev
+    develop:
+      watch:
+        - action: sync
+          path: ./api/src
+          target: /app/src
+        - action: rebuild
+          path: ./api/package-lock.json
+
+  analisis:
+    image: atias-analisis:dev
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: ./uv.lock

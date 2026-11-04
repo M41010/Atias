@@ -1,0 +1,9 @@
+# Contexto del servicio de análisis: solo entra lo que necesita, y nunca datos ni vídeos.
+*
+!pyproject.toml
+!uv.lock
+!.python-version
+!README.md
+!LICENSE
+!src
+**/__pycache__

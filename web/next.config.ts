@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Genera una salida autónoma para que la imagen de Docker no necesite todo node_modules.
+  output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
