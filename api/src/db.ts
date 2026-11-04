@@ -89,6 +89,21 @@ const MIGRATIONS: { id: string; sql: string }[] = [
       CREATE UNIQUE INDEX greenhouses_unique_name ON greenhouses (lower(name));
     `,
   },
+  {
+    id: "003_cosecha_real",
+    sql: `
+      -- Los dos alcances miden cosas distintas y nunca se suman ni se mezclan.
+      CREATE TABLE harvest_records (
+        greenhouse_id text NOT NULL REFERENCES greenhouses(id),
+        harvest_id text NOT NULL REFERENCES harvests(id),
+        scope text NOT NULL CHECK (scope IN ('lunes_jueves', 'cosecha_inmediata')),
+        kg double precision NOT NULL CHECK (kg >= 0),
+        recorded_by uuid NOT NULL REFERENCES users(id),
+        recorded_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (greenhouse_id, harvest_id, scope)
+      );
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */

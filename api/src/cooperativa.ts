@@ -49,6 +49,77 @@ export function createCooperativeRouter(pool: Pool, videoDir: string): Router {
     });
   });
 
+  // ---- Cosecha real ----
+  router.get("/recolecciones/:id/cosecha", async (req, res) => {
+    const harvest = await pool.query("SELECT id, label FROM harvests WHERE id = $1", [req.params.id]);
+    if (!harvest.rows[0]) {
+      res.status(404).json({ error: "Recolección no encontrada" });
+      return;
+    }
+    const greenhouses = await pool.query("SELECT id, name, crop FROM greenhouses ORDER BY name");
+    const records = await pool.query(
+      `SELECT r.greenhouse_id, r.scope, r.kg, r.recorded_at, u.name AS recorded_by
+       FROM harvest_records r JOIN users u ON u.id = r.recorded_by
+       WHERE r.harvest_id = $1`,
+      [req.params.id],
+    );
+    const record = (greenhouseId: string, scope: string) => {
+      const row = records.rows.find((r) => r.greenhouse_id === greenhouseId && r.scope === scope);
+      return row ? { kg: row.kg, registradoPor: row.recorded_by, registradoEn: row.recorded_at } : null;
+    };
+    res.json({
+      id: harvest.rows[0].id,
+      etiqueta: harvest.rows[0].label,
+      invernaderos: greenhouses.rows.map((g) => ({
+        id: g.id,
+        nombre: g.name,
+        cultivo: g.crop,
+        registros: {
+          lunes_jueves: record(g.id, "lunes_jueves"),
+          cosecha_inmediata: record(g.id, "cosecha_inmediata"),
+        },
+      })),
+    });
+  });
+
+  // kg nulo borra el dato.
+  router.put("/recolecciones/:id/cosecha/:invernaderoId/:alcance", async (req, res) => {
+    const user: SessionUser = res.locals.user;
+    const { id, invernaderoId, alcance } = req.params;
+    const kg = (req.body as Record<string, unknown> | undefined)?.kg;
+    if (alcance !== "lunes_jueves" && alcance !== "cosecha_inmediata") {
+      res.status(400).json({ error: "Tipo de cosecha no válido" });
+      return;
+    }
+    if (kg !== null && (typeof kg !== "number" || !Number.isFinite(kg) || kg < 0 || kg > 10_000_000)) {
+      res.status(400).json({ error: "Los kilos deben ser un número entre 0 y 10.000.000" });
+      return;
+    }
+    const known = await pool.query(
+      "SELECT 1 FROM harvests h, greenhouses g WHERE h.id = $1 AND g.id = $2",
+      [id, invernaderoId],
+    );
+    if (!known.rowCount) {
+      res.status(404).json({ error: "Recolección o invernadero no encontrados" });
+      return;
+    }
+    if (kg === null) {
+      await pool.query(
+        "DELETE FROM harvest_records WHERE harvest_id = $1 AND greenhouse_id = $2 AND scope = $3",
+        [id, invernaderoId, alcance],
+      );
+    } else {
+      await pool.query(
+        `INSERT INTO harvest_records (greenhouse_id, harvest_id, scope, kg, recorded_by)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (greenhouse_id, harvest_id, scope) DO UPDATE SET
+           kg = EXCLUDED.kg, recorded_by = EXCLUDED.recorded_by, recorded_at = now()`,
+        [invernaderoId, id, alcance, kg, user.id],
+      );
+    }
+    res.status(204).end();
+  });
+
   // ---- Vídeos ----
   // Admite peticiones parciales: el navegador las usa para avanzar en el vídeo sin descargarlo entero.
   router.get("/videos/:id/contenido", async (req, res, next) => {

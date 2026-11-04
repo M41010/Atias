@@ -108,3 +108,32 @@ export const revokeLink = async (id: string): Promise<void> => {
 export const createGreenhouse = async (nombre: string, cultivo: CropId, hileras: number): Promise<void> => {
   await request("/api/cooperativa/invernaderos", { method: "POST", body: JSON.stringify({ nombre, cultivo, hileras }) });
 };
+
+// ---- Cosecha real ----
+export type HarvestScope = "lunes_jueves" | "cosecha_inmediata";
+export type HarvestRecord = { kg: number; registradoPor: string; registradoEn: string };
+export type HarvestRecords = {
+  id: string;
+  etiqueta: string;
+  invernaderos: {
+    id: string;
+    nombre: string;
+    cultivo: CropId;
+    registros: Record<HarvestScope, HarvestRecord | null>;
+  }[];
+};
+
+export const fetchHarvestRecords = async (harvestId: string): Promise<HarvestRecords> =>
+  (await request(`/api/cooperativa/recolecciones/${encodeURIComponent(harvestId)}/cosecha`)).json();
+
+export const saveHarvestRecord = async (
+  harvestId: string,
+  greenhouseId: string,
+  scope: HarvestScope,
+  kg: number | null,
+): Promise<void> => {
+  await request(
+    `/api/cooperativa/recolecciones/${encodeURIComponent(harvestId)}/cosecha/${encodeURIComponent(greenhouseId)}/${scope}`,
+    { method: "PUT", body: JSON.stringify({ kg }) },
+  );
+};

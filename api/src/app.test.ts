@@ -120,7 +120,7 @@ describe("API", () => {
 
   beforeEach(async () => {
     analysisStatus = 200;
-    await pool.query("DELETE FROM videos; DELETE FROM weekly_data;");
+    await pool.query("DELETE FROM videos; DELETE FROM weekly_data; DELETE FROM harvest_records;");
     await pool.query("DELETE FROM upload_links WHERE created_by IS NOT NULL OR expires_at IS NOT NULL");
     await pool.query("DELETE FROM sessions; DELETE FROM users;");
     await pool.query("DELETE FROM greenhouses WHERE id NOT IN ('inv-1', 'inv-2', 'inv-3')");
@@ -441,6 +441,7 @@ describe("API", () => {
         ["POST", "/invernaderos"], ["GET", "/proximas-recolecciones"], ["GET", "/enlaces"],
         ["POST", "/enlaces"], ["POST", "/enlaces/x/revocar"],
         ["GET", "/videos/00000000-0000-0000-0000-000000000000/contenido"],
+        ["GET", `/recolecciones/${HARVEST}/cosecha`], ["PUT", `/recolecciones/${HARVEST}/cosecha/inv-1/lunes_jueves`],
       ]) {
         const response = await fetch(`${api}/api/cooperativa${path}`, { method });
         assert.equal(response.status, 401, `${method} ${path}`);
@@ -449,6 +450,57 @@ describe("API", () => {
 
     it("el enlace del agricultor no da acceso a la cooperativa", async () => {
       const response = await fetch(`${api}/api/cooperativa/invernaderos`, { headers: { "x-atias-enlace": TOKEN } });
+      assert.equal(response.status, 401);
+    });
+  });
+
+  describe("cosecha real", () => {
+    const put = (scope: string, kg: unknown, greenhouse = "inv-1", harvest = HARVEST) =>
+      coop(`/recolecciones/${harvest}/cosecha/${greenhouse}/${scope}`, { method: "PUT", body: JSON.stringify({ kg }) });
+    const read = async () => (await (await coop(`/recolecciones/${HARVEST}/cosecha`)).json()) as {
+      invernaderos: { id: string; registros: Record<string, { kg: number; registradoPor: string } | null> }[];
+    };
+    const inv1 = async () => (await read()).invernaderos.find((g) => g.id === "inv-1")?.registros;
+
+    it("guarda cada tipo de cosecha por separado y dice quién la registró", async () => {
+      assert.equal((await put("lunes_jueves", 1234.5)).status, 204);
+      const records = await inv1();
+      assert.equal(records?.lunes_jueves?.kg, 1234.5);
+      assert.equal(records?.lunes_jueves?.registradoPor, "Ana");
+      assert.equal(records?.cosecha_inmediata, null);
+    });
+
+    it("cero kilos es un dato válido y sustituir actualiza el valor", async () => {
+      await put("lunes_jueves", 100);
+      await put("lunes_jueves", 0);
+      assert.equal((await inv1())?.lunes_jueves?.kg, 0);
+    });
+
+    it("kg nulo borra el dato", async () => {
+      await put("cosecha_inmediata", 50);
+      assert.equal((await put("cosecha_inmediata", null)).status, 204);
+      assert.equal((await inv1())?.cosecha_inmediata, null);
+    });
+
+    it("rechaza valores y tipos de cosecha inválidos", async () => {
+      for (const bad of [-1, "100", 10_000_001, undefined]) {
+        assert.equal((await put("lunes_jueves", bad)).status, 400, String(bad));
+      }
+      assert.equal((await put("otra", 10)).status, 400);
+    });
+
+    it("responde 404 si no existe la recolección o el invernadero", async () => {
+      assert.equal((await put("lunes_jueves", 10, "nada")).status, 404);
+      assert.equal((await put("lunes_jueves", 10, "inv-1", "2000-W01")).status, 404);
+      assert.equal((await coop("/recolecciones/nada/cosecha")).status, 404);
+    });
+
+    it("el enlace del agricultor no puede registrar cosecha", async () => {
+      const response = await fetch(`${api}/api/cooperativa/recolecciones/${HARVEST}/cosecha/inv-1/lunes_jueves`, {
+        method: "PUT",
+        headers: { "x-atias-enlace": TOKEN, "content-type": "application/json" },
+        body: JSON.stringify({ kg: 1 }),
+      });
       assert.equal(response.status, 401);
     });
   });

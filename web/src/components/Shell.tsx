@@ -1,6 +1,6 @@
 "use client";
 
-import { Link2, LogOut, Home, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
+import { Home, Link2, LogOut, Scale, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense, useState } from "react";
@@ -14,6 +14,7 @@ const NAV = [
   { href: "/invernaderos", label: "Invernaderos", icon: Warehouse },
   { href: "/videos", label: "Vídeos recibidos", icon: Video },
   { href: "/enlaces", label: "Enlaces", icon: Link2 },
+  { href: "/cosecha", label: "Cosecha real", icon: Scale },
   { href: "/temporeros", label: "Temporeros", icon: Users },
   { href: "/parametros", label: "Parámetros", icon: SlidersHorizontal },
 ];
@@ -80,7 +81,7 @@ const SIMULATED_NOTICE = "Datos simulados: ninguna cifra procede de un invernade
 function DataNotice() {
   // Esta pantalla sí muestra lo que han enviado de verdad: no debe decir que es simulada.
   const pathname = usePathname();
-  const real = pathname.startsWith("/videos") || pathname.startsWith("/enlaces");
+  const real = ["/videos", "/enlaces", "/cosecha"].some((path) => pathname.startsWith(path));
   return <>{real ? "Prototipo: vídeos y datos reales de esta prueba. Aún no se analizan." : SIMULATED_NOTICE}</>;
 }
 
