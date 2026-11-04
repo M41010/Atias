@@ -78,6 +78,10 @@ services:
     restart: unless-stopped
     environment:
       PORT: "8000"
+      VIDEO_DIR: /data/videos
+    # Solo lectura: el análisis nunca modifica los vídeos.
+    volumes:
+      - videos:/data/videos:ro
     healthcheck:
       test: ["CMD", ".venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/salud', timeout=3)"]
       interval: 10s

@@ -14,6 +14,7 @@ import { createApp } from "./app.js";
 import { disableUser, LoginLimiter, setUserPassword } from "./auth.js";
 import { createPool, hashToken, migrate, type Pool, seedDemo } from "./db.js";
 import { harvestWeek, upcomingHarvests } from "./harvests.js";
+import { createQualityRunner, reviewPendingVideos } from "./quality.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
 
 const databaseUrl = process.env.TEST_DATABASE_URL;
@@ -38,9 +39,17 @@ describe("API", () => {
   let store: FileStore;
   let videoDir: string;
   let analysisStatus = 200;
-  const analysis = createServer((_req, res) => {
-    res.statusCode = analysisStatus;
-    res.end("{}");
+  let analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
+  let analysisCalls: string[] = [];
+  let analysisUrl = "";
+  const analysis = createServer((req, res) => {
+    let body = "";
+    req.on("data", (chunk) => { body += chunk; });
+    req.on("end", () => {
+      if (req.url === "/calidad") analysisCalls.push(JSON.parse(body).video);
+      res.statusCode = analysisStatus;
+      res.end(analysisBody);
+    });
   });
   let apiServer: Server;
   let api: string;
@@ -113,13 +122,15 @@ describe("API", () => {
     await seedDemo(pool);
     videoDir = await mkdtemp(join(tmpdir(), "atias-videos-"));
     store = createVideoStore(videoDir);
-    const analysisUrl = await listen(analysis);
+    analysisUrl = await listen(analysis);
     apiServer = createServer(createApp({ analysisUrl, pool, store, limiter }));
     api = await listen(apiServer);
   });
 
   beforeEach(async () => {
     analysisStatus = 200;
+    analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
+    analysisCalls = [];
     await pool.query("DELETE FROM videos; DELETE FROM weekly_data; DELETE FROM harvest_records;");
     await pool.query("DELETE FROM upload_links WHERE created_by IS NOT NULL OR expires_at IS NOT NULL");
     await pool.query("DELETE FROM sessions; DELETE FROM users;");
@@ -502,6 +513,69 @@ describe("API", () => {
         body: JSON.stringify({ kg: 1 }),
       });
       assert.equal(response.status, 401);
+    });
+  });
+
+  describe("revisión de calidad", () => {
+    const quality = async () =>
+      ((await (await link("")).json()) as { videos: { id: string; calidad: { estado: string; avisos: string[] } }[] }).videos[0].calidad;
+
+    it("un vídeo recién recibido queda pendiente y pasa a correcto", async () => {
+      const id = await uploadComplete();
+      assert.deepEqual(await quality(), { estado: "pendiente", avisos: [] });
+      assert.equal(await reviewPendingVideos(pool, analysisUrl), 1);
+      assert.deepEqual(analysisCalls, [id]);
+      assert.deepEqual(await quality(), { estado: "ok", avisos: [] });
+    });
+
+    it("guarda los avisos y no vuelve a revisar lo ya revisado", async () => {
+      await uploadComplete();
+      analysisBody = JSON.stringify({ medidas: { brillo: 3 }, avisos: ["POCA_LUZ"] });
+      await reviewPendingVideos(pool, analysisUrl);
+      assert.deepEqual(await quality(), { estado: "avisos", avisos: ["POCA_LUZ"] });
+      assert.equal(await reviewPendingVideos(pool, analysisUrl), 0);
+      assert.equal(analysisCalls.length, 1);
+    });
+
+    it("la cooperativa ve el mismo resultado", async () => {
+      await uploadComplete();
+      analysisBody = JSON.stringify({ medidas: {}, avisos: ["DESENFOCADO"] });
+      await reviewPendingVideos(pool, analysisUrl);
+      const body = await (await coop(`/recolecciones/${HARVEST}`)).json() as { invernaderos: { id: string; videos: { calidad: unknown }[] }[] };
+      assert.deepEqual(body.invernaderos.find((g) => g.id === "inv-1")?.videos[0].calidad, { estado: "avisos", avisos: ["DESENFOCADO"] });
+    });
+
+    it("no revisa subidas a medias ni vídeos retirados", async () => {
+      await createUpload();
+      const id = await uploadComplete({ lado: "B" });
+      await link(`/videos/${id}`, { method: "DELETE" });
+      assert.equal(await reviewPendingVideos(pool, analysisUrl), 0);
+      assert.deepEqual(analysisCalls, []);
+    });
+
+    it("con el servicio caído sigue pendiente, sin gastar intentos", async () => {
+      await uploadComplete();
+      assert.equal(await reviewPendingVideos(pool, "http://127.0.0.1:1"), 0);
+      assert.equal((await quality()).estado, "pendiente");
+      const { rows } = await pool.query("SELECT quality_attempts FROM videos");
+      assert.equal(rows[0].quality_attempts, 0);
+    });
+
+    it("tras 3 errores del servicio se rinde y no bloquea a los siguientes", async () => {
+      await uploadComplete({ lado: "A" });
+      await uploadComplete({ lado: "B" });
+      analysisStatus = 500;
+      await reviewPendingVideos(pool, analysisUrl);
+      const { rows } = await pool.query("SELECT quality_status, quality_attempts FROM videos");
+      assert.ok(rows.every((r) => r.quality_status === "error" && r.quality_attempts === 3));
+      assert.equal((await quality()).estado, "error");
+    });
+
+    it("no solapa dos revisiones a la vez", async () => {
+      await uploadComplete();
+      const run = createQualityRunner(pool, analysisUrl);
+      await Promise.all([run(), run(), run()]);
+      assert.equal(analysisCalls.length, 1);
     });
   });
 

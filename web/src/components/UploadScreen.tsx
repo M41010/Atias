@@ -5,6 +5,7 @@ import { AlertTriangle, Camera, CheckCircle2, ChevronDown, FolderOpen, Info, Ref
 import { type ChangeEvent, useId, useState } from "react";
 import { Panel, Pill } from "@/components/ui";
 import { useDocumentTitle } from "@/lib/hooks";
+import { qualityMessages } from "@/lib/quality";
 import type { LinkInfo } from "@/lib/serverApi";
 import { CROPS } from "@/lib/simulated";
 import {
@@ -106,6 +107,18 @@ function VideoRow({
               <CheckCircle2 size={16} className="shrink-0" aria-hidden />
               Recibido
             </p>
+          )}
+          {status === "recibido" && upload?.calidad?.estado === "pendiente" && (
+            <p className="text-xs text-muted">Revisando la imagen…</p>
+          )}
+          {status === "recibido" && qualityMessages(upload?.calidad).map((message) => (
+            <p key={message} className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
+              <AlertTriangle size={15} className="shrink-0" aria-hidden />
+              {message}
+            </p>
+          ))}
+          {status === "recibido" && upload?.calidad?.estado === "avisos" && (
+            <p className="text-xs text-warn-ink">Si puedes, repítelo con «Cambiar».</p>
           )}
           {!upload && !removed && <p className="text-sm text-muted">Pendiente</p>}
           {!upload && removed && (

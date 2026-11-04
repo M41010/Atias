@@ -24,5 +24,9 @@ export function videoDto(row: Record<string, unknown>) {
     sizeBytes: Number(row.size_bytes),
     status: row.status,
     receivedAt: row.received_at ?? null,
+    calidad: {
+      estado: row.quality_status,
+      avisos: (row.quality as { avisos?: string[] } | null)?.avisos ?? [],
+    },
   };
 }

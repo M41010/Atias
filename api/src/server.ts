@@ -1,9 +1,11 @@
 import { createApp } from "./app.js";
 import { purgeExpiredSessions } from "./auth.js";
 import { createPool, migrate, seedDemo } from "./db.js";
+import { createQualityRunner } from "./quality.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
 
 const PURGE_INTERVAL_MS = 60 * 60 * 1000;
+const QUALITY_INTERVAL_MS = 5000;
 
 const port = Number(process.env.PORT ?? 4000);
 const analysisUrl = process.env.ANALISIS_URL ?? "http://localhost:8000";
@@ -21,6 +23,7 @@ const purge = () =>
     .catch((error) => console.error("Fallo en la limpieza periódica", error));
 void purge();
 const purgeTimer = setInterval(purge, PURGE_INTERVAL_MS);
+const qualityTimer = setInterval(createQualityRunner(pool, analysisUrl), QUALITY_INTERVAL_MS);
 
 const server = createApp({
   analysisUrl,
@@ -35,6 +38,7 @@ const server = createApp({
 for (const signal of ["SIGTERM", "SIGINT"] as const) {
   process.on(signal, () => {
     clearInterval(purgeTimer);
+    clearInterval(qualityTimer);
     server.close(() => {
       void pool.end().finally(() => process.exit(0));
     });

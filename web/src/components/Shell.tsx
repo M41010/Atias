@@ -82,7 +82,7 @@ function DataNotice() {
   // Esta pantalla sí muestra lo que han enviado de verdad: no debe decir que es simulada.
   const pathname = usePathname();
   const real = ["/videos", "/enlaces", "/cosecha"].some((path) => pathname.startsWith(path));
-  return <>{real ? "Prototipo: vídeos y datos reales de esta prueba. Aún no se analizan." : SIMULATED_NOTICE}</>;
+  return <>{real ? "Prototipo: vídeos y datos reales de esta prueba. Aún no se cuentan frutos." : SIMULATED_NOTICE}</>;
 }
 
 function Notices() {

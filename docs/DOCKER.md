@@ -7,11 +7,11 @@ Atias se ejecuta en cuatro contenedores:
 | `web` | Aplicación Next.js. Reenvía `/api` a la API, así el móvil solo necesita este puerto | `localhost:3000` |
 | `api` | Express: subidas reanudables (tus), datos de la semana y vídeos recibidos | `localhost:4000` |
 | `db` | PostgreSQL | Solo interno |
-| `analisis` | Python con la pila de visión. Por ahora solo informa de su estado | Solo interno |
+| `analisis` | Python con la pila de visión. Por ahora revisa la calidad de los vídeos recibidos; no cuenta frutos | Solo interno |
 
 Los vídeos se guardan en el volumen `videos` y la base de datos en `postgres`. `docker compose down` los conserva; `docker compose down -v` **los borra**.
 
-La subida y «Vídeos recibidos» usan datos reales. Los kilos y temporeros siguen simulados, porque los vídeos aún no se analizan.
+La subida, los enlaces, la cosecha real y «Vídeos recibidos» usan datos reales. Los kilos y temporeros siguen simulados, porque aún no hay detector que cuente frutos.
 
 Enlaces de prueba: `/subir/demo-invernadero-1`, `-2` y `-3`. Son públicos: desactívalos con `ATIAS_DATOS_DEMO=0` fuera del entorno local.
 

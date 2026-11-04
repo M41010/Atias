@@ -1,5 +1,7 @@
 /** Estado de las subidas del agricultor, sin dependencias de la interfaz ni de la red. */
 
+import type { VideoQuality } from "./quality";
+
 export type Side = "A" | "B";
 export type UploadStatus = "en_cola" | "subiendo" | "recibido" | "interrumpido" | "error";
 export type Upload = {
@@ -17,6 +19,7 @@ export type Upload = {
   errorMessage?: string;
   /** La conexión con el servidor ha fallado y se está reintentando sola. */
   reconnecting?: boolean;
+  calidad?: VideoQuality;
 };
 export type Uploads = Record<string, Upload>;
 export type ServerVideo = {
@@ -27,6 +30,7 @@ export type ServerVideo = {
   sizeBytes: number;
   status: "recibido" | "subiendo";
   receivedAt: string | null;
+  calidad: VideoQuality;
 };
 
 export const MAX_VIDEO_BYTES = 8 * 1024 ** 3;
@@ -58,6 +62,7 @@ export function fromServer(videos: ServerVideo[]): Uploads {
       status: video.status === "recibido" ? "recibido" : "interrumpido",
       progress: video.status === "recibido" ? 1 : 0,
       videoId: video.id,
+      calidad: video.calidad,
     };
   }
   return uploads;
@@ -112,11 +117,26 @@ export function markReconnecting(uploads: Uploads, key: string): Uploads {
 export function markReceived(uploads: Uploads, key: string, videoId: string | undefined): Uploads {
   const upload = uploads[key];
   if (!upload) return uploads;
-  const done: Upload = { ...upload, status: "recibido", progress: 1, videoId };
+  const done: Upload = { ...upload, status: "recibido", progress: 1, videoId, calidad: { estado: "pendiente", avisos: [] } };
   delete done.previous;
   delete done.errorMessage;
   delete done.reconnecting;
   return { ...uploads, [key]: done };
+}
+
+/** Actualiza los resultados de calidad que ya tenga el servidor, sin tocar lo demás. */
+export function mergeQuality(uploads: Uploads, videos: ServerVideo[]): Uploads {
+  const byId = new Map(videos.map((v) => [v.id, v.calidad]));
+  let changed = false;
+  const next: Uploads = { ...uploads };
+  for (const [key, upload] of Object.entries(uploads)) {
+    const calidad = upload.videoId ? byId.get(upload.videoId) : undefined;
+    if (calidad && calidad.estado !== upload.calidad?.estado) {
+      next[key] = { ...upload, calidad };
+      changed = true;
+    }
+  }
+  return changed ? next : uploads;
 }
 
 export function markError(uploads: Uploads, key: string, errorMessage: string): Uploads {

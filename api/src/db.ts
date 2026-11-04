@@ -104,6 +104,17 @@ const MIGRATIONS: { id: string; sql: string }[] = [
       );
     `,
   },
+  {
+    id: "004_calidad_videos",
+    sql: `
+      ALTER TABLE videos
+        ADD COLUMN quality_status text NOT NULL DEFAULT 'pendiente'
+          CHECK (quality_status IN ('pendiente', 'ok', 'avisos', 'error')),
+        ADD COLUMN quality jsonb,
+        ADD COLUMN quality_attempts integer NOT NULL DEFAULT 0,
+        ADD COLUMN quality_checked_at timestamptz;
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */

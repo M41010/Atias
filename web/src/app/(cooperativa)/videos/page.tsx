@@ -1,10 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { CheckCircle2, Play, X } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Play, X } from "lucide-react";
 import { useState } from "react";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
 import { fmtDate } from "@/lib/format";
+import { qualityMessages } from "@/lib/quality";
 import { useDocumentTitle } from "@/lib/hooks";
 import { fetchHarvestList, fetchHarvestOverview, type HarvestOverview } from "@/lib/serverApi";
 import { CROPS } from "@/lib/simulated";
@@ -57,6 +58,14 @@ function SideCell({ video, onPlay }: { video?: ServerVideo; onPlay: (video: Serv
         {video.fileName} · {formatSize(video.sizeBytes)}
       </span>
       {video.receivedAt && <span className="block text-xs text-muted">{fmtDate(video.receivedAt)}</span>}
+      {video.calidad.estado === "pendiente" && <span className="block text-xs text-muted">Revisando la imagen…</span>}
+      {video.calidad.estado === "error" && <span className="block text-xs text-muted">No se ha podido revisar la imagen</span>}
+      {qualityMessages(video.calidad).map((message) => (
+        <span key={message} className="mt-0.5 flex items-center gap-1 text-xs font-medium text-warn-ink">
+          <AlertTriangle size={13} className="shrink-0" aria-hidden />
+          {message}
+        </span>
+      ))}
       <button
         type="button"
         onClick={() => onPlay(video)}
@@ -154,7 +163,7 @@ export default function VideosPage() {
   const header = (
     <PageHeader
       title="Vídeos recibidos"
-      description="Lo que ha enviado cada agricultor. Se actualiza solo. Aún no se analizan: los kilos del resto de la app siguen simulados."
+      description="Lo que ha enviado cada agricultor. Se actualiza solo. Aún no se cuentan frutos: los kilos del resto de la app siguen simulados."
       actions={harvests.data && harvests.data.length > 0 ? (
         <label className="flex items-center gap-2 text-sm text-muted">
           <span className="sr-only md:not-sr-only">Recolección</span>
