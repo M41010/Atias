@@ -38,7 +38,7 @@ La estimación sale de la propia fruta filmada en cada hilera, no de medias hist
 
 - Cultivos iniciales: tomate cherry y pimiento (madurez por color) y pepino (madurez por calibre).
 - Cada resultado distingue dos cifras que nunca se mezclan: **kg maduros observados** en la captura y **previsión de la semana siguiente**, rotulada como experimental.
-- La cifra de kg se destaca como valor central con su rango.
+- La cifra para planificar la venta es la previsión, destacada como valor central con su rango, mientras esté sin validar se rotula como experimental. Lo observado queda como dato de apoyo.
 - Temporeros: kg previstos ÷ (kg por jornal × días disponibles), por cultivo y ajustable por la cooperativa.
 - Desglose por cultivo, invernadero, hilera y tramo de hilera. No se da detalle por planta exacta porque no hay marcadores físicos.
 - Muestra fecha y hora de captura, estado del análisis, advertencias y comparación con la cosecha real cuando exista.
