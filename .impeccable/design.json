@@ -1,0 +1,509 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T14:38:27.700Z",
+  "title": "Design System: Atias",
+  "extensions": {
+    "colorMeta": {
+      "brand": {
+        "role": "primary",
+        "displayName": "Verde Hoja",
+        "canonical": "#17803d",
+        "tonalRamp": [
+          "#001003",
+          "#012e10",
+          "#035022",
+          "#047534",
+          "#389854",
+          "#69ba7c",
+          "#a6d8af",
+          "#e4f3e6"
+        ]
+      },
+      "brand-ink": {
+        "role": "primary",
+        "displayName": "Verde Hoja Tinta",
+        "canonical": "#11632f",
+        "tonalRamp": [
+          "#001003",
+          "#012e11",
+          "#035022",
+          "#26723d",
+          "#4b955e",
+          "#76b784",
+          "#acd5b4",
+          "#e5f3e8"
+        ]
+      },
+      "brand-soft": {
+        "role": "primary",
+        "displayName": "Verde Hoja Suave",
+        "canonical": "#e7f4ea",
+        "tonalRamp": [
+          "#080c09",
+          "#1f2721",
+          "#3b453d",
+          "#59655c",
+          "#7a867d",
+          "#9ea8a0",
+          "#c4cbc6",
+          "#edefed"
+        ]
+      },
+      "warn": {
+        "role": "secondary",
+        "displayName": "Ámbar Señal",
+        "canonical": "#c98a0c",
+        "tonalRamp": [
+          "#130900",
+          "#342100",
+          "#5a3b02",
+          "#825803",
+          "#ad7605",
+          "#d19940",
+          "#e7c38f",
+          "#f9eddc"
+        ]
+      },
+      "warn-ink": {
+        "role": "secondary",
+        "displayName": "Ámbar Tinta",
+        "canonical": "#77500a",
+        "tonalRamp": [
+          "#130900",
+          "#342000",
+          "#5a3b01",
+          "#805817",
+          "#a37a3d",
+          "#c49e69",
+          "#dec5a3",
+          "#f5ede2"
+        ]
+      },
+      "warn-soft": {
+        "role": "secondary",
+        "displayName": "Ámbar Suave",
+        "canonical": "#fdf3d7",
+        "tonalRamp": [
+          "#0e0b03",
+          "#2b2412",
+          "#4a412a",
+          "#696148",
+          "#8b8269",
+          "#ada58e",
+          "#cec9ba",
+          "#f0eee9"
+        ]
+      },
+      "warn-line": {
+        "role": "secondary",
+        "displayName": "Ámbar Línea",
+        "canonical": "#f3dd9f",
+        "tonalRamp": [
+          "#100a00",
+          "#2f2401",
+          "#514001",
+          "#735f22",
+          "#958045",
+          "#b6a46f",
+          "#d5c9a7",
+          "#f2eee4"
+        ]
+      },
+      "bad-ink": {
+        "role": "tertiary",
+        "displayName": "Rojo Fallo",
+        "canonical": "#a42b1a",
+        "tonalRamp": [
+          "#1e0100",
+          "#4b0500",
+          "#7e0e00",
+          "#a9301f",
+          "#d15542",
+          "#f0806d",
+          "#ffb3a5",
+          "#ffe9e4"
+        ]
+      },
+      "ok-ink": {
+        "role": "tertiary",
+        "displayName": "Verde Estado Tinta",
+        "canonical": "#1a6836",
+        "tonalRamp": [
+          "#001004",
+          "#002e12",
+          "#015024",
+          "#277240",
+          "#4b9560",
+          "#77b786",
+          "#add5b5",
+          "#e6f2e8"
+        ]
+      },
+      "ok-soft": {
+        "role": "tertiary",
+        "displayName": "Verde Estado Suave",
+        "canonical": "#e5f4e9",
+        "tonalRamp": [
+          "#080d09",
+          "#1e2821",
+          "#39463d",
+          "#58655c",
+          "#79867d",
+          "#9ca9a0",
+          "#c3ccc6",
+          "#ecefed"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Lienzo",
+        "canonical": "#f7f8f6",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252524",
+          "#414241",
+          "#616160",
+          "#828381",
+          "#a4a5a4",
+          "#c9c9c8",
+          "#eeeeee"
+        ]
+      },
+      "sunken": {
+        "role": "neutral",
+        "displayName": "Hundido",
+        "canonical": "#eef0ec",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#242523",
+          "#41433f",
+          "#60625e",
+          "#81837f",
+          "#a4a6a2",
+          "#c8c9c7",
+          "#eeeeee"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Superficie",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "#16201a",
+        "tonalRamp": [
+          "#080c0a",
+          "#1f2722",
+          "#3a453e",
+          "#59655d",
+          "#7a867e",
+          "#9da8a1",
+          "#c4cbc6",
+          "#edefed"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Gris Texto",
+        "canonical": "#5a665e",
+        "tonalRamp": [
+          "#080c09",
+          "#1f2822",
+          "#3a453e",
+          "#59655d",
+          "#79867e",
+          "#9da8a1",
+          "#c4cbc6",
+          "#edefed"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Línea",
+        "canonical": "#e3e6e1",
+        "tonalRamp": [
+          "#0a0b0a",
+          "#242623",
+          "#40433f",
+          "#60625e",
+          "#81837f",
+          "#a3a6a2",
+          "#c8cac7",
+          "#eeefee"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Línea Fuerte",
+        "canonical": "#c9cec7",
+        "tonalRamp": [
+          "#0a0c09",
+          "#232622",
+          "#3f433e",
+          "#5e635d",
+          "#7f847d",
+          "#a2a6a1",
+          "#c7cac6",
+          "#eeefed"
+        ]
+      },
+      "control": {
+        "role": "neutral",
+        "displayName": "Borde de Control",
+        "canonical": "#89938b",
+        "tonalRamp": [
+          "#090c09",
+          "#202722",
+          "#3c453e",
+          "#5b645d",
+          "#7b857d",
+          "#9fa8a1",
+          "#c5cbc6",
+          "#edefed"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "La cifra de la decisión, una por vista."
+      },
+      "metric": {
+        "displayName": "Metric",
+        "purpose": "Cifras de apoyo en el mismo panel y resultado lateral."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Título de página."
+      },
+      "unit": {
+        "displayName": "Unit",
+        "purpose": "Unidades junto a la cifra; 1.125rem junto a Metric."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Título de panel y de estados vacío o de error."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descripciones, rangos y navegación."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Rótulo sobre una cifra, enlaces de acción, botones y selector."
+      },
+      "table": {
+        "displayName": "Table",
+        "purpose": "Celdas de tabla."
+      },
+      "label-small": {
+        "displayName": "Label Small",
+        "purpose": "Cabeceras de tabla y pastillas."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Línea secundaria en celda, «parcial» y mensaje de campo inválido."
+      }
+    },
+    "shadows": [
+      {
+        "name": "panel-rest",
+        "value": "0 1px 2px rgb(20 30 24 / 0.04)",
+        "purpose": "Reposo de panel; única sombra del sistema."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms",
+        "purpose": "Color de fondo, borde y texto en hover y activo; giro de flecha y aparición de tramos."
+      },
+      {
+        "name": "recalc-number",
+        "value": "220ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Transición de la cifra al recalcularse."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción de edición o reintento; es el único botón con estilo propio.",
+      "html": "<button type=\"button\" class=\"ds-btn-secondary\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/></svg>Restablecer</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1px solid var(--color-line-strong);border-radius:6px;background:var(--color-surface);color:var(--color-ink);font-size:14px;font-weight:500;cursor:pointer;transition:background-color 150ms,border-color 150ms}.ds-btn-secondary:hover:not(:disabled){background:var(--color-sunken)}.ds-btn-secondary:active:not(:disabled){border-color:var(--color-muted)}.ds-btn-secondary:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}.ds-btn-secondary:disabled{cursor:not-allowed;opacity:.55}"
+    },
+    {
+      "name": "Campo numérico",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Parámetro editable que recalcula al instante; a la derecha, con cifras tabulares.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Días de recolección</span><span class=\"ds-field-row\"><input class=\"ds-input\" value=\"4\" inputmode=\"decimal\"><span class=\"ds-field-unit\">días</span></span></label>",
+      "css": ".ds-field{display:block;font-size:14px;color:var(--color-ink)}.ds-field-label{display:block;margin-bottom:4px;font-weight:500}.ds-field-row{display:flex;align-items:center;gap:8px}.ds-field-unit{color:var(--color-muted)}.ds-input{width:96px;min-height:36px;padding:4px 10px;border:1px solid var(--color-control);border-radius:6px;background:var(--color-surface);color:var(--color-ink);font-size:14px;text-align:right;font-variant-numeric:tabular-nums;transition:border-color 150ms}.ds-input:hover{border-color:var(--color-ink)}.ds-input:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}.ds-input[aria-invalid=\"true\"]{border-color:var(--color-bad-ink)}"
+    },
+    {
+      "name": "Selector de recolección",
+      "kind": "input",
+      "refersTo": "select-harvest",
+      "description": "Cambia la semana que se consulta; va en la cabecera de página.",
+      "html": "<label class=\"ds-picker\">Recolección <select class=\"ds-select\"><option>2–5 nov</option><option>26–29 oct</option></select></label>",
+      "css": ".ds-picker{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--color-muted)}.ds-select{min-height:40px;padding:0 12px;border:1px solid var(--color-control);border-radius:6px;background:var(--color-surface);color:var(--color-ink);font-size:14px;font-weight:500;transition:border-color 150ms}.ds-select:hover{border-color:var(--color-ink)}.ds-select:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}"
+    },
+    {
+      "name": "Navegación lateral",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Secciones principales con marca textual; activo en verde suave.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Principal\"><a class=\"ds-nav-brand\" href=\"#\">Atias</a><a class=\"ds-nav-link ds-nav-active\" href=\"#\" aria-current=\"page\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>Resumen</a><a class=\"ds-nav-link\" href=\"#\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 21V10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v11\"/><path d=\"M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 1.132-1.803l7.95-3.974a2 2 0 0 1 1.837 0l7.948 3.974A2 2 0 0 1 22 8z\"/><path d=\"M6 13h12\"/><path d=\"M6 17h12\"/></svg>Invernaderos</a></nav>",
+      "css": ".ds-nav{display:grid;gap:4px;width:200px;padding:20px 12px;background:var(--color-surface)}.ds-nav-brand{margin-bottom:24px;padding:0 12px;font-size:18px;font-weight:600;letter-spacing:-.025em;color:var(--color-brand-ink);text-decoration:none}.ds-nav-link{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border-radius:6px;font-size:14px;color:var(--color-muted);text-decoration:none;transition:background-color 150ms,color 150ms}.ds-nav-link:hover{background:var(--color-sunken);color:var(--color-ink)}.ds-nav-link:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}.ds-nav-active,.ds-nav-active:hover{background:var(--color-brand-soft);color:var(--color-brand-ink);font-weight:600}"
+    },
+    {
+      "name": "Pastillas de estado",
+      "kind": "chip",
+      "refersTo": "pill-warn",
+      "description": "Estado siempre con palabra; ámbar para lo no probado.",
+      "html": "<span class=\"ds-pills\"><span class=\"ds-pill ds-pill-warn\">Experimental</span><span class=\"ds-pill ds-pill-ok\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9-5.5 5.5L8 12\"/></svg>Analizado</span><span class=\"ds-pill ds-pill-warn\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/></svg>Con advertencias</span><span class=\"ds-pill ds-pill-neutral\">Analizando</span><span class=\"ds-pill ds-pill-brand\">Nuevo</span></span>",
+      "css": ".ds-pills{display:flex;flex-wrap:wrap;gap:6px}.ds-pill{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;border-radius:9999px;padding:2px 8px;font-size:12px;font-weight:500}.ds-pill-warn{background:var(--color-warn-soft);color:var(--color-warn-ink)}.ds-pill-ok{background:var(--color-ok-soft);color:var(--color-ok-ink)}.ds-pill-neutral{background:var(--color-sunken);color:var(--color-muted)}.ds-pill-brand{background:var(--color-brand-soft);color:var(--color-brand-ink)}"
+    },
+    {
+      "name": "Bloque de cifra",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Panel único: cifra de decisión con rótulo, unidad, banda de rango y frase de rango. Valores de muestra.",
+      "html": "<section class=\"ds-panel\"><div class=\"ds-figure\"><p class=\"ds-figure-label\">Previsión para la venta <span class=\"ds-figure-pill\">Experimental</span></p><p class=\"ds-figure-value\">4.708 <span class=\"ds-figure-unit\">kg</span></p><div class=\"ds-band\" aria-hidden=\"true\"><div class=\"ds-band-range\"></div><div class=\"ds-band-tick\"></div></div><p class=\"ds-figure-note\">Entre 3.892 y 5.527 kg</p></div></section>",
+      "css": ".ds-panel{overflow:hidden;border:1px solid var(--color-line);border-radius:8px;background:var(--color-surface);box-shadow:0 1px 2px rgb(20 30 24/.04);color:var(--color-ink)}.ds-figure{padding:20px}.ds-figure-label{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0;font-size:14px;font-weight:500}.ds-figure-pill{border-radius:9999px;padding:2px 8px;background:var(--color-warn-soft);color:var(--color-warn-ink);font-size:12px;font-weight:500}.ds-figure-value{margin:8px 0 0;font-size:48px;line-height:1;font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums}.ds-figure-unit{font-size:20px;font-weight:500;letter-spacing:0;color:var(--color-muted)}.ds-band{position:relative;margin-top:12px;height:6px;border-radius:9999px;background:var(--color-sunken)}.ds-band-range{position:absolute;inset-block:0;left:68%;width:28%;border-radius:9999px;background:color-mix(in oklab,var(--color-warn) 30%,transparent)}.ds-band-tick{position:absolute;inset-block:-2px;left:82%;width:2px;border-radius:9999px;background:var(--color-warn-ink)}.ds-figure-note{margin:8px 0 0;font-size:14px;color:var(--color-muted)}"
+    },
+    {
+      "name": "Tabla de datos",
+      "kind": "custom",
+      "refersTo": "table-cell",
+      "description": "Tabla compacta; la fila entera abre el detalle. Valores de muestra.",
+      "html": "<table class=\"ds-table\"><thead><tr><th scope=\"col\">Invernadero</th><th scope=\"col\" class=\"ds-num\">Observado (kg)</th><th scope=\"col\" class=\"ds-num\">Previsión (kg) <abbr class=\"ds-exp\" title=\"Experimental, sin validar\">Exp.</abbr></th><th scope=\"col\" aria-label=\"Abrir\"></th></tr></thead><tbody><tr class=\"ds-row\"><th scope=\"row\"><a href=\"#\">Invernadero 1</a><span class=\"ds-sub\">Tomate cherry</span></th><td class=\"ds-num\">1.355</td><td class=\"ds-num\">1.865</td><td class=\"ds-go\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></td></tr><tr class=\"ds-row\"><th scope=\"row\"><a href=\"#\">Invernadero 3</a><span class=\"ds-sub\">Pepino</span></th><td class=\"ds-num\">932<span class=\"ds-partial\">parcial</span></td><td class=\"ds-num\">1.316<span class=\"ds-partial\">parcial</span></td><td class=\"ds-go\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></td></tr></tbody></table>",
+      "css": ".ds-table{width:100%;border-collapse:collapse;background:var(--color-surface);color:var(--color-ink);font-size:14px}.ds-table thead th{padding:10px 20px;border-bottom:1px solid var(--color-line);background:var(--color-canvas);color:var(--color-muted);font-size:12px;font-weight:500;text-align:left;white-space:nowrap}.ds-table tbody th{padding:11px 20px;border-bottom:1px solid var(--color-line);font-weight:500;text-align:left}.ds-table td{padding:11px 20px;border-bottom:1px solid var(--color-line);vertical-align:middle}.ds-table tbody tr:last-child th,.ds-table tbody tr:last-child td{border-bottom:0}.ds-table .ds-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.ds-row{position:relative;transition:background-color 150ms}.ds-row:hover{background:var(--color-canvas)}.ds-row a{color:var(--color-ink);text-decoration:none}.ds-row a::after{content:\"\";position:absolute;inset:0}.ds-row a:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}.ds-sub{display:block;font-size:12px;font-weight:400;color:var(--color-muted)}.ds-partial{display:block;font-size:12px;color:var(--color-warn-ink)}.ds-exp{margin-left:4px;border-radius:9999px;padding:0 6px;background:var(--color-warn-soft);color:var(--color-warn-ink);font-size:11px;font-weight:500;text-decoration:none}.ds-table td.ds-go{width:32px;padding-left:0;color:var(--color-muted)}"
+    },
+    {
+      "name": "Franja de datos simulados",
+      "kind": "custom",
+      "refersTo": "notice-simulated",
+      "description": "Aviso fijo, en todas las pantallas, mientras los datos sean simulados.",
+      "html": "<p class=\"ds-notice\" role=\"status\">Datos simulados: ninguna cifra procede de un invernadero real ni indica la precisión del sistema.</p>",
+      "css": ".ds-notice{margin:0;padding:8px 16px;border-bottom:1px solid var(--color-warn-line);background:var(--color-warn-soft);color:var(--color-warn-ink);font-size:14px;font-weight:500;text-align:center}"
+    },
+    {
+      "name": "Lista de advertencias",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "Advertencias con severidad por icono, mensaje y enlace a la hilera.",
+      "html": "<ul class=\"ds-warnings\"><li><svg class=\"ds-w-bad\" xmlns=\"http://www.w3.org/2000/svg\" width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/></svg><div class=\"ds-w-text\"><p class=\"ds-w-scope\">Invernadero 2 · Hilera 3 · Lado B</p><p>Imagen demasiado oscura. Pide que se repita la grabación.</p></div><a href=\"#\">Ver hilera <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></a></li><li><svg class=\"ds-w-warn\" xmlns=\"http://www.w3.org/2000/svg\" width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4\"/><path d=\"M12 8h.01\"/></svg><div class=\"ds-w-text\"><p class=\"ds-w-scope\">Invernadero 3 · Hilera 4</p><p>Falta analizar la hilera 4.</p></div><a href=\"#\">Ver hilera <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></a></li></ul>",
+      "css": ".ds-warnings{margin:0;padding:0;list-style:none;background:var(--color-surface);font-size:14px;color:var(--color-ink)}.ds-warnings li{display:flex;gap:12px;padding:12px 20px}.ds-warnings li+li{border-top:1px solid var(--color-line)}.ds-w-bad,.ds-w-warn{flex-shrink:0;margin-top:2px}.ds-w-bad{color:var(--color-bad-ink)}.ds-w-warn{color:var(--color-warn-ink)}.ds-w-text{flex:1;min-width:0}.ds-w-text p{margin:0;color:var(--color-muted)}.ds-w-text .ds-w-scope{font-weight:500;color:var(--color-ink)}.ds-warnings a{display:flex;align-items:center;gap:2px;align-self:center;white-space:nowrap;font-weight:500;color:var(--color-brand-ink);text-decoration:none;text-underline-offset:3px}.ds-warnings a:hover{text-decoration:underline}.ds-warnings a:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Cifra con su Margen",
+    "overview": "Atias es un panel de gestión del estándar del sector, a la altura de Linear y Stripe en orden y precisión. Toda la composición existe para que dos cifras, kilos que vender y personas que contratar, se lean sin abrir nada, y para que cada una lleve visible su rango, su estado y su procedencia. La cifra destaca por tamaño y peso; su margen la acompaña siempre.\n\nLa densidad es de herramienta de trabajo: tablas compactas, texto base de 14 px, líneas de 1 px y paneles blancos sobre un fondo gris muy claro. El color no decora: el verde señala acción y selección, el ámbar marca lo que aún no está probado y el rojo, lo que ha fallado. La superficie no cambia de carácter entre pantallas; solo cambia el dato.\n\nEl sistema rechaza cualquier disfraz agrícola y la fila de tarjetas sueltas sin relación entre sí.",
+    "keyCharacteristics": [
+      "Fondo gris muy claro, superficies blancas y tinta casi negra.",
+      "Una familia tipográfica, Inter, con cifras tabulares en todo dato numérico.",
+      "Líneas de 1 px y radios pequeños; profundidad casi nula.",
+      "Ámbar reservado a lo experimental, lo simulado y lo parcial.",
+      "Las cifras relacionadas comparten panel, separadas por líneas.",
+      "Recalcular es la única animación con significado: la cifra transita hacia su nuevo valor."
+    ],
+    "rules": [
+      {
+        "name": "La Regla del Ámbar Honesto",
+        "body": "El ámbar significa «todavía no probado»: experimental, simulado, parcial o provisional. Si un dato está validado, no lleva ámbar; si no lo está, no se le quita.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Verde Medido",
+        "body": "El verde es para acción, selección y foco, con una extensión de datos: la banda de lo observado, que así se distingue a primera vista de la previsión en ámbar. El contrato de dirección lo limitaba a acción y selección; se registra lo construido.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla Nunca Solo Color",
+        "body": "Todo estado lleva palabra o icono con nombre accesible. Una pastilla sin texto o un punto de color no son un estado.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de la Cifra Tabular",
+        "body": "Toda cifra que se compara o se recalcula usa numerales tabulares, y en tabla va alineada a la derecha. Una columna de kilos debe poder leerse por posición.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla de la Cifra Principal",
+        "body": "El tamaño Display aparece una sola vez por vista y se reserva a la decisión. Si una pantalla no tiene decisión principal, su cifra mayor es Metric.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla de la Frase",
+        "body": "Rótulos y cabeceras se escriben en minúscula de frase, sin versales ni tracking abierto. El orden lo da el peso.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Panel Único",
+        "body": "Las cifras que se leen juntas viven en un solo panel, divididas por líneas de 1 px. Tres tarjetas sueltas no sirven para comparar.",
+        "section": "layout"
+      },
+      {
+        "name": "La Regla de la Línea Primero",
+        "body": "Para separar se usa una línea o un cambio de tono. Una sombra nueva no es una forma de dar importancia.",
+        "section": "elevation"
+      },
+      {
+        "name": "La Regla del Rango Adjunto",
+        "body": "Una cifra destacada de kilos nunca aparece sin su rango en texto. La banda solo lo refuerza: es decorativa para el lector de pantalla y la frase lleva el dato.",
+        "section": "components"
+      },
+      {
+        "name": "La Regla del Rótulo Experimental",
+        "body": "Toda previsión lleva su rótulo ámbar visible junto a la cifra o en la cabecera de su columna, y también la cifra destacada de temporeros que se deriva de ella.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do usa los tokens de color para todo color; el único literal admitido es la sombra de reposo de panel.",
+      "Do coloca lo observado y lo previsto como cifras separadas, con su rótulo y su color de banda.",
+      "Do marca lo parcial en cada cifra afectada, con pastilla en bloques de cifra y la palabra «parcial» en celdas.",
+      "Do muestra los estados de carga, error y vacío con los tratamientos de panel establecidos, y explica qué ocurrirá después.",
+      "Do limita las transiciones de estado a 150 ms y respeta la preferencia de movimiento reducido en giros y pulsos.",
+      "Do usa iconos SVG de trazo de la misma familia (Lucide), con 12–22 px y ocultos al lector salvo que transmitan estado."
+    ],
+    "donts": [
+      "Don't añadas disfraz agrícola: nada de ilustraciones de fruta, texturas de tierra ni paletas temáticas.",
+      "Don't compongas una fila de tarjetas sueltas para cifras que se leen juntas.",
+      "Don't mezcles observado y previsión en una misma cifra, ni presentes una previsión sin su rótulo experimental.",
+      "Don't uses el ámbar como acento decorativo ni Ámbar Señal como texto.",
+      "Don't comuniques un estado solo con color.",
+      "Don't escribas rótulos en versales ni con tracking abierto.",
+      "Don't añadas sombras para dar importancia ni animes el dato salvo para mostrar un recálculo."
+    ]
+  }
+}

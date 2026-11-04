@@ -1,0 +1,304 @@
+"use client";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertTriangle, ArrowLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  EmptyState,
+  ErrorState,
+  ForecastHeader,
+  HarvestPicker,
+  PageHeader,
+  PartialNote,
+  Panel,
+  Pill,
+  RangeBand,
+  Skeleton,
+  StatusPill,
+  WarningList,
+} from "@/components/ui";
+import { type GreenhouseRow, type HileraRow, markSeen } from "@/lib/api";
+import { fmtBetween, fmtDate, fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
+import { queryKeys, useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
+import type { Video } from "@/lib/simulated";
+
+const STATUS_WORD = { analizado: "analizado", analizando: "analizando", problema: "con problema" };
+
+function VideoSummary({ videos }: { videos: Video[] }) {
+  return (
+    <a href="#estado-analisis" className="text-muted underline-offset-3 hover:text-ink hover:underline">
+      {videos.map((v) => `${v.lado}: ${STATUS_WORD[v.status]}`).join(" · ")}
+    </a>
+  );
+}
+
+function HileraRows({ hilera, videos, warned, startOpen }: { hilera: HileraRow; videos: Video[]; warned: boolean; startOpen: boolean }) {
+  const [open, setOpen] = useState(startOpen);
+  if (!hilera.observed || !hilera.forecast) {
+    return (
+      <tr id={`hilera-${hilera.n}`} className="scroll-mt-16">
+        <th scope="row">Hilera {hilera.n}</th>
+        <td className="num text-muted" colSpan={2}>Pendiente de análisis</td>
+        <td className="num hidden text-muted sm:table-cell">—</td>
+        <td className="hidden text-xs lg:table-cell"><VideoSummary videos={videos} /></td>
+      </tr>
+    );
+  }
+  return (
+    <>
+      <tr id={`hilera-${hilera.n}`} className="scroll-mt-16">
+        <th scope="row">
+          <button
+            type="button"
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+            className="-mx-1 flex min-h-8 items-center gap-1.5 rounded px-1 font-medium transition-colors duration-150 hover:text-brand-ink"
+          >
+            <motion.span animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.15 }} className="flex">
+              <ChevronRight size={15} aria-hidden />
+            </motion.span>
+            Hilera {hilera.n}
+            {warned && <AlertTriangle size={14} className="text-bad-ink" aria-label="Con advertencia" />}
+          </button>
+        </th>
+        <td className="num">
+          {fmtKg(hilera.observed.kg)}
+          <span className="hidden text-xs text-muted lg:block">{fmtRange(hilera.observed)}</span>
+        </td>
+        <td className="num">
+          {fmtKg(hilera.forecast.kg)}
+          <span className="hidden text-xs text-muted lg:block">{fmtRange(hilera.forecast)}</span>
+        </td>
+        <td className="num hidden sm:table-cell">{fmtInt(hilera.matureFruits ?? 0)}</td>
+        <td className="hidden text-xs lg:table-cell"><VideoSummary videos={videos} /></td>
+      </tr>
+      <AnimatePresence initial={false}>
+        {open &&
+          hilera.tramos.map((t) => (
+            <motion.tr
+              key={t.n}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="bg-canvas text-[0.8125rem]"
+            >
+              <th scope="row" className="pl-11! font-normal! text-muted">Tramo {t.n}</th>
+              <td className="num">
+                {fmtKg(t.observed.kg)}
+                <span className="hidden text-xs text-muted lg:block">{fmtRange(t.observed)}</span>
+              </td>
+              <td className="num">
+                {fmtKg(t.forecast.kg)}
+                <span className="hidden text-xs text-muted lg:block">{fmtRange(t.forecast)}</span>
+              </td>
+              <td className="num hidden sm:table-cell">{fmtInt(t.matureFruits)}</td>
+              <td className="hidden lg:table-cell" />
+            </motion.tr>
+          ))}
+      </AnimatePresence>
+    </>
+  );
+}
+
+function Comparison({ g }: { g: GreenhouseRow }) {
+  if (g.realKg === null) {
+    return (
+      <p className="px-5 py-4 text-sm text-muted">
+        Aún no hay cosecha pesada para esta recolección. Cuando se registre, aquí se comparará con la previsión.
+      </p>
+    );
+  }
+  return (
+    <>
+      <dl className="grid grid-cols-3 divide-x divide-line">
+        <div className="p-5">
+          <dt className="flex flex-wrap items-center gap-1.5 text-sm text-muted">Previsión <Pill tone="warn">Experimental</Pill></dt>
+          <dd className="mt-1 text-lg font-semibold tabular-nums">{fmtKg(g.forecast.kg)} kg</dd>
+        </div>
+        <div className="p-5">
+          <dt className="text-sm text-muted">Cosechado</dt>
+          <dd className="mt-1 text-lg font-semibold tabular-nums">{fmtKg(g.realKg)} kg</dd>
+        </div>
+        <div className="p-5">
+          <dt className="text-sm text-muted">Error</dt>
+          <dd className="mt-1 text-lg font-semibold tabular-nums">{g.errorPct === null ? "—" : fmtPct(g.errorPct)}</dd>
+        </div>
+      </dl>
+      <p className="border-t border-line px-5 py-3 text-sm text-muted">
+        Cosecha simulada: el error comprueba el cálculo, no la precisión real.
+      </p>
+    </>
+  );
+}
+
+export default function GreenhousePage() {
+  const { id } = useParams<{ id: string }>();
+  const harvestId = useSelectedHarvest();
+  const client = useQueryClient();
+  const { data: report, isPending, isError, error, refetch } = useReport(harvestId);
+  const greenhouse = report?.greenhouses.find((g) => g.info.id === id);
+  useDocumentTitle(greenhouse?.info.name ?? "Invernadero");
+  const isNew = greenhouse?.isNew ?? false;
+
+  const { mutate: seen } = useMutation({
+    mutationFn: () => markSeen(harvestId, id),
+    onSuccess: () => client.invalidateQueries({ queryKey: queryKeys.report(harvestId) }),
+  });
+  useEffect(() => {
+    if (isNew) seen();
+  }, [isNew, seen]);
+
+  const [target, setTarget] = useState<number | null>(null);
+  const hasData = Boolean(greenhouse);
+  useEffect(() => {
+    const match = window.location.hash.match(/^#hilera-(\d+)$/);
+    if (!hasData || !match) return;
+    const raf = requestAnimationFrame(() => setTarget(Number(match[1])));
+    return () => cancelAnimationFrame(raf);
+  }, [hasData]);
+  useEffect(() => {
+    if (target !== null) document.getElementById(`hilera-${target}`)?.scrollIntoView({ block: "center" });
+  }, [target]);
+
+  const back = (
+    <Link href={`/invernaderos?recoleccion=${encodeURIComponent(harvestId)}`} className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted transition-colors duration-150 hover:text-ink">
+      <ArrowLeft size={15} aria-hidden />
+      Invernaderos
+    </Link>
+  );
+
+  if (isPending) return <>{back}<Skeleton /></>;
+  if (isError) return <>{back}<ErrorState message={error.message} onRetry={refetch} /></>;
+  if (!greenhouse) {
+    return (
+      <>
+        {back}
+        <PageHeader title="Sin datos para esta recolección" actions={<HarvestPicker selected={harvestId} />} />
+        <EmptyState title="No hay capturas de este invernadero">Elige otra recolección o espera a que el agricultor suba los vídeos.</EmptyState>
+      </>
+    );
+  }
+
+  const g = greenhouse;
+  const scale = g.forecast.max * 1.04;
+  const done = g.videos.filter((v) => v.status !== "analizando").length;
+  const number = "mt-2 text-3xl font-semibold tracking-tight tabular-nums";
+  const partial = <PartialNote missing={g.missingHileras} total={g.hileras.length} />;
+
+  return (
+    <>
+      {back}
+      <PageHeader
+        title={g.info.name}
+        description={
+          <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+            {g.cropName} · {g.variety} · Captura: {fmtDate(g.capturedAt)}
+            <StatusPill status={g.status} />
+          </span>
+        }
+        actions={<HarvestPicker selected={harvestId} />}
+      />
+      <div className="grid gap-5">
+        <Panel>
+          <div className="grid divide-y divide-line md:grid-cols-[1fr_1fr_0.8fr] md:divide-x md:divide-y-0">
+            <div className="p-5">
+              <p className="text-sm font-medium">Fruta madura observada</p>
+              <p className={number}>{fmtKg(g.observed.kg)} <span className="text-lg font-medium text-muted">kg</span></p>
+              <RangeBand range={g.observed} scaleMax={scale} tone="brand" />
+              <p className="mt-2 text-sm text-muted">{fmtBetween(g.observed)}</p>
+              {partial}
+            </div>
+            <div className="p-5">
+              <p className="flex flex-wrap items-center gap-2 text-sm font-medium">Previsión <Pill tone="warn">Experimental</Pill></p>
+              <p className={number}>{fmtKg(g.forecast.kg)} <span className="text-lg font-medium text-muted">kg</span></p>
+              <RangeBand range={g.forecast} scaleMax={scale} tone="warn" />
+              <p className="mt-2 text-sm text-muted">{fmtBetween(g.forecast)} · maduración {g.ripeningPct} %</p>
+              {partial}
+            </div>
+            <div className="p-5">
+              <p className="text-sm font-medium">Frutos maduros</p>
+              <p className={number}>{fmtInt(g.matureFruits)}</p>
+              <ul className="mt-3 text-sm text-muted">
+                {g.classes.map((c) => (
+                  <li key={c.name} className="flex justify-between gap-3">
+                    <span>{g.criterion} {c.name.toLowerCase()}</span>
+                    <span className="tabular-nums">{fmtInt(c.fruits)}</span>
+                  </li>
+                ))}
+              </ul>
+              {partial}
+            </div>
+          </div>
+        </Panel>
+
+        {g.warnings.length > 0 && (
+          <Panel title={`Advertencias (${g.warnings.length})`}>
+            <WarningList warnings={g.warnings} />
+          </Panel>
+        )}
+
+        <Panel title="Por hilera y tramo" description="Abre una hilera para ver sus tramos. No se da detalle por planta porque no hay marcadores físicos.">
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Ámbito</th>
+                  <th scope="col" className="num">Observado (kg)</th>
+                  <th scope="col" className="num"><ForecastHeader /></th>
+                  <th scope="col" className="num hidden sm:table-cell">Frutos maduros</th>
+                  <th scope="col" className="hidden lg:table-cell">Vídeos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {g.hileras.map((h) => (
+                  <HileraRows
+                    key={`${h.n}-${target === h.n}`}
+                    hilera={h}
+                    videos={g.videos.filter((v) => v.hilera === h.n)}
+                    warned={g.warnedHileras.includes(h.n)}
+                    startOpen={target === h.n}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+
+        <div className="grid items-start gap-5 lg:grid-cols-2">
+          <div id="estado-analisis" className="scroll-mt-16">
+            <Panel title="Estado del análisis" description={`${done} de ${g.videos.length} vídeos terminados`}>
+              <div className="overflow-x-auto">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Vídeo</th>
+                      <th scope="col">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {g.videos.map((v) => (
+                      <tr key={`${v.hilera}${v.lado}`}>
+                        <th scope="row" className="font-normal!">
+                          Hilera {v.hilera} · Lado {v.lado}
+                          {v.note && <span className="block text-xs text-muted">{v.note}</span>}
+                        </th>
+                        <td><StatusPill status={v.status} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+          </div>
+          <Panel title="Cosecha real">
+            <Comparison g={g} />
+          </Panel>
+        </div>
+      </div>
+    </>
+  );
+}
