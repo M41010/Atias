@@ -1,4 +1,5 @@
 import { createApp } from "./app.js";
+import { purgeExpiredSessions } from "./auth.js";
 import { createPool, migrate, seedDemo } from "./db.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
 
@@ -15,11 +16,19 @@ await migrate(pool);
 if (process.env.ATIAS_DATOS_DEMO === "1") await seedDemo(pool);
 
 const store = createVideoStore(videoDir);
-const purge = () => purgeExpired(pool, store).catch((error) => console.error("Fallo al limpiar vídeos", error));
+const purge = () =>
+  Promise.all([purgeExpired(pool, store), purgeExpiredSessions(pool)])
+    .catch((error) => console.error("Fallo en la limpieza periódica", error));
 void purge();
 const purgeTimer = setInterval(purge, PURGE_INTERVAL_MS);
 
-const server = createApp({ analysisUrl, pool, store }).listen(port, () => {
+const server = createApp({
+  analysisUrl,
+  pool,
+  store,
+  // En la nube, con HTTPS, debe activarse: la cookie de sesión solo viajará cifrada.
+  secureCookies: process.env.ATIAS_COOKIE_SEGURA === "1",
+}).listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
 });
 

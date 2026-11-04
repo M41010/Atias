@@ -15,6 +15,20 @@ La subida y «Vídeos recibidos» usan datos reales. Los kilos y temporeros sigu
 
 Enlaces de prueba: `/subir/demo-invernadero-1`, `-2` y `-3`. Son públicos: desactívalos con `ATIAS_DATOS_DEMO=0` fuera del entorno local.
 
+## Cuentas de la cooperativa
+
+La web de la cooperativa exige iniciar sesión. Las cuentas se gestionan con un comando, y la contraseña generada solo se muestra una vez:
+
+```powershell
+# Crear una cuenta, o cambiar su contraseña
+docker compose exec api node dist/usuarios.js crear correo@ejemplo.com "Nombre"
+
+# Retirar el acceso
+docker compose exec api node dist/usuarios.js retirar correo@ejemplo.com
+```
+
+En modo desarrollo, usa `npx tsx src/usuarios.ts` en lugar de `node dist/usuarios.js`.
+
 ## Arrancar
 
 Requiere Docker Desktop en marcha.
@@ -44,15 +58,15 @@ Para ver el estado: `docker compose ps`, `http://localhost:4000/salud` y `http:/
 3. Abre en el móvil `http://<esa-ip>:3000/subir/demo-invernadero-1`, conectado a la misma wifi.
 4. Si no carga, revisa si el Firewall de Windows bloquea el puerto 3000.
 
-Mientras esté activo, cualquier equipo de esa red puede entrar, ver lo enviado en «Vídeos recibidos» y usar los enlaces de prueba: la cooperativa aún no tiene contraseña. Usa `docker compose down` al terminar y no lo hagas en una red pública.
+Mientras esté activo, cualquier equipo de esa red puede llegar a la web y usar los enlaces de prueba. La cooperativa está protegida con contraseña, pero sin HTTPS viaja sin cifrar. Usa `docker compose down` al terminar y no lo hagas en una red pública.
 
 ## Antes de pasar a la nube
 
 Las imágenes de `compose.yaml` no llevan secretos ni datos, y no se ejecutan como root. Faltan estas piezas, que dependen de elegir proveedor:
 
 - Registro de imágenes y publicación automática.
-- HTTPS, dominio y **autenticación de la cooperativa**: hoy cualquiera con acceso puede ver sus datos.
+- HTTPS y dominio, con `ATIAS_COOKIE_SEGURA=1`.
 - Almacenamiento de objetos para los vídeos (tus tiene adaptador para S3), base de datos gestionada y copias de seguridad. Cambiar `POSTGRES_PASSWORD` y poner `ATIAS_DATOS_DEMO=0`.
 - Con varias copias de la API: bloqueo de subidas compartido, porque el actual es en memoria.
-- Generar y revocar enlaces desde la cooperativa, y límites de peticiones y de disco.
+- Límites de peticiones y de disco. El bloqueo por intentos de acceso también es en memoria.
 - Una GPU o cola de trabajos si el análisis real lo requiere, a medir con el detector entrenado.

@@ -1,6 +1,9 @@
 import type { FileStore } from "@tus/file-store";
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
+import { createAuthRouter, LoginLimiter } from "./auth.js";
+import { createCooperativeRouter } from "./cooperativa.js";
 import type { Pool } from "./db.js";
+import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
 import { type Link, LINK_HEADER, resolveLink } from "./links.js";
 import { createUploadServer, UPLOADS_PATH } from "./uploads.js";
 
@@ -21,34 +24,19 @@ function validNumber(value: unknown, rule: NumberRule): boolean {
     && value <= rule.max && (!rule.integer || Number.isInteger(value)));
 }
 
-const weeklyColumns = `
-  w.variety, COALESCE(w.hileras, g.default_hileras) AS hileras, w.longitud_m, w.temperatura_c,
-  w.humedad_pct, w.kilos_semana_pasada`;
-
-function weeklyData(row: Record<string, unknown>) {
-  return {
-    variety: row.variety ?? "",
-    hileras: row.hileras,
-    longitudM: row.longitud_m ?? null,
-    temperaturaC: row.temperatura_c ?? null,
-    humedadPct: row.humedad_pct ?? null,
-    kilosSemanaPasada: row.kilos_semana_pasada ?? null,
-  };
-}
-
-function videoDto(row: Record<string, unknown>) {
-  return {
-    id: row.id,
-    hilera: row.hilera,
-    lado: row.lado,
-    fileName: row.file_name,
-    sizeBytes: Number(row.size_bytes),
-    status: row.status,
-    receivedAt: row.received_at ?? null,
-  };
-}
-
-export function createApp({ analysisUrl, pool, store }: { analysisUrl: string; pool: Pool; store: FileStore }): Express {
+export function createApp({
+  analysisUrl,
+  pool,
+  store,
+  secureCookies = false,
+  limiter = new LoginLimiter(),
+}: {
+  analysisUrl: string;
+  pool: Pool;
+  store: FileStore;
+  secureCookies?: boolean;
+  limiter?: LoginLimiter;
+}): Express {
   const app = express();
   app.disable("x-powered-by");
   const uploads = createUploadServer(pool, store);
@@ -187,41 +175,8 @@ export function createApp({ analysisUrl, pool, store }: { analysisUrl: string; p
 
   app.use("/api/enlace", linkRoutes);
 
-  // ---- Cooperativa ----
-  app.get("/api/cooperativa/recolecciones", async (_req, res) => {
-    const { rows } = await pool.query("SELECT id, label FROM harvests ORDER BY starts_on DESC");
-    res.json({ recolecciones: rows.map((r) => ({ id: r.id, etiqueta: r.label })) });
-  });
-
-  app.get("/api/cooperativa/recolecciones/:id", async (req, res) => {
-    const harvest = await pool.query("SELECT id, label FROM harvests WHERE id = $1", [req.params.id]);
-    if (!harvest.rows[0]) {
-      res.status(404).json({ error: "Recolección no encontrada" });
-      return;
-    }
-    const greenhouses = await pool.query(
-      `SELECT g.id, g.name, g.crop, ${weeklyColumns}
-       FROM greenhouses g
-       LEFT JOIN weekly_data w ON w.greenhouse_id = g.id AND w.harvest_id = $1
-       ORDER BY g.name`,
-      [req.params.id],
-    );
-    const videos = await pool.query(
-      "SELECT * FROM videos WHERE harvest_id = $1 AND status = 'recibido' ORDER BY hilera, lado",
-      [req.params.id],
-    );
-    res.json({
-      id: harvest.rows[0].id,
-      etiqueta: harvest.rows[0].label,
-      invernaderos: greenhouses.rows.map((g) => ({
-        id: g.id,
-        nombre: g.name,
-        cultivo: g.crop,
-        datos: weeklyData(g),
-        videos: videos.rows.filter((v) => v.greenhouse_id === g.id).map(videoDto),
-      })),
-    });
-  });
+  app.use("/api/auth", createAuthRouter(pool, limiter, secureCookies));
+  app.use("/api/cooperativa", createCooperativeRouter(pool));
 
   app.use((_req, res) => {
     res.status(404).json({ error: "Ruta no encontrada" });

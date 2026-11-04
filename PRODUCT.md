@@ -47,7 +47,8 @@ La estimación sale de la propia fruta filmada en cada hilera, no de medias hist
 - Las subidas son reanudables. Un vídeo sustituido o quitado se conserva 7 días antes de borrarse.
 - La cooperativa ve en «Vídeos recibidos» lo enviado realmente. Mientras no haya detector, esos vídeos no alimentan los kilos, que siguen simulados.
 - La cooperativa ve los resultados nuevos marcados dentro de la app. No hay avisos externos en el prototipo.
-- Sin decidir: cómo entra la cooperativa y qué permisos tiene.
+- La cooperativa entra con correo y contraseña. Por ahora hay un solo tipo de usuario, y las cuentas se crean con un comando.
+- La cooperativa crea un enlace por invernadero y recolección. Caduca al empezar la recolección, se puede revocar y solo se muestra al crearlo.
 
 ## Brand Commitments
 
