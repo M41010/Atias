@@ -1,10 +1,7 @@
-/**
- * Lógica de la subida del agricultor, sin dependencias de la interfaz. La transferencia es
- * SIMULADA: el progreso avanza con el tiempo y los archivos no se envían a ningún servidor.
- */
+/** Estado de las subidas del agricultor, sin dependencias de la interfaz ni de la red. */
 
 export type Side = "A" | "B";
-export type UploadStatus = "en_cola" | "subiendo" | "recibido" | "interrumpido";
+export type UploadStatus = "en_cola" | "subiendo" | "recibido" | "interrumpido" | "error";
 export type Upload = {
   hilera: number;
   lado: Side;
@@ -13,15 +10,26 @@ export type Upload = {
   status: UploadStatus;
   /** Entre 0 y 1. */
   progress: number;
-  /** Vídeo ya recibido que este sustituye: se conserva hasta recibir el nuevo. */
+  /** Identificador en el servidor, si ya existe. */
+  videoId?: string;
+  /** Vídeo ya recibido que este sustituye: sigue vigente hasta recibir el nuevo. */
   previous?: Upload;
+  errorMessage?: string;
+  /** La conexión con el servidor ha fallado y se está reintentando sola. */
+  reconnecting?: boolean;
 };
 export type Uploads = Record<string, Upload>;
+export type ServerVideo = {
+  id: string;
+  hilera: number;
+  lado: Side;
+  fileName: string;
+  sizeBytes: number;
+  status: "recibido" | "subiendo";
+  receivedAt: string | null;
+};
 
 export const MAX_VIDEO_BYTES = 8 * 1024 ** 3;
-const SIMULATED_BYTES_PER_SECOND = 4 * 1024 ** 2;
-const MIN_SECONDS = 5;
-const MAX_SECONDS = 40;
 
 export const uploadKey = (hilera: number, lado: Side) => `${hilera}-${lado}`;
 
@@ -31,6 +39,28 @@ export function validateVideo(file: { type: string; size: number }): string | nu
   if (file.size === 0) return "El vídeo está vacío. Vuelve a grabarlo.";
   if (file.size > MAX_VIDEO_BYTES) return "El vídeo supera los 8 GB. Graba la hilera con menos calidad.";
   return null;
+}
+
+/**
+ * Convierte lo que hay en el servidor en estado inicial. Una subida sin terminar se muestra
+ * como interrumpida, salvo que ya haya un vídeo vigente en ese lado, que es el que vale.
+ */
+export function fromServer(videos: ServerVideo[]): Uploads {
+  const uploads: Uploads = {};
+  for (const video of videos) {
+    const key = uploadKey(video.hilera, video.lado);
+    if (video.status === "subiendo" && uploads[key]?.status === "recibido") continue;
+    uploads[key] = {
+      hilera: video.hilera,
+      lado: video.lado,
+      fileName: video.fileName,
+      sizeBytes: video.sizeBytes,
+      status: video.status === "recibido" ? "recibido" : "interrumpido",
+      progress: video.status === "recibido" ? 1 : 0,
+      videoId: video.id,
+    };
+  }
+  return uploads;
 }
 
 /** Añade o sustituye el vídeo de un lado: solo sube uno cada vez y el resto espera. */
@@ -53,13 +83,63 @@ export function addUpload(uploads: Uploads, hilera: number, lado: Side, file: { 
 }
 
 /** Cancela una subida. Si sustituía a un vídeo recibido, ese vídeo vuelve a su sitio. */
-export function cancelUpload(uploads: Uploads, hilera: number, lado: Side): Uploads {
-  const key = uploadKey(hilera, lado);
+export function cancelUpload(uploads: Uploads, key: string): Uploads {
   const next = { ...uploads };
   const previous = uploads[key]?.previous;
   if (previous) next[key] = previous;
   else delete next[key];
   return next;
+}
+
+export function removeUpload(uploads: Uploads, key: string): Uploads {
+  const next = { ...uploads };
+  delete next[key];
+  return next;
+}
+
+export function setProgress(uploads: Uploads, key: string, progress: number): Uploads {
+  const upload = uploads[key];
+  if (!upload) return uploads;
+  return { ...uploads, [key]: { ...upload, status: "subiendo", progress: Math.min(1, progress), reconnecting: false } };
+}
+
+export function markReconnecting(uploads: Uploads, key: string): Uploads {
+  const upload = uploads[key];
+  if (!upload || upload.reconnecting) return uploads;
+  return { ...uploads, [key]: { ...upload, reconnecting: true } };
+}
+
+export function markReceived(uploads: Uploads, key: string, videoId: string | undefined): Uploads {
+  const upload = uploads[key];
+  if (!upload) return uploads;
+  const done: Upload = { ...upload, status: "recibido", progress: 1, videoId };
+  delete done.previous;
+  delete done.errorMessage;
+  delete done.reconnecting;
+  return { ...uploads, [key]: done };
+}
+
+export function markError(uploads: Uploads, key: string, errorMessage: string): Uploads {
+  const upload = uploads[key];
+  if (!upload) return uploads;
+  return { ...uploads, [key]: { ...upload, status: "error", errorMessage, reconnecting: false } };
+}
+
+export function requeue(uploads: Uploads, key: string): Uploads {
+  const upload = uploads[key];
+  if (!upload) return uploads;
+  const queued: Upload = { ...upload, status: "en_cola" };
+  delete queued.errorMessage;
+  return { ...uploads, [key]: queued };
+}
+
+/** Siguiente subida que debe arrancar: primero la que estaba en curso, después la cola. */
+export function nextToStart(uploads: Uploads, hasFile: (key: string) => boolean): string | null {
+  const entries = Object.entries(uploads).filter(([key]) => hasFile(key));
+  const running = entries.find(([, u]) => u.status === "subiendo");
+  if (running) return running[0];
+  const queued = entries.find(([, u]) => u.status === "en_cola");
+  return queued ? queued[0] : null;
 }
 
 /** Primer lado sin vídeo: es el siguiente paso que se le propone al agricultor. */
@@ -71,30 +151,6 @@ export function nextPending(uploads: Uploads, hileras: number): string | null {
     }
   }
   return null;
-}
-
-/** Avanza la cola. Sin conexión no cambia nada: la subida queda en pausa y sigue al volver. */
-export function tick(uploads: Uploads, elapsedSeconds: number, online: boolean): Uploads {
-  if (!online) return uploads;
-  const active = Object.values(uploads).filter((u) => u.status === "subiendo" || u.status === "en_cola");
-  if (active.length === 0) return uploads;
-  const current = active.find((u) => u.status === "subiendo") ?? active[0];
-  const duration = Math.min(MAX_SECONDS, Math.max(MIN_SECONDS, current.sizeBytes / SIMULATED_BYTES_PER_SECOND));
-  const progress = Math.min(1, current.progress + elapsedSeconds / duration);
-  const updated: Upload = { ...current, progress, status: progress >= 1 ? "recibido" : "subiendo" };
-  if (updated.status === "recibido") delete updated.previous;
-  return { ...uploads, [uploadKey(current.hilera, current.lado)]: updated };
-}
-
-/** Al recargar, los archivos en curso ya no están en memoria y hay que volver a elegirlos. */
-export function restoreAfterReload(uploads: Uploads): Uploads {
-  return Object.fromEntries(
-    Object.entries(uploads).map(([key, u]) => {
-      if (u.status !== "subiendo" && u.status !== "en_cola") return [key, u];
-      // Si sustituía a un vídeo recibido, ese vídeo sigue siendo el válido.
-      return [key, u.previous ?? { ...u, status: "interrumpido" as const, progress: 0 }];
-    }),
-  );
 }
 
 /** Última hilera con vídeo: no se pueden indicar menos hileras sin perderlo. */

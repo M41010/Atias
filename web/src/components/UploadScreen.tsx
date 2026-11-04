@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertTriangle, Camera, CheckCircle2, ChevronDown, FolderOpen, Info, Trash2, Undo2, WifiOff, X } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, ChevronDown, FolderOpen, Info, RefreshCw, Trash2, Undo2, WifiOff, X } from "lucide-react";
 import { type ChangeEvent, useId, useState } from "react";
 import { Panel, Pill } from "@/components/ui";
 import { useDocumentTitle } from "@/lib/hooks";
-import { CROPS, DEFAULT_PARAMS, type GreenhouseInfo } from "@/lib/simulated";
+import type { LinkInfo } from "@/lib/serverApi";
+import { CROPS } from "@/lib/simulated";
 import {
   type FarmerData,
   formatSize,
@@ -16,7 +17,7 @@ import {
   type Upload,
   uploadKey,
 } from "@/lib/upload";
-import { useUploadSession } from "@/lib/useUploadSession";
+import { type SaveState, useUploadSession } from "@/lib/useUploadSession";
 
 function FileButton({
   label,
@@ -74,6 +75,7 @@ function VideoRow({
   onCancel,
   onRemove,
   onUndo,
+  onRetry,
 }: {
   hilera: number;
   lado: Side;
@@ -86,12 +88,13 @@ function VideoRow({
   onCancel: () => void;
   onRemove: () => void;
   onUndo: () => void;
+  onRetry: () => void;
 }) {
   const context = `para hilera ${hilera}, lado ${lado}`;
   const status = upload?.status;
   const active = status === "subiendo" || status === "en_cola";
   const percent = Math.round((upload?.progress ?? 0) * 100);
-  const paused = active && !online;
+  const paused = active && (!online || Boolean(upload?.reconnecting));
 
   return (
     <li className="px-5 py-3">
@@ -120,13 +123,19 @@ function VideoRow({
               Vuelve a elegirlo
             </p>
           )}
+          {status === "error" && (
+            <p className="flex items-center gap-1.5 text-sm font-medium text-bad-ink">
+              <AlertTriangle size={15} className="shrink-0" aria-hidden />
+              No se ha subido
+            </p>
+          )}
           {paused && (
             <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink tabular-nums">
               <WifiOff size={15} className="shrink-0" aria-hidden />
-              En pausa · {percent} %
+              {online ? "Reconectando" : "En pausa"} · {percent} %
             </p>
           )}
-          {active && online && (
+          {active && !paused && (
             <p className="text-sm font-medium tabular-nums">
               {status === "en_cola" ? "En cola" : `Subiendo · ${percent} %`}
             </p>
@@ -134,12 +143,20 @@ function VideoRow({
           {upload && (
             <p className="truncate text-xs text-muted">
               {upload.fileName} · {formatSize(upload.sizeBytes)}
-              {status === "interrumpido" && " · No se terminó de subir"}
+              {status === "interrumpido" && " · Elige el mismo archivo para continuar"}
             </p>
           )}
         </div>
         {active ? (
           <IconButton label={`Cancelar la subida ${context}`} icon={X} onClick={onCancel} />
+        ) : status === "error" ? (
+          <span className="flex gap-2">
+            <button type="button" onClick={onRetry} className="btn-primary min-h-11">
+              <RefreshCw size={16} aria-hidden />
+              Reintentar<span className="sr-only"> {context}</span>
+            </button>
+            <IconButton label={`Cancelar la subida ${context}`} icon={X} onClick={onCancel} />
+          </span>
         ) : status === "recibido" ? (
           <span className="flex gap-2">
             <FileButton label="Cambiar" context={context} onFile={onFile} />
@@ -163,13 +180,13 @@ function VideoRow({
           className="mt-2 h-1.5 overflow-hidden rounded-full bg-sunken"
         >
           <motion.div
-            className={`h-full rounded-full ${online ? "bg-brand" : "bg-warn-ink"}`}
+            className={`h-full rounded-full ${paused ? "bg-warn-ink" : "bg-brand"}`}
             animate={{ width: `${percent}%` }}
             transition={{ duration: 0.25, ease: "linear" }}
           />
         </div>
       )}
-      {error && <p role="alert" className="mt-2 text-sm text-bad-ink">{error}</p>}
+      {(error || upload?.errorMessage) && <p role="alert" className="mt-2 text-sm text-bad-ink">{error ?? upload?.errorMessage}</p>}
     </li>
   );
 }
@@ -243,6 +260,8 @@ function DataPanel({
   minHileras,
   invalid,
   missing,
+  saveState,
+  onRetrySave,
   onChange,
   onValidity,
 }: {
@@ -250,6 +269,8 @@ function DataPanel({
   minHileras: number;
   invalid: number;
   missing: number;
+  saveState: SaveState;
+  onRetrySave: () => void;
   onChange: (data: FarmerData) => void;
   onValidity: (field: string, valid: boolean) => void;
 }) {
@@ -307,22 +328,25 @@ function DataPanel({
             <DataField label="Kilos recogidos la semana pasada" unit="kg" value={data.kilosSemanaPasada} min={0} max={10000000} onChange={(kilosSemanaPasada) => onChange({ ...data, kilosSemanaPasada })} onValidity={(ok) => onValidity("kilosSemanaPasada", ok)} />
             <p className="mt-1 text-xs text-muted">Pon 0 si no hubo recolección.</p>
           </div>
+          <p role="status" className="text-sm sm:col-span-2">
+            {saveState === "guardando" && <span className="text-muted">Guardando…</span>}
+            {saveState === "guardado" && <span className="text-muted">Guardado</span>}
+            {saveState === "error" && (
+              <span className="text-bad-ink">
+                No se ha podido guardar. Se reintentará al volver la conexión.{" "}
+                <button type="button" onClick={onRetrySave} className="font-medium underline underline-offset-3">Reintentar ahora</button>
+              </span>
+            )}
+          </p>
         </div>
       </div>
     </section>
   );
 }
 
-export function UploadScreen({ token, greenhouse, harvestLabel }: { token: string; greenhouse: GreenhouseInfo; harvestLabel: string }) {
+export function UploadScreen({ token, link }: { token: string; link: LinkInfo }) {
   useDocumentTitle("Subir vídeos");
-  const session = useUploadSession(token, {
-    variety: DEFAULT_PARAMS.crops[greenhouse.crop].variety,
-    hileras: greenhouse.hileras,
-    longitudM: null,
-    temperaturaC: null,
-    humedadPct: null,
-    kilosSemanaPasada: null,
-  });
+  const session = useUploadSession(token, link);
   const { uploads, removed, data, errors, online, summary } = session;
   const [invalidFields, setInvalidFields] = useState<Record<string, boolean>>({});
   const invalid = Object.values(invalidFields).filter(Boolean).length;
@@ -341,7 +365,7 @@ export function UploadScreen({ token, greenhouse, harvestLabel }: { token: strin
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Vídeos de la semana</h1>
         <p className="mt-1 text-sm text-muted">
-          {greenhouse.name} · {CROPS[greenhouse.crop].name} · {harvestLabel}
+          {link.invernadero.nombre} · {CROPS[link.invernadero.cultivo]?.name ?? link.invernadero.cultivo} · {link.recoleccion.etiqueta}
         </p>
       </header>
 
@@ -371,7 +395,7 @@ export function UploadScreen({ token, greenhouse, harvestLabel }: { token: strin
           {interrupted && (
             <p className="mt-3 flex gap-2 rounded-md bg-warn-soft p-3 text-sm text-warn-ink">
               <AlertTriangle size={16} className="mt-0.5 shrink-0" aria-hidden />
-              Algún vídeo no se terminó de subir. Los ya recibidos están a salvo.
+              Algún vídeo no se terminó de subir. Elige el mismo archivo y continuará por donde iba.
             </p>
           )}
         </div>
@@ -382,6 +406,8 @@ export function UploadScreen({ token, greenhouse, harvestLabel }: { token: strin
         minHileras={highestHileraWithVideo(uploads)}
         invalid={invalid}
         missing={missing}
+        saveState={session.saveState}
+        onRetrySave={session.retrySave}
         onChange={session.setData}
         onValidity={(field, valid) => setInvalidFields((current) => ({ ...current, [field]: !valid }))}
       />
@@ -405,6 +431,7 @@ export function UploadScreen({ token, greenhouse, harvestLabel }: { token: strin
                   onCancel={() => session.cancel(hilera, lado)}
                   onRemove={() => session.remove(hilera, lado)}
                   onUndo={() => session.undoRemove(hilera, lado)}
+                  onRetry={() => session.retry(hilera, lado)}
                 />
               );
             })}

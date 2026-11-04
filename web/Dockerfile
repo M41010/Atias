@@ -1,5 +1,7 @@
 FROM node:24.22.1-slim AS deps
 WORKDIR /app
+# Next.js fija este destino al compilar. Si el servicio cambia de nombre, hay que reconstruir.
+ENV API_INTERNAL_URL=http://api:4000
 COPY package.json package-lock.json ./
 RUN npm ci
 
