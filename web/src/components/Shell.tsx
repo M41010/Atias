@@ -61,6 +61,23 @@ function Notices() {
   );
 }
 
+/** Pantalla del agricultor: sin menú, porque no debe ver datos de la cooperativa ni de otros. */
+export function FarmerShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-dvh">
+      <div className="sticky top-0 z-10">
+        <p role="status" className="border-b border-warn-line bg-warn-soft px-4 py-2 text-center text-sm font-medium text-warn-ink">
+          Demostración: vídeos y datos no salen de este dispositivo, y «Recibido» es simulado.
+        </p>
+      </div>
+      <p className="mx-auto max-w-xl px-4 pt-4 text-lg font-semibold tracking-tight text-brand-ink">Atias</p>
+      <main className="mx-auto max-w-xl px-4 pt-2 pb-8">
+        <Suspense fallback={null}>{children}</Suspense>
+      </main>
+    </div>
+  );
+}
+
 export function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[224px_minmax(0,1fr)]">
