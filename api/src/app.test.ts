@@ -11,7 +11,10 @@ import { join } from "node:path";
 import { after, before, beforeEach, describe, it } from "node:test";
 import type { FileStore } from "@tus/file-store";
 import { createApp } from "./app.js";
+import { disableUser, LoginLimiter, setUserPassword } from "./auth.js";
 import { createPool, hashToken, migrate, type Pool, seedDemo } from "./db.js";
+import { harvestWeek, upcomingHarvests } from "./harvests.js";
+import { createQualityRunner, reviewPendingVideos } from "./quality.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
 
 const databaseUrl = process.env.TEST_DATABASE_URL;
@@ -20,6 +23,8 @@ if (!databaseUrl) throw new Error("Falta TEST_DATABASE_URL: usa compose.test.yam
 const TOKEN = "demo-invernadero-1";
 const OTHER_TOKEN = "demo-invernadero-2";
 const HARVEST = "2026-W46";
+const EMAIL = "ana@cooperativa.test";
+const PASSWORD = "contrasena-de-prueba-1";
 
 function listen(server: Server): Promise<string> {
   return new Promise((resolve) => {
@@ -34,12 +39,37 @@ describe("API", () => {
   let store: FileStore;
   let videoDir: string;
   let analysisStatus = 200;
-  const analysis = createServer((_req, res) => {
-    res.statusCode = analysisStatus;
-    res.end("{}");
+  let analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
+  let analysisCalls: string[] = [];
+  let analysisUrl = "";
+  const analysis = createServer((req, res) => {
+    let body = "";
+    req.on("data", (chunk) => { body += chunk; });
+    req.on("end", () => {
+      if (req.url === "/calidad") analysisCalls.push(JSON.parse(body).video);
+      res.statusCode = analysisStatus;
+      res.end(analysisBody);
+    });
   });
   let apiServer: Server;
   let api: string;
+  let cookie: string;
+  let now = 0;
+  const limiter = new LoginLimiter(() => now);
+
+  const login = (correo = EMAIL, contrasena = PASSWORD) =>
+    fetch(`${api}/api/auth/entrar`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ correo, contrasena }),
+    });
+
+  /** Petición autenticada a la cooperativa. */
+  const coop = (path: string, init: RequestInit = {}) =>
+    fetch(`${api}/api/cooperativa${path}`, {
+      ...init,
+      headers: { cookie, "content-type": "application/json", ...init.headers },
+    });
 
   const link = (path: string, init: RequestInit = {}, token = TOKEN) =>
     fetch(`${api}/api/enlace${path}`, {
@@ -92,15 +122,25 @@ describe("API", () => {
     await seedDemo(pool);
     videoDir = await mkdtemp(join(tmpdir(), "atias-videos-"));
     store = createVideoStore(videoDir);
-    const analysisUrl = await listen(analysis);
-    apiServer = createServer(createApp({ analysisUrl, pool, store }));
+    analysisUrl = await listen(analysis);
+    apiServer = createServer(createApp({ analysisUrl, pool, store, limiter }));
     api = await listen(apiServer);
   });
 
   beforeEach(async () => {
     analysisStatus = 200;
-    await pool.query("DELETE FROM videos; DELETE FROM weekly_data;");
+    analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
+    analysisCalls = [];
+    await pool.query("DELETE FROM videos; DELETE FROM weekly_data; DELETE FROM harvest_records;");
+    await pool.query("DELETE FROM upload_links WHERE created_by IS NOT NULL OR expires_at IS NOT NULL");
+    await pool.query("DELETE FROM sessions; DELETE FROM users;");
+    await pool.query("DELETE FROM greenhouses WHERE id NOT IN ('inv-1', 'inv-2', 'inv-3')");
+    await pool.query("DELETE FROM harvests WHERE id <> $1", [HARVEST]);
     await pool.query("UPDATE upload_links SET expires_at = NULL, revoked_at = NULL");
+    now += 3_600_000; // Deja atrás cualquier bloqueo de la prueba anterior.
+    await setUserPassword(pool, EMAIL, "Ana", PASSWORD);
+    const response = await login();
+    cookie = (response.headers.get("set-cookie") as string).split(";")[0];
   });
 
   after(async () => {
@@ -330,12 +370,372 @@ describe("API", () => {
     });
   });
 
+  describe("acceso", () => {
+    it("entra con correo sin distinguir mayúsculas y da una cookie protegida", async () => {
+      const response = await login(EMAIL.toUpperCase());
+      assert.equal(response.status, 200);
+      assert.deepEqual(await response.json(), { nombre: "Ana", correo: EMAIL });
+      const header = response.headers.get("set-cookie") as string;
+      assert.match(header, /HttpOnly/);
+      assert.match(header, /SameSite=Lax/);
+    });
+
+    it("no revela si falla el correo o la contraseña, ni guarda la contraseña en claro", async () => {
+      const wrongPassword = await login(EMAIL, "incorrecta-de-verdad");
+      const wrongEmail = await login("nadie@cooperativa.test", PASSWORD);
+      assert.equal(wrongPassword.status, 401);
+      assert.equal(wrongEmail.status, 401);
+      assert.deepEqual(await wrongPassword.json(), await wrongEmail.json());
+      const { rows } = await pool.query("SELECT password_hash FROM users");
+      assert.ok(!rows[0].password_hash.includes(PASSWORD));
+    });
+
+    it("bloquea tras 5 fallos, incluso con la contraseña correcta, y desbloquea con el tiempo", async () => {
+      for (let i = 0; i < 5; i++) assert.equal((await login(EMAIL, "mal-mal-mal-mal")).status, 401);
+      assert.equal((await login()).status, 429);
+      now += 16 * 60 * 1000;
+      assert.equal((await login()).status, 200);
+    });
+
+    it("un acierto reinicia el contador de fallos", async () => {
+      for (let i = 0; i < 4; i++) await login(EMAIL, "mal-mal-mal-mal");
+      assert.equal((await login()).status, 200);
+      await login(EMAIL, "mal-mal-mal-mal");
+      assert.equal((await login()).status, 200);
+    });
+
+    it("rechaza peticiones mal formadas o contraseñas enormes", async () => {
+      const response = await fetch(`${api}/api/auth/entrar`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ correo: EMAIL }),
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await login(EMAIL, "x".repeat(201))).status, 400);
+    });
+
+    it("/yo identifica la sesión y salir la invalida en el servidor", async () => {
+      const me = await fetch(`${api}/api/auth/yo`, { headers: { cookie } });
+      assert.deepEqual(await me.json(), { nombre: "Ana", correo: EMAIL });
+      assert.equal((await fetch(`${api}/api/auth/salir`, { method: "POST", headers: { cookie } })).status, 204);
+      assert.equal((await fetch(`${api}/api/auth/yo`, { headers: { cookie } })).status, 401);
+      assert.equal((await coop("/invernaderos")).status, 401);
+    });
+
+    it("no guarda el token de sesión en claro", async () => {
+      const token = cookie.split("=")[1];
+      const { rows } = await pool.query("SELECT token_sha256 FROM sessions");
+      assert.ok(rows.every((r) => r.token_sha256 !== token));
+    });
+
+    it("una sesión caducada deja de valer", async () => {
+      await pool.query("UPDATE sessions SET expires_at = now() - interval '1 minute'");
+      assert.equal((await coop("/invernaderos")).status, 401);
+    });
+
+    it("retirar el acceso cierra la sesión y cambiar la contraseña también", async () => {
+      assert.ok(await disableUser(pool, EMAIL));
+      assert.equal((await coop("/invernaderos")).status, 401);
+      assert.equal((await login()).status, 401);
+
+      await setUserPassword(pool, EMAIL, "Ana", "otra-contrasena-larga");
+      assert.equal((await login(EMAIL, "otra-contrasena-larga")).status, 200);
+    });
+
+    it("exige contraseñas largas al crear cuentas", async () => {
+      await assert.rejects(setUserPassword(pool, "b@c.test", "B", "corta"), /12 caracteres/);
+    });
+
+    it("todas las rutas de la cooperativa exigen sesión", async () => {
+      for (const [method, path] of [
+        ["GET", "/recolecciones"], ["GET", `/recolecciones/${HARVEST}`], ["GET", "/invernaderos"],
+        ["POST", "/invernaderos"], ["GET", "/proximas-recolecciones"], ["GET", "/enlaces"],
+        ["POST", "/enlaces"], ["POST", "/enlaces/x/revocar"],
+        ["GET", "/videos/00000000-0000-0000-0000-000000000000/contenido"],
+        ["GET", `/recolecciones/${HARVEST}/cosecha`], ["PUT", `/recolecciones/${HARVEST}/cosecha/inv-1/lunes_jueves`],
+      ]) {
+        const response = await fetch(`${api}/api/cooperativa${path}`, { method });
+        assert.equal(response.status, 401, `${method} ${path}`);
+      }
+    });
+
+    it("el enlace del agricultor no da acceso a la cooperativa", async () => {
+      const response = await fetch(`${api}/api/cooperativa/invernaderos`, { headers: { "x-atias-enlace": TOKEN } });
+      assert.equal(response.status, 401);
+    });
+  });
+
+  describe("cosecha real", () => {
+    const put = (scope: string, kg: unknown, greenhouse = "inv-1", harvest = HARVEST) =>
+      coop(`/recolecciones/${harvest}/cosecha/${greenhouse}/${scope}`, { method: "PUT", body: JSON.stringify({ kg }) });
+    const read = async () => (await (await coop(`/recolecciones/${HARVEST}/cosecha`)).json()) as {
+      invernaderos: { id: string; registros: Record<string, { kg: number; registradoPor: string } | null> }[];
+    };
+    const inv1 = async () => (await read()).invernaderos.find((g) => g.id === "inv-1")?.registros;
+
+    it("guarda cada tipo de cosecha por separado y dice quién la registró", async () => {
+      assert.equal((await put("lunes_jueves", 1234.5)).status, 204);
+      const records = await inv1();
+      assert.equal(records?.lunes_jueves?.kg, 1234.5);
+      assert.equal(records?.lunes_jueves?.registradoPor, "Ana");
+      assert.equal(records?.cosecha_inmediata, null);
+    });
+
+    it("cero kilos es un dato válido y sustituir actualiza el valor", async () => {
+      await put("lunes_jueves", 100);
+      await put("lunes_jueves", 0);
+      assert.equal((await inv1())?.lunes_jueves?.kg, 0);
+    });
+
+    it("kg nulo borra el dato", async () => {
+      await put("cosecha_inmediata", 50);
+      assert.equal((await put("cosecha_inmediata", null)).status, 204);
+      assert.equal((await inv1())?.cosecha_inmediata, null);
+    });
+
+    it("rechaza valores y tipos de cosecha inválidos", async () => {
+      for (const bad of [-1, "100", 10_000_001, undefined]) {
+        assert.equal((await put("lunes_jueves", bad)).status, 400, String(bad));
+      }
+      assert.equal((await put("otra", 10)).status, 400);
+    });
+
+    it("responde 404 si no existe la recolección o el invernadero", async () => {
+      assert.equal((await put("lunes_jueves", 10, "nada")).status, 404);
+      assert.equal((await put("lunes_jueves", 10, "inv-1", "2000-W01")).status, 404);
+      assert.equal((await coop("/recolecciones/nada/cosecha")).status, 404);
+    });
+
+    it("el enlace del agricultor no puede registrar cosecha", async () => {
+      const response = await fetch(`${api}/api/cooperativa/recolecciones/${HARVEST}/cosecha/inv-1/lunes_jueves`, {
+        method: "PUT",
+        headers: { "x-atias-enlace": TOKEN, "content-type": "application/json" },
+        body: JSON.stringify({ kg: 1 }),
+      });
+      assert.equal(response.status, 401);
+    });
+  });
+
+  describe("revisión de calidad", () => {
+    const quality = async () =>
+      ((await (await link("")).json()) as { videos: { id: string; calidad: { estado: string; avisos: string[] } }[] }).videos[0].calidad;
+
+    it("un vídeo recién recibido queda pendiente y pasa a correcto", async () => {
+      const id = await uploadComplete();
+      assert.deepEqual(await quality(), { estado: "pendiente", avisos: [] });
+      assert.equal(await reviewPendingVideos(pool, analysisUrl), 1);
+      assert.deepEqual(analysisCalls, [id]);
+      assert.deepEqual(await quality(), { estado: "ok", avisos: [] });
+    });
+
+    it("guarda los avisos y no vuelve a revisar lo ya revisado", async () => {
+      await uploadComplete();
+      analysisBody = JSON.stringify({ medidas: { brillo: 3 }, avisos: ["POCA_LUZ"] });
+      await reviewPendingVideos(pool, analysisUrl);
+      assert.deepEqual(await quality(), { estado: "avisos", avisos: ["POCA_LUZ"] });
+      assert.equal(await reviewPendingVideos(pool, analysisUrl), 0);
+      assert.equal(analysisCalls.length, 1);
+    });
+
+    it("la cooperativa ve el mismo resultado", async () => {
+      await uploadComplete();
+      analysisBody = JSON.stringify({ medidas: {}, avisos: ["DESENFOCADO"] });
+      await reviewPendingVideos(pool, analysisUrl);
+      const body = await (await coop(`/recolecciones/${HARVEST}`)).json() as { invernaderos: { id: string; videos: { calidad: unknown }[] }[] };
+      assert.deepEqual(body.invernaderos.find((g) => g.id === "inv-1")?.videos[0].calidad, { estado: "avisos", avisos: ["DESENFOCADO"] });
+    });
+
+    it("no revisa subidas a medias ni vídeos retirados", async () => {
+      await createUpload();
+      const id = await uploadComplete({ lado: "B" });
+      await link(`/videos/${id}`, { method: "DELETE" });
+      assert.equal(await reviewPendingVideos(pool, analysisUrl), 0);
+      assert.deepEqual(analysisCalls, []);
+    });
+
+    it("con el servicio caído sigue pendiente, sin gastar intentos", async () => {
+      await uploadComplete();
+      assert.equal(await reviewPendingVideos(pool, "http://127.0.0.1:1"), 0);
+      assert.equal((await quality()).estado, "pendiente");
+      const { rows } = await pool.query("SELECT quality_attempts FROM videos");
+      assert.equal(rows[0].quality_attempts, 0);
+    });
+
+    it("tras 3 errores del servicio se rinde y no bloquea a los siguientes", async () => {
+      await uploadComplete({ lado: "A" });
+      await uploadComplete({ lado: "B" });
+      analysisStatus = 500;
+      await reviewPendingVideos(pool, analysisUrl);
+      const { rows } = await pool.query("SELECT quality_status, quality_attempts FROM videos");
+      assert.ok(rows.every((r) => r.quality_status === "error" && r.quality_attempts === 3));
+      assert.equal((await quality()).estado, "error");
+    });
+
+    it("no solapa dos revisiones a la vez", async () => {
+      await uploadComplete();
+      const run = createQualityRunner(pool, analysisUrl);
+      await Promise.all([run(), run(), run()]);
+      assert.equal(analysisCalls.length, 1);
+    });
+  });
+
+  describe("ver vídeos", () => {
+    const content = (id: string, headers: Record<string, string> = {}) =>
+      coop(`/videos/${id}/contenido`, { headers });
+
+    it("sirve el vídeo recibido con su tipo y sin dejar que el navegador lo reinterprete", async () => {
+      const id = await uploadComplete({ size: 100 });
+      const response = await content(id);
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get("content-type"), "video/mp4");
+      assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+      assert.equal((await response.arrayBuffer()).byteLength, 100);
+    });
+
+    it("admite peticiones parciales para avanzar en el vídeo", async () => {
+      const id = await uploadComplete({ size: 100 });
+      const response = await content(id, { range: "bytes=10-19" });
+      assert.equal(response.status, 206);
+      assert.equal(response.headers.get("content-range"), "bytes 10-19/100");
+      assert.equal((await response.arrayBuffer()).byteLength, 10);
+    });
+
+    it("no sirve subidas a medias, vídeos quitados ni identificadores inválidos", async () => {
+      const created = await createUpload();
+      assert.equal((await content((created.headers.get("location") as string).split("/").at(-1) as string)).status, 404);
+      const id = await uploadComplete({ lado: "B" });
+      await link(`/videos/${id}`, { method: "DELETE" });
+      assert.equal((await content(id)).status, 404);
+      assert.equal((await content("..%2F..%2Fetc%2Fpasswd")).status, 404);
+    });
+
+    it("responde 404 si falta el archivo, sin detalles internos", async () => {
+      const id = await uploadComplete();
+      await rm(join(videoDir, id), { force: true });
+      const response = await content(id);
+      assert.equal(response.status, 404);
+      assert.deepEqual(await response.json(), { error: "Archivo no encontrado" });
+    });
+
+    it("el enlace del agricultor no permite ver vídeos", async () => {
+      const id = await uploadComplete();
+      const response = await fetch(`${api}/api/cooperativa/videos/${id}/contenido`, { headers: { "x-atias-enlace": TOKEN } });
+      assert.equal(response.status, 401);
+    });
+  });
+
+  describe("gestión de enlaces", () => {
+    const next = () => upcomingHarvests()[0];
+    const create = async (invernaderoId = "inv-1", inicio = next().inicio) =>
+      coop("/enlaces", { method: "POST", body: JSON.stringify({ invernaderoId, inicio }) });
+
+    it("crea un enlace que funciona, ligado a su recolección, y solo guarda el hash", async () => {
+      const response = await create();
+      assert.equal(response.status, 201);
+      const { token } = await response.json() as { token: string };
+      assert.ok(token.length >= 30);
+      const info = await (await link("", {}, token)).json() as { invernadero: { id: string }; recoleccion: { id: string; etiqueta: string } };
+      assert.equal(info.invernadero.id, "inv-1");
+      assert.equal(info.recoleccion.id, next().id);
+      assert.equal(info.recoleccion.etiqueta, next().etiqueta);
+      const { rows } = await pool.query("SELECT 1 FROM upload_links WHERE token_sha256 = $1", [token]);
+      assert.equal(rows.length, 0);
+    });
+
+    it("caduca a las 00:00 del lunes en España", async () => {
+      const { caducaEn } = await (await create()).json() as { caducaEn: string };
+      const local = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Madrid", dateStyle: "short", timeStyle: "short" }).format(new Date(caducaEn));
+      assert.equal(local, `${next().inicio} 00:00`);
+    });
+
+    it("el enlace deja de valer al caducar", async () => {
+      const { token, id } = await (await create()).json() as { token: string; id: string };
+      await pool.query("UPDATE upload_links SET expires_at = now() - interval '1 minute' WHERE id = $1", [id]);
+      assert.equal((await link("", {}, token)).status, 404);
+      assert.equal((await createUpload({ token })).status, 403);
+    });
+
+    it("crear otro sustituye al vigente", async () => {
+      const first = await (await create()).json() as { token: string };
+      const second = await (await create()).json() as { token: string };
+      assert.equal((await link("", {}, first.token)).status, 404);
+      assert.equal((await link("", {}, second.token)).status, 200);
+    });
+
+    it("revocar deja el enlace sin efecto, y las subidas en curso también", async () => {
+      const { token, id } = await (await create()).json() as { token: string; id: string };
+      const created = await createUpload({ token });
+      const location = created.headers.get("location") as string;
+      assert.equal((await coop(`/enlaces/${id}/revocar`, { method: "POST" })).status, 204);
+      assert.equal((await link("", {}, token)).status, 404);
+      assert.equal((await patch(location, Buffer.alloc(10, 1), 0, token)).status, 403);
+      assert.equal((await coop(`/enlaces/${id}/revocar`, { method: "POST" })).status, 404);
+    });
+
+    it("muestra el estado de cada invernadero sin revelar el enlace", async () => {
+      // La semana siguiente, sin los enlaces de demostración de la próxima recolección.
+      const later = upcomingHarvests()[1].inicio;
+      const { token, id } = await (await create("inv-1", later)).json() as { token: string; id: string };
+      const response = await coop(`/enlaces?inicio=${later}`);
+      const text = await response.text();
+      assert.ok(!text.includes(token));
+      const body = JSON.parse(text) as { invernaderos: { id: string; enlace: { id: string } | null }[] };
+      assert.equal(body.invernaderos.find((g) => g.id === "inv-1")?.enlace?.id, id);
+      assert.equal(body.invernaderos.find((g) => g.id === "inv-2")?.enlace, null);
+    });
+
+    it("no acepta fechas fuera de las próximas recolecciones ni invernaderos inexistentes", async () => {
+      assert.equal((await create("inv-1", "2020-01-06")).status, 400);
+      assert.equal((await create("inv-1", harvestWeek("2099-01-05").inicio)).status, 400);
+      assert.equal((await create("nada")).status, 404);
+      assert.equal((await coop("/enlaces?inicio=2020-01-06")).status, 400);
+    });
+
+    it("registra quién creó el enlace", async () => {
+      const { id } = await (await create()).json() as { id: string };
+      const { rows } = await pool.query(
+        "SELECT u.email FROM upload_links l JOIN users u ON u.id = l.created_by WHERE l.id = $1", [id],
+      );
+      assert.equal(rows[0].email, EMAIL);
+    });
+  });
+
+  describe("invernaderos", () => {
+    const add = (body: unknown) => coop("/invernaderos", { method: "POST", body: JSON.stringify(body) });
+
+    it("crea uno nuevo que ya admite enlaces y subidas", async () => {
+      const response = await add({ nombre: "  Nave Sur ", cultivo: "pepino", hileras: 6 });
+      assert.equal(response.status, 201);
+      const { id, nombre } = await response.json() as { id: string; nombre: string };
+      assert.equal(nombre, "Nave Sur");
+      const { token } = await (await coop("/enlaces", {
+        method: "POST",
+        body: JSON.stringify({ invernaderoId: id, inicio: upcomingHarvests()[0].inicio }),
+      })).json() as { token: string };
+      assert.equal((await createUpload({ hilera: 6, token })).status, 201);
+      assert.equal((await createUpload({ hilera: 7, token })).status, 400);
+    });
+
+    it("rechaza nombres repetidos sin distinguir mayúsculas y valores inválidos", async () => {
+      assert.equal((await add({ nombre: "INVERNADERO 1", cultivo: "pepino", hileras: 1 })).status, 409);
+      for (const bad of [
+        { nombre: "", cultivo: "pepino", hileras: 1 },
+        { nombre: "x".repeat(101), cultivo: "pepino", hileras: 1 },
+        { nombre: "A", cultivo: "uva", hileras: 1 },
+        { nombre: "A", cultivo: "pepino", hileras: 0 },
+        { nombre: "A", cultivo: "pepino", hileras: 2.5 },
+      ]) {
+        assert.equal((await add(bad)).status, 400, JSON.stringify(bad));
+      }
+    });
+  });
+
   describe("cooperativa", () => {
     it("ve los vídeos recibidos y los datos de todos los invernaderos, sin subidas a medias", async () => {
       const id = await uploadComplete({ filename: "vigente.mp4" });
       await createUpload({ lado: "B" });
       await uploadComplete({ token: OTHER_TOKEN, filename: "otro.mp4" });
-      const response = await fetch(`${api}/api/cooperativa/recolecciones/${HARVEST}`);
+      const response = await coop(`/recolecciones/${HARVEST}`);
       assert.equal(response.status, 200);
       const body = await response.json() as { invernaderos: { id: string; videos: { id: string }[] }[] };
       assert.equal(body.invernaderos.length, 3);
@@ -344,9 +744,9 @@ describe("API", () => {
     });
 
     it("lista recolecciones y responde 404 si no existe", async () => {
-      const list = await (await fetch(`${api}/api/cooperativa/recolecciones`)).json() as { recolecciones: { id: string }[] };
+      const list = await (await coop("/recolecciones")).json() as { recolecciones: { id: string }[] };
       assert.ok(list.recolecciones.some((h) => h.id === HARVEST));
-      assert.equal((await fetch(`${api}/api/cooperativa/recolecciones/nada`)).status, 404);
+      assert.equal((await coop("/recolecciones/nada")).status, 404);
     });
   });
 });

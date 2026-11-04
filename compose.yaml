@@ -33,6 +33,8 @@ services:
       VIDEO_DIR: /data/videos
       # Crea los invernaderos y enlaces de prueba. Debe desactivarse fuera del entorno local.
       ATIAS_DATOS_DEMO: "${ATIAS_DATOS_DEMO:-1}"
+      # Actívala (1) en cuanto haya HTTPS.
+      ATIAS_COOKIE_SEGURA: "${ATIAS_COOKIE_SEGURA:-0}"
     volumes:
       - videos:/data/videos
     ports:
@@ -76,6 +78,10 @@ services:
     restart: unless-stopped
     environment:
       PORT: "8000"
+      VIDEO_DIR: /data/videos
+    # Solo lectura: el análisis nunca modifica los vídeos.
+    volumes:
+      - videos:/data/videos:ro
     healthcheck:
       test: ["CMD", ".venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/salud', timeout=3)"]
       interval: 10s

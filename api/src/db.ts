@@ -62,6 +62,59 @@ const MIGRATIONS: { id: string; sql: string }[] = [
       CREATE INDEX videos_by_harvest ON videos (harvest_id, greenhouse_id);
     `,
   },
+  {
+    id: "002_acceso_cooperativa",
+    sql: `
+      CREATE TABLE users (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        email text NOT NULL UNIQUE,
+        name text NOT NULL,
+        password_hash text NOT NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        disabled_at timestamptz
+      );
+      CREATE TABLE sessions (
+        token_sha256 text PRIMARY KEY,
+        user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        expires_at timestamptz NOT NULL
+      );
+      ALTER TABLE upload_links
+        ADD COLUMN id uuid NOT NULL DEFAULT gen_random_uuid() UNIQUE,
+        ADD COLUMN created_at timestamptz NOT NULL DEFAULT now(),
+        ADD COLUMN created_by uuid REFERENCES users(id);
+      -- Un solo enlace vigente por invernadero y recolección.
+      CREATE UNIQUE INDEX upload_links_one_active
+        ON upload_links (greenhouse_id, harvest_id) WHERE revoked_at IS NULL;
+      CREATE UNIQUE INDEX greenhouses_unique_name ON greenhouses (lower(name));
+    `,
+  },
+  {
+    id: "003_cosecha_real",
+    sql: `
+      -- Los dos alcances miden cosas distintas y nunca se suman ni se mezclan.
+      CREATE TABLE harvest_records (
+        greenhouse_id text NOT NULL REFERENCES greenhouses(id),
+        harvest_id text NOT NULL REFERENCES harvests(id),
+        scope text NOT NULL CHECK (scope IN ('lunes_jueves', 'cosecha_inmediata')),
+        kg double precision NOT NULL CHECK (kg >= 0),
+        recorded_by uuid NOT NULL REFERENCES users(id),
+        recorded_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (greenhouse_id, harvest_id, scope)
+      );
+    `,
+  },
+  {
+    id: "004_calidad_videos",
+    sql: `
+      ALTER TABLE videos
+        ADD COLUMN quality_status text NOT NULL DEFAULT 'pendiente'
+          CHECK (quality_status IN ('pendiente', 'ok', 'avisos', 'error')),
+        ADD COLUMN quality jsonb,
+        ADD COLUMN quality_attempts integer NOT NULL DEFAULT 0,
+        ADD COLUMN quality_checked_at timestamptz;
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */
@@ -113,7 +166,7 @@ export async function seedDemo(pool: Pool): Promise<void> {
   for (const [index, token] of DEMO_TOKENS.entries()) {
     await pool.query(
       `INSERT INTO upload_links (token_sha256, greenhouse_id, harvest_id) VALUES ($1, $2, '2026-W46')
-       ON CONFLICT (token_sha256) DO NOTHING`,
+       ON CONFLICT DO NOTHING`,
       [hashToken(token), `inv-${index + 1}`],
     );
   }

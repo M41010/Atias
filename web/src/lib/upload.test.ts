@@ -8,6 +8,7 @@ import {
   highestHileraWithVideo,
   markError,
   markReconnecting,
+  mergeQuality,
   markReceived,
   MAX_VIDEO_BYTES,
   missingData,
@@ -33,6 +34,7 @@ const serverVideo = (overrides: Partial<ServerVideo> = {}): ServerVideo => ({
   sizeBytes: MB,
   status: "recibido",
   receivedAt: null,
+  calidad: { estado: "ok", avisos: [] },
   ...overrides,
 });
 
@@ -150,6 +152,29 @@ describe("sustituir un vídeo recibido", () => {
   });
 });
 
+describe("mergeQuality", () => {
+  const received = markReceived(addUpload({}, 1, "A", file), "1-A", "v1");
+
+  it("un vídeo recién recibido queda pendiente de revisar", () => {
+    expect(received["1-A"].calidad?.estado).toBe("pendiente");
+  });
+
+  it("incorpora el resultado del servidor", () => {
+    const merged = mergeQuality(received, [serverVideo({ calidad: { estado: "avisos", avisos: ["POCA_LUZ"] } })]);
+    expect(merged["1-A"].calidad).toEqual({ estado: "avisos", avisos: ["POCA_LUZ"] });
+    expect(merged["1-A"].status).toBe("recibido");
+  });
+
+  it("no toca nada si no cambia, para no repintar", () => {
+    const pending = serverVideo({ calidad: { estado: "pendiente", avisos: [] } });
+    expect(mergeQuality(received, [pending])).toBe(received);
+  });
+
+  it("ignora vídeos que ya no están en este lado", () => {
+    expect(mergeQuality(received, [serverVideo({ id: "otro" })])).toBe(received);
+  });
+});
+
 describe("nextPending", () => {
   it("propone el primer lado sin vídeo o interrumpido", () => {
     expect(nextPending({}, 2)).toBe("1-A");
@@ -207,5 +232,6 @@ describe("formatSize", () => {
   it("usa MB y GB", () => {
     expect(formatSize(1.5 * 1024 ** 3)).toBe("1,5 GB");
     expect(formatSize(250 * MB)).toBe("250 MB");
+    expect(formatSize(26_000)).toBe("menos de 1 MB");
   });
 });

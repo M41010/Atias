@@ -1,10 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Play, X } from "lucide-react";
 import { useState } from "react";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
 import { fmtDate } from "@/lib/format";
+import { qualityMessages } from "@/lib/quality";
 import { useDocumentTitle } from "@/lib/hooks";
 import { fetchHarvestList, fetchHarvestOverview, type HarvestOverview } from "@/lib/serverApi";
 import { CROPS } from "@/lib/simulated";
@@ -13,7 +14,39 @@ import { formatSize, missingData, type ServerVideo, type Side } from "@/lib/uplo
 const REFRESH_MS = 15_000;
 const SIDES: Side[] = ["A", "B"];
 
-function SideCell({ video }: { video?: ServerVideo }) {
+function VideoPlayer({ video, hilera, onClose }: { video: ServerVideo; hilera: number; onClose: () => void }) {
+  const [failed, setFailed] = useState(false);
+  const src = `/api/cooperativa/videos/${encodeURIComponent(video.id)}/contenido`;
+  return (
+    <div className="border-t border-line px-5 py-4">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-medium">Hilera {hilera} · Lado {video.lado} · {video.fileName}</p>
+        <button type="button" className="btn-secondary" onClick={onClose}>
+          <X size={15} aria-hidden />
+          Cerrar
+        </button>
+      </div>
+      {failed ? (
+        <p role="alert" className="text-sm text-warn-ink">
+          Este navegador no puede reproducir el formato de este vídeo.{" "}
+          <a href={src} download={video.fileName} className="font-medium underline underline-offset-3">Descargarlo</a>
+        </p>
+      ) : (
+        <video
+          key={video.id}
+          controls
+          preload="metadata"
+          src={src}
+          onError={() => setFailed(true)}
+          aria-label={`Vídeo de la hilera ${hilera}, lado ${video.lado}`}
+          className="max-h-[28rem] w-full rounded-md bg-ink"
+        />
+      )}
+    </div>
+  );
+}
+
+function SideCell({ video, onPlay }: { video?: ServerVideo; onPlay: (video: ServerVideo) => void }) {
   if (!video) return <td className="text-muted">Pendiente</td>;
   return (
     <td>
@@ -25,6 +58,23 @@ function SideCell({ video }: { video?: ServerVideo }) {
         {video.fileName} · {formatSize(video.sizeBytes)}
       </span>
       {video.receivedAt && <span className="block text-xs text-muted">{fmtDate(video.receivedAt)}</span>}
+      {video.calidad.estado === "pendiente" && <span className="block text-xs text-muted">Revisando la imagen…</span>}
+      {video.calidad.estado === "error" && <span className="block text-xs text-muted">No se ha podido revisar la imagen</span>}
+      {qualityMessages(video.calidad).map((message) => (
+        <span key={message} className="mt-0.5 flex items-center gap-1 text-xs font-medium text-warn-ink">
+          <AlertTriangle size={13} className="shrink-0" aria-hidden />
+          {message}
+        </span>
+      ))}
+      <button
+        type="button"
+        onClick={() => onPlay(video)}
+        aria-label={`Ver vídeo de la hilera ${video.hilera}, lado ${video.lado}`}
+        className="mt-1 inline-flex min-h-7 items-center gap-1 text-sm font-medium text-brand-ink underline-offset-3 hover:underline"
+      >
+        <Play size={14} aria-hidden />
+        Ver
+      </button>
     </td>
   );
 }
@@ -38,6 +88,7 @@ function GreenhousePanel({ greenhouse }: { greenhouse: HarvestOverview["invernad
   const hileras = datos.hileras ?? 0;
   const total = hileras * 2;
   const missing = missingData(datos);
+  const [playing, setPlaying] = useState<ServerVideo | null>(null);
   return (
     <Panel
       title={greenhouse.nombre}
@@ -67,13 +118,14 @@ function GreenhousePanel({ greenhouse }: { greenhouse: HarvestOverview["invernad
               <tr key={hilera}>
                 <th scope="row" className="whitespace-nowrap">Hilera {hilera}</th>
                 {SIDES.map((lado) => (
-                  <SideCell key={lado} video={videos.find((v) => v.hilera === hilera && v.lado === lado)} />
+                  <SideCell key={lado} video={videos.find((v) => v.hilera === hilera && v.lado === lado)} onPlay={setPlaying} />
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {playing && <VideoPlayer key={playing.id} video={playing} hilera={playing.hilera} onClose={() => setPlaying(null)} />}
       <dl className="grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line px-5 py-4 text-sm lg:grid-cols-4">
         <div>
           <dt className="text-muted">Longitud de hilera</dt>
@@ -111,7 +163,7 @@ export default function VideosPage() {
   const header = (
     <PageHeader
       title="Vídeos recibidos"
-      description="Lo que ha enviado cada agricultor. Se actualiza solo. Aún no se analizan: los kilos del resto de la app siguen simulados."
+      description="Lo que ha enviado cada agricultor. Se actualiza solo. Aún no se cuentan frutos: los kilos del resto de la app siguen simulados."
       actions={harvests.data && harvests.data.length > 0 ? (
         <label className="flex items-center gap-2 text-sm text-muted">
           <span className="sr-only md:not-sr-only">Recolección</span>

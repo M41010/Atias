@@ -6,6 +6,7 @@ import { useOnline } from "./hooks";
 import {
   ApiError,
   deleteVideo,
+  fetchLink,
   LINK_HEADER,
   type LinkInfo,
   restoreVideo,
@@ -19,6 +20,7 @@ import {
   fromServer,
   markError,
   markReconnecting,
+  mergeQuality,
   markReceived,
   nextToStart,
   removeUpload,
@@ -35,6 +37,7 @@ import {
 const CHUNK_BYTES = 8 * 1024 * 1024;
 const RETRY_DELAYS_MS = [0, 1000, 3000, 5000, 10_000, 20_000, 30_000, 60_000];
 const SAVE_DEBOUNCE_MS = 700;
+const QUALITY_POLL_MS = 5000;
 
 export type SaveState = "guardado" | "guardando" | "error";
 type Removed = { kind: "recibido"; upload: Upload } | { kind: "cancelado"; file: File };
@@ -141,6 +144,20 @@ export function useUploadSession(token: string, link: LinkInfo) {
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [hasActive]);
+
+  // Mientras haya vídeos por revisar, consulta si ya está el resultado.
+  const awaitingQuality = Object.values(uploads).some(
+    (u) => u.status === "recibido" && u.calidad?.estado === "pendiente",
+  );
+  useEffect(() => {
+    if (!awaitingQuality || !online) return;
+    const timer = setInterval(() => {
+      fetchLink(token)
+        .then((info) => setUploads((value) => mergeQuality(value, info.videos)))
+        .catch(() => {});
+    }, QUALITY_POLL_MS);
+    return () => clearInterval(timer);
+  }, [awaitingQuality, online, token]);
 
   const setError = useCallback((key: string, message: string | null) => {
     setErrors((value) => {

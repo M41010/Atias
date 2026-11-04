@@ -1,18 +1,49 @@
 "use client";
 
-import { Home, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
+import { Home, Link2, LogOut, Scale, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { type ReactNode, Suspense } from "react";
+import { type ReactNode, Suspense, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { AuthGate } from "@/components/AuthGate";
 import { useOnline } from "@/lib/hooks";
+import { fetchCurrentUser, signOut } from "@/lib/serverApi";
 
 const NAV = [
   { href: "/", label: "Resumen", icon: Home },
   { href: "/invernaderos", label: "Invernaderos", icon: Warehouse },
   { href: "/videos", label: "Vídeos recibidos", icon: Video },
+  { href: "/enlaces", label: "Enlaces", icon: Link2 },
+  { href: "/cosecha", label: "Cosecha real", icon: Scale },
   { href: "/temporeros", label: "Temporeros", icon: Users },
   { href: "/parametros", label: "Parámetros", icon: SlidersHorizontal },
 ];
+
+function UserMenu() {
+  const { data } = useQuery({ queryKey: ["usuario"], queryFn: fetchCurrentUser, staleTime: 60_000 });
+  const [failed, setFailed] = useState(false);
+  if (!data) return null;
+  return (
+    <div className="ml-auto shrink-0 md:mt-6 md:ml-0 md:border-t md:border-line md:px-3 md:pt-4">
+      <p className="hidden truncate text-sm font-medium md:block">{data.nombre}</p>
+      <button
+        type="button"
+        onClick={() => {
+          signOut()
+            // Carga completa a propósito: no debe quedar en memoria nada de la sesión cerrada.
+            // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+            .then(() => window.location.assign("/acceder"))
+            .catch(() => setFailed(true));
+        }}
+        className="flex min-h-10 items-center gap-2 whitespace-nowrap rounded-md text-sm text-muted transition-colors duration-150 hover:text-ink"
+      >
+        <LogOut size={16} aria-hidden />
+        Salir
+      </button>
+      {failed && <p role="alert" className="text-xs text-bad-ink">No se ha podido cerrar la sesión.</p>}
+    </div>
+  );
+}
 
 function NavLinks() {
   const pathname = usePathname();
@@ -49,8 +80,9 @@ const SIMULATED_NOTICE = "Datos simulados: ninguna cifra procede de un invernade
 
 function DataNotice() {
   // Esta pantalla sí muestra lo que han enviado de verdad: no debe decir que es simulada.
-  const real = usePathname().startsWith("/videos");
-  return <>{real ? "Prototipo: vídeos y datos reales de esta prueba. Aún no se analizan." : SIMULATED_NOTICE}</>;
+  const pathname = usePathname();
+  const real = ["/videos", "/enlaces", "/cosecha"].some((path) => pathname.startsWith(path));
+  return <>{real ? "Prototipo: vídeos y datos reales de esta prueba. Aún no se cuentan frutos." : SIMULATED_NOTICE}</>;
 }
 
 function Notices() {
@@ -100,12 +132,15 @@ export function Shell({ children }: { children: ReactNode }) {
           <Suspense fallback={null}>
             <NavLinks />
           </Suspense>
+          <UserMenu />
         </div>
       </nav>
       <div className="min-w-0">
         <Notices />
         <main className="mx-auto max-w-[1160px] px-4 py-6 md:px-8 md:py-7">
-          <Suspense fallback={null}>{children}</Suspense>
+          <AuthGate>
+            <Suspense fallback={null}>{children}</Suspense>
+          </AuthGate>
         </main>
       </div>
     </div>
