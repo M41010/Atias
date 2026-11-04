@@ -1,0 +1,43 @@
+{
+  "cultivos": [
+    {
+      "crop": "tomate_cherry",
+      "label": "Tomate cherry",
+      "criterion": "color",
+      "classes": [
+        { "id": "rojo", "label": "Rojo", "mature": true, "hue_ranges": null },
+        { "id": "inmaduro", "label": "Inmaduro", "mature": false, "hue_ranges": null }
+      ],
+      "weights": { "rojo": null },
+      "calibration": null,
+      "side_overlap": null,
+      "overlap_origin": null
+    },
+    {
+      "crop": "pimiento",
+      "label": "Pimiento",
+      "criterion": "color",
+      "classes": [
+        { "id": "maduro", "label": "Maduro", "mature": true, "hue_ranges": null },
+        { "id": "inmaduro", "label": "Inmaduro", "mature": false, "hue_ranges": null }
+      ],
+      "weights": { "maduro": null },
+      "calibration": null,
+      "side_overlap": null,
+      "overlap_origin": null
+    },
+    {
+      "crop": "pepino",
+      "label": "Pepino",
+      "criterion": "calibre",
+      "classes": [
+        { "id": "comercial", "label": "Comercial", "mature": true, "length_mm": null, "diameter_mm": null },
+        { "id": "pequeno", "label": "Pequeño", "mature": false, "length_mm": null, "diameter_mm": null }
+      ],
+      "weights": { "comercial": null },
+      "calibration": null,
+      "side_overlap": null,
+      "overlap_origin": null
+    }
+  ]
+}
