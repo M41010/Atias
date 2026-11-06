@@ -42,7 +42,7 @@ export default function ResumenPage() {
       <>
         {header}
         <EmptyState title="Todavía no hay capturas">
-          Los resultados aparecerán aquí cuando el agricultor suba los vídeos del viernes o el sábado y termine el análisis.
+          Los resultados aparecerán aquí cuando el agricultor suba los vídeos del sábado y termine el análisis.
         </EmptyState>
       </>
     );
@@ -81,7 +81,7 @@ export default function ResumenPage() {
         )}
 
         <Panel
-          title="Por cultivo"
+          title="Por familia"
           actions={report.isLatest ? (
             <Link href="/temporeros" className="text-sm font-medium text-brand-ink underline-offset-3 hover:underline">
               Ajustar temporeros
@@ -92,7 +92,7 @@ export default function ResumenPage() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th scope="col">Cultivo</th>
+                  <th scope="col">Familia</th>
                   <th scope="col" className="num">Observado<span className="hidden sm:inline"> (kg)</span></th>
                   <th scope="col" className="num hidden lg:table-cell">Rango observado</th>
                   <th scope="col" className="num"><ForecastHeader /></th>
@@ -103,11 +103,11 @@ export default function ResumenPage() {
                 </tr>
               </thead>
               <tbody>
-                {report.crops.map((crop) => (
-                  <tr key={crop.crop} className="row-link">
+                {report.families.map((crop) => (
+                  <tr key={crop.family} className="row-link">
                     <th scope="row">
                       <Link
-                        href={`/invernaderos?recoleccion=${encodeURIComponent(harvestId)}&cultivo=${crop.crop}`}
+                        href={`/invernaderos?recoleccion=${encodeURIComponent(harvestId)}&familia=${crop.family}`}
                         className="whitespace-nowrap font-medium text-ink"
                       >
                         {crop.name}

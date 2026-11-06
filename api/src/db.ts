@@ -115,6 +115,97 @@ const MIGRATIONS: { id: string; sql: string }[] = [
         ADD COLUMN quality_checked_at timestamptz;
     `,
   },
+  {
+    id: "005_tecnicos_familias_diario",
+    sql: `
+      -- La recolección pasa a ser de lunes a viernes, como la registra la empresa.
+      ALTER TABLE harvest_records DROP CONSTRAINT harvest_records_scope_check;
+      UPDATE harvest_records SET scope = 'lunes_viernes' WHERE scope = 'lunes_jueves';
+      ALTER TABLE harvest_records ADD CONSTRAINT harvest_records_scope_check
+        CHECK (scope IN ('lunes_viernes', 'cosecha_inmediata'));
+
+      -- Familia es como la empresa llama al cultivo y la variedad. crop es el tipo que reconoce la visión.
+      CREATE TABLE families (
+        id text PRIMARY KEY,
+        name text NOT NULL UNIQUE,
+        crop text NOT NULL CHECK (crop IN ('tomate_cherry', 'pimiento', 'pepino'))
+      );
+      INSERT INTO families (id, name, crop) VALUES
+        ('cherry_pera', 'Cherry pera', 'tomate_cherry'),
+        ('cherry_redondo_rojo', 'Cherry redondo rojo', 'tomate_cherry'),
+        ('cherry_colores', 'Cherry colores', 'tomate_cherry'),
+        ('cherry_rama', 'Cherry rama', 'tomate_cherry'),
+        ('katrina', 'Katrina', 'pepino'),
+        ('tatayoyo', 'Tatayoyo', 'pimiento'),
+        ('jalapeno', 'Jalapeño', 'pimiento'),
+        ('padron', 'Padrón', 'pimiento'),
+        ('chilis', 'Chilis', 'pimiento'),
+        ('snack', 'Snack', 'pepino'),
+        ('sweetbites', 'Sweetbites', 'pimiento'),
+        ('pepino_holandes', 'Pepino holandés', 'pepino');
+
+      -- Cada técnico lleva varios agricultores y cada agricultor uno o varios invernaderos.
+      -- erp_code enlaza con el registro del ERP cuando se conecte.
+      CREATE TABLE technicians (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        name text NOT NULL,
+        erp_code text UNIQUE,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE TABLE growers (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        name text NOT NULL,
+        technician_id uuid REFERENCES technicians(id),
+        erp_code text UNIQUE,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      ALTER TABLE greenhouses
+        ADD COLUMN grower_id uuid REFERENCES growers(id),
+        ADD COLUMN family_id text REFERENCES families(id),
+        ADD COLUMN erp_code text UNIQUE,
+        -- Localización: de ella sale la meteorología.
+        ADD COLUMN municipality text,
+        ADD COLUMN latitude double precision CHECK (latitude BETWEEN -90 AND 90),
+        ADD COLUMN longitude double precision CHECK (longitude BETWEEN -180 AND 180);
+      CREATE INDEX growers_by_technician ON growers (technician_id);
+      CREATE INDEX greenhouses_by_grower ON greenhouses (grower_id);
+
+      -- Previsiones por día de recolección. Las del técnico y las de Atias se guardan aparte para compararlas.
+      CREATE TABLE daily_forecasts (
+        greenhouse_id text NOT NULL REFERENCES greenhouses(id),
+        day date NOT NULL CHECK (extract(isodow FROM day) BETWEEN 1 AND 5),
+        source text NOT NULL CHECK (source IN ('tecnico', 'atias')),
+        kg double precision NOT NULL CHECK (kg >= 0),
+        recorded_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (greenhouse_id, day, source)
+      );
+
+      -- Kilos reales de cada día. Vendrán del ERP; manual queda para pruebas sin conexión.
+      CREATE TABLE daily_harvests (
+        greenhouse_id text NOT NULL REFERENCES greenhouses(id),
+        day date NOT NULL CHECK (extract(isodow FROM day) BETWEEN 1 AND 5),
+        kg double precision NOT NULL CHECK (kg >= 0),
+        source text NOT NULL CHECK (source IN ('erp', 'manual')),
+        recorded_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (greenhouse_id, day)
+      );
+
+      -- Meteorología diaria en la localización del invernadero (Open-Meteo).
+      -- observado sustituye a prevision cuando el día ya ha pasado.
+      CREATE TABLE daily_weather (
+        greenhouse_id text NOT NULL REFERENCES greenhouses(id),
+        day date NOT NULL,
+        kind text NOT NULL CHECK (kind IN ('prevision', 'observado')),
+        temp_max_c double precision NOT NULL,
+        temp_min_c double precision NOT NULL CHECK (temp_min_c <= temp_max_c),
+        precipitation_mm double precision CHECK (precipitation_mm >= 0),
+        radiation_mj_m2 double precision CHECK (radiation_mj_m2 >= 0),
+        source text NOT NULL CHECK (source IN ('open-meteo', 'simulado')),
+        fetched_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (greenhouse_id, day)
+      );
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */
@@ -159,8 +250,25 @@ export async function seedDemo(pool: Pool): Promise<void> {
       ('inv-3', 'Invernadero 3', 'pepino', 4)
     ON CONFLICT (id) DO NOTHING
   `);
+  // Nombres inventados: la empresa dará de alta los suyos.
   await pool.query(`
-    INSERT INTO harvests (id, label, starts_on) VALUES ('2026-W46', 'Recolección 9–12 nov', '2026-11-09')
+    INSERT INTO technicians (id, name) VALUES
+      ('00000000-0000-4000-8000-000000000001', 'Lucía Ferrer')
+    ON CONFLICT (id) DO NOTHING
+  `);
+  await pool.query(`
+    INSERT INTO growers (id, name, technician_id) VALUES
+      ('00000000-0000-4000-8000-000000000101', 'Antonio Gil', '00000000-0000-4000-8000-000000000001')
+    ON CONFLICT (id) DO NOTHING
+  `);
+  await pool.query(`
+    UPDATE greenhouses g SET grower_id = '00000000-0000-4000-8000-000000000101', family_id = v.family,
+      municipality = 'El Ejido', latitude = 36.776, longitude = -2.814
+    FROM (VALUES ('inv-1', 'cherry_redondo_rojo'), ('inv-2', 'padron'), ('inv-3', 'pepino_holandes')) AS v(id, family)
+    WHERE g.id = v.id AND g.grower_id IS NULL
+  `);
+  await pool.query(`
+    INSERT INTO harvests (id, label, starts_on) VALUES ('2026-W46', 'Recolección 9–13 nov', '2026-11-09')
     ON CONFLICT (id) DO NOTHING
   `);
   for (const [index, token] of DEMO_TOKENS.entries()) {

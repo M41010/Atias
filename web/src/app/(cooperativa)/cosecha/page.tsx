@@ -137,7 +137,7 @@ export default function CosechaPage() {
               <thead>
                 <tr>
                   <th scope="col">Invernadero</th>
-                  <th scope="col">Recolección de lunes a jueves</th>
+                  <th scope="col">Recolección de lunes a viernes</th>
                   <th scope="col">Cosecha de control</th>
                 </tr>
               </thead>
@@ -149,13 +149,13 @@ export default function CosechaPage() {
                       <span className="block text-xs font-normal text-muted">{CROPS[g.cultivo]?.name ?? g.cultivo}</span>
                     </th>
                     <RecordCell
-                      key={`lj-${g.registros.lunes_jueves?.kg ?? ""}`}
+                      key={`lj-${g.registros.lunes_viernes?.kg ?? ""}`}
                       harvestId={records.data.id}
                       greenhouseId={g.id}
                       greenhouse={g.nombre}
-                      scope="lunes_jueves"
-                      scopeLabel="Recolección de lunes a jueves"
-                      record={g.registros.lunes_jueves}
+                      scope="lunes_viernes"
+                      scopeLabel="Recolección de lunes a viernes"
+                      record={g.registros.lunes_viernes}
                     />
                     <RecordCell
                       key={`ci-${g.registros.cosecha_inmediata?.kg ?? ""}`}
@@ -175,7 +175,7 @@ export default function CosechaPage() {
         <Panel title="Qué poner en cada columna">
           <dl className="grid gap-4 p-5 text-sm md:grid-cols-2">
             <div>
-              <dt className="font-medium">Recolección de lunes a jueves</dt>
+              <dt className="font-medium">Recolección de lunes a viernes</dt>
               <dd className="mt-1 text-muted">Todo lo recogido esos días. Sirve para medir la previsión. Incluye fruta que maduró después de grabar.</dd>
             </div>
             <div>

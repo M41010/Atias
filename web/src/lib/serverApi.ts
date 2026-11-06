@@ -113,7 +113,7 @@ export const createGreenhouse = async (nombre: string, cultivo: CropId, hileras:
 };
 
 // ---- Cosecha real ----
-export type HarvestScope = "lunes_jueves" | "cosecha_inmediata";
+export type HarvestScope = "lunes_viernes" | "cosecha_inmediata";
 export type HarvestRecord = { kg: number; registradoPor: string; registradoEn: string };
 export type HarvestRecords = {
   id: string;

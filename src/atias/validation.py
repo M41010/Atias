@@ -41,7 +41,7 @@ VERDICT_TEXT = {
     Verdict.SIMULATED: "Datos simulados: este error comprueba el cálculo y no dice nada "
     "sobre la precisión real del sistema.",
     Verdict.NOT_COMPARABLE: "La fruta observada el día de captura no es comparable con la "
-    "recolección lunes–jueves, que incluye fruta madurada después.",
+    "recolección lunes–viernes, que incluye fruta madurada después.",
     Verdict.INSUFFICIENT: "Datos reales insuficientes para concluir.",
     Verdict.NOT_MET: "Con estos datos no se puede afirmar que se alcance el objetivo.",
     Verdict.MET: "Objetivo alcanzado en este piloto. No extrapolar a otros invernaderos, "
@@ -52,7 +52,7 @@ VERDICT_TEXT = {
 def is_comparable(semantics: Semantics, scope: HarvestScope) -> bool:
     return (semantics, scope) in {
         (Semantics.OBSERVED, HarvestScope.IMMEDIATE),
-        (Semantics.FORECAST_MON_THU, HarvestScope.MON_THU),
+        (Semantics.FORECAST_MON_FRI, HarvestScope.MON_FRI),
     }
 
 

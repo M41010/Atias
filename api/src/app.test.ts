@@ -452,7 +452,7 @@ describe("API", () => {
         ["POST", "/invernaderos"], ["GET", "/proximas-recolecciones"], ["GET", "/enlaces"],
         ["POST", "/enlaces"], ["POST", "/enlaces/x/revocar"],
         ["GET", "/videos/00000000-0000-0000-0000-000000000000/contenido"],
-        ["GET", `/recolecciones/${HARVEST}/cosecha`], ["PUT", `/recolecciones/${HARVEST}/cosecha/inv-1/lunes_jueves`],
+        ["GET", `/recolecciones/${HARVEST}/cosecha`], ["PUT", `/recolecciones/${HARVEST}/cosecha/inv-1/lunes_viernes`],
       ]) {
         const response = await fetch(`${api}/api/cooperativa${path}`, { method });
         assert.equal(response.status, 401, `${method} ${path}`);
@@ -474,17 +474,17 @@ describe("API", () => {
     const inv1 = async () => (await read()).invernaderos.find((g) => g.id === "inv-1")?.registros;
 
     it("guarda cada tipo de cosecha por separado y dice quién la registró", async () => {
-      assert.equal((await put("lunes_jueves", 1234.5)).status, 204);
+      assert.equal((await put("lunes_viernes", 1234.5)).status, 204);
       const records = await inv1();
-      assert.equal(records?.lunes_jueves?.kg, 1234.5);
-      assert.equal(records?.lunes_jueves?.registradoPor, "Ana");
+      assert.equal(records?.lunes_viernes?.kg, 1234.5);
+      assert.equal(records?.lunes_viernes?.registradoPor, "Ana");
       assert.equal(records?.cosecha_inmediata, null);
     });
 
     it("cero kilos es un dato válido y sustituir actualiza el valor", async () => {
-      await put("lunes_jueves", 100);
-      await put("lunes_jueves", 0);
-      assert.equal((await inv1())?.lunes_jueves?.kg, 0);
+      await put("lunes_viernes", 100);
+      await put("lunes_viernes", 0);
+      assert.equal((await inv1())?.lunes_viernes?.kg, 0);
     });
 
     it("kg nulo borra el dato", async () => {
@@ -495,24 +495,59 @@ describe("API", () => {
 
     it("rechaza valores y tipos de cosecha inválidos", async () => {
       for (const bad of [-1, "100", 10_000_001, undefined]) {
-        assert.equal((await put("lunes_jueves", bad)).status, 400, String(bad));
+        assert.equal((await put("lunes_viernes", bad)).status, 400, String(bad));
       }
       assert.equal((await put("otra", 10)).status, 400);
     });
 
     it("responde 404 si no existe la recolección o el invernadero", async () => {
-      assert.equal((await put("lunes_jueves", 10, "nada")).status, 404);
-      assert.equal((await put("lunes_jueves", 10, "inv-1", "2000-W01")).status, 404);
+      assert.equal((await put("lunes_viernes", 10, "nada")).status, 404);
+      assert.equal((await put("lunes_viernes", 10, "inv-1", "2000-W01")).status, 404);
       assert.equal((await coop("/recolecciones/nada/cosecha")).status, 404);
     });
 
     it("el enlace del agricultor no puede registrar cosecha", async () => {
-      const response = await fetch(`${api}/api/cooperativa/recolecciones/${HARVEST}/cosecha/inv-1/lunes_jueves`, {
+      const response = await fetch(`${api}/api/cooperativa/recolecciones/${HARVEST}/cosecha/inv-1/lunes_viernes`, {
         method: "PUT",
         headers: { "x-atias-enlace": TOKEN, "content-type": "application/json" },
         body: JSON.stringify({ kg: 1 }),
       });
       assert.equal(response.status, 401);
+    });
+  });
+
+  describe("técnicos, familias y datos diarios", () => {
+    it("carga las doce familias de la empresa con su tipo de cultivo", async () => {
+      const { rows } = await pool.query("SELECT crop, count(*)::int AS n FROM families GROUP BY crop ORDER BY crop");
+      assert.deepEqual(rows, [{ crop: "pepino", n: 3 }, { crop: "pimiento", n: 5 }, { crop: "tomate_cherry", n: 4 }]);
+    });
+
+    it("cada invernadero de prueba tiene agricultor, técnico, familia y localización", async () => {
+      const { rows } = await pool.query(
+        `SELECT g.id, t.name AS technician, g.family_id, g.latitude, g.longitude FROM greenhouses g
+         JOIN growers a ON a.id = g.grower_id JOIN technicians t ON t.id = a.technician_id ORDER BY g.id`,
+      );
+      assert.equal(rows.length, 3);
+      for (const row of rows) {
+        assert.ok(row.family_id && row.technician && row.latitude !== null && row.longitude !== null, row.id);
+      }
+    });
+
+    it("solo admite días de lunes a viernes en previsiones y cosecha diaria", async () => {
+      await pool.query("DELETE FROM daily_forecasts; DELETE FROM daily_harvests");
+      await pool.query("INSERT INTO daily_forecasts VALUES ('inv-1', '2026-11-13', 'tecnico', 300)");
+      await pool.query("INSERT INTO daily_forecasts VALUES ('inv-1', '2026-11-13', 'atias', 280)");
+      await assert.rejects(pool.query("INSERT INTO daily_forecasts VALUES ('inv-1', '2026-11-14', 'tecnico', 300)"));
+      await assert.rejects(pool.query("INSERT INTO daily_harvests VALUES ('inv-1', '2026-11-15', 300, 'erp')"));
+      await assert.rejects(pool.query("INSERT INTO daily_forecasts VALUES ('inv-1', '2026-11-12', 'otra', 300)"));
+      await pool.query("DELETE FROM daily_forecasts");
+    });
+
+    it("ya no acepta el alcance antiguo de lunes a jueves", async () => {
+      assert.equal(
+        (await coop(`/recolecciones/${HARVEST}/cosecha/inv-1/lunes_jueves`, { method: "PUT", body: JSON.stringify({ kg: 1 }) })).status,
+        400,
+      );
     });
   });
 

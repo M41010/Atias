@@ -25,10 +25,10 @@ Los pares con cosecha real de 0 kg quedan fuera (el error relativo no existe), y
 | Estimación | Cosecha pesada | ¿Válido? |
 |---|---|---|
 | Observado en captura (Fase 1) | **Cosecha inmediata**: todo lo maduro, con el mismo criterio, justo tras capturar | **Sí** |
-| Observado en captura (Fase 1) | Recolección de lunes a jueves | **No**: incluye fruta madurada después |
-| Previsión lunes–jueves (Fase 3) | Recolección de lunes a jueves | Sí |
+| Observado en captura (Fase 1) | Recolección de lunes a viernes | **No**: incluye fruta madurada después |
+| Previsión lunes–viernes (Fase 3) | Recolección de lunes a viernes | Sí |
 
-El alcance de cada cosecha se registra (`cosecha_inmediata` o `lunes_jueves`) y los alcances no se mezclan.
+El alcance de cada cosecha se registra (`cosecha_inmediata` o `lunes_viernes`) y los alcances no se mezclan.
 
 ### Cosecha de control
 

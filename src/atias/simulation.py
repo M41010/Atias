@@ -353,13 +353,13 @@ def run_demo(out_dir: Path, conn: sqlite3.Connection, *, n_weeks: int = 4,
             all_fruits = [f for items in truth.values() for f in items]
             immediate = sum(f.weight_g for f in all_fruits
                             if f.fruit_class in profile.mature_ids) / 1000
-            # Lunes a jueves incluye fruta que madura tras la captura: por eso no es comparable.
+            # Lunes a viernes incluye fruta que madura tras la captura: por eso no es comparable.
             ripening = sum(f.weight_g for f in all_fruits
                            if f.fruit_class not in profile.mature_ids and rng.random() < 0.35
                            ) / 1000
             week = manifest.week
             for scope, kg in ((HarvestScope.IMMEDIATE, immediate),
-                              (HarvestScope.MON_THU, immediate + ripening)):
+                              (HarvestScope.MON_FRI, immediate + ripening)):
                 save_harvest(conn, greenhouse, crop, week, scope, round(kg, 2), Origin.SIMULATED)
                 harvest_rows.append([greenhouse, crop, week, scope.value, round(kg, 2),
                                      Origin.SIMULATED.value])

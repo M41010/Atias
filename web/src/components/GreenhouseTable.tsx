@@ -34,7 +34,7 @@ export function GreenhouseTable({ rows, harvestId }: { rows: GreenhouseRow[]; ha
                 >
                   {g.info.name}
                 </Link>
-                <span className="block text-xs font-normal text-muted">{g.cropName}</span>
+                <span className="block whitespace-nowrap text-xs font-normal text-muted">{g.familyName} · {g.growerName}</span>
                 <span className="mt-1 flex flex-wrap items-center gap-1.5 sm:hidden">
                   <StatusPill status={g.status} />
                   {g.isNew && <Pill tone="brand">Nuevo</Pill>}

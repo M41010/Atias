@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Link2, LogOut, Scale, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
+import { CalendarDays, Home, Link2, LogOut, Scale, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
@@ -21,6 +21,7 @@ import { fetchCurrentUser, signOut } from "@/lib/serverApi";
 
 const NAV = [
   { href: "/", label: "Resumen", icon: Home },
+  { href: "/prevision", label: "Previsión diaria", icon: CalendarDays },
   { href: "/invernaderos", label: "Invernaderos", icon: Warehouse },
   { href: "/videos", label: "Vídeos recibidos", icon: Video },
   { href: "/enlaces", label: "Enlaces", icon: Link2 },
@@ -69,7 +70,7 @@ function NavLinks() {
           <li key={href}>
             <Link
               // Temporeros y Parámetros siempre trabajan sobre la recolección actual.
-              href={href === "/" || href === "/invernaderos" ? `${href}${query}` : href}
+              href={href === "/" || href === "/invernaderos" || href === "/prevision" ? `${href}${query}` : href}
               aria-current={active ? "page" : undefined}
               className={`flex min-h-10 items-center gap-2.5 whitespace-nowrap rounded-md px-3 text-sm transition-colors duration-150 ${
                 active

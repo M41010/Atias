@@ -184,3 +184,10 @@ body {
     opacity: 0.55;
   }
 }
+
+/* Tabla ancha (cinco días × tres cifras): menos relleno para que quepa sin desplazar en escritorio. */
+.data-table.compact thead th,
+.data-table.compact tbody th,
+.data-table.compact td {
+  padding-inline: 0.625rem;
+}

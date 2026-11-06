@@ -21,7 +21,8 @@ import {
   WarningList,
 } from "@/components/ui";
 import { type GreenhouseRow, type HileraRow, markSeen } from "@/lib/api";
-import { fmtBetween, fmtDate, fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
+import { fmtBetween, fmtDate, fmtDay, fmtDecimal, fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
+import { REF_WEEKLY_DEGREE_DAYS } from "@/lib/calc";
 import { queryKeys, useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
 import type { Video } from "@/lib/simulated";
 
@@ -101,6 +102,93 @@ function HileraRows({ hilera, videos, warned, startOpen }: { hilera: HileraRow; 
           ))}
       </AnimatePresence>
     </>
+  );
+}
+
+function DailyPanel({ g }: { g: GreenhouseRow }) {
+  const total = (pick: (d: GreenhouseRow["daily"][number]) => number | null) => {
+    const values = g.daily.map(pick);
+    return values.some((v) => v === null) ? null : (values as number[]).reduce((a, b) => a + b, 0);
+  };
+  const cells = (value: number | null) => (value === null ? "—" : fmtKg(value));
+  return (
+    <Panel title="Por día de recolección" description="Cada día se recoge una zona del invernadero. Lo que madura después de grabar se reparte según el calor de cada día; el del fin de semana, el lunes.">
+      <div className="overflow-x-auto">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Día</th>
+              <th scope="col" className="num">Real (kg)</th>
+              <th scope="col" className="num">Técnico (kg)</th>
+              <th scope="col" className="num"><ForecastHeader unit="Atias, kg" /></th>
+            </tr>
+          </thead>
+          <tbody>
+            {g.daily.map((d) => (
+              <tr key={d.date}>
+                <th scope="row" className="whitespace-nowrap font-normal!">{fmtDay(d.date)}</th>
+                <td className="num">{cells(d.real)}</td>
+                <td className="num">{fmtKg(d.technician)}</td>
+                <td className="num">{fmtKg(d.atias)}</td>
+              </tr>
+            ))}
+            <tr className="font-semibold">
+              <th scope="row">Total</th>
+              <td className="num">{cells(total((d) => d.real))}</td>
+              <td className="num">{fmtKg(g.technicianKg)}</td>
+              <td className="num">{fmtKg(g.forecast.kg)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      {g.partial && <p className="border-t border-line px-5 py-3 text-sm text-warn-ink">La previsión de Atias es parcial: faltan hileras por analizar.</p>}
+    </Panel>
+  );
+}
+
+function WeatherPanel({ g }: { g: GreenhouseRow }) {
+  const change = Math.round((g.weather.factor - 1) * 100);
+  return (
+    <Panel
+      title={`Meteorología en ${g.info.location.municipality}`}
+      description="De sábado, día de la grabación, a viernes."
+      actions={<Pill tone="warn">Simulada</Pill>}
+    >
+      <div className="overflow-x-auto">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Día</th>
+              <th scope="col" className="num">Máx.</th>
+              <th scope="col" className="num">Mín.</th>
+              <th scope="col" className="num">Lluvia</th>
+              <th scope="col" className="num">Grados-día</th>
+            </tr>
+          </thead>
+          <tbody>
+            {g.weather.days.map((d) => (
+              <tr key={d.date}>
+                <th scope="row" className="whitespace-nowrap font-normal!">
+                  {fmtDay(d.date)}
+                  {d.kind === "prevision" && <span className="ml-1.5 text-xs text-muted">previsto</span>}
+                </th>
+                <td className="num">{fmtDecimal(d.tempMaxC)} °C</td>
+                <td className="num">{fmtDecimal(d.tempMinC)} °C</td>
+                <td className="num">{d.precipitationMm > 0 ? `${fmtDecimal(d.precipitationMm)} mm` : "—"}</td>
+                <td className="num">{fmtDecimal(d.degreeDays)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="border-t border-line px-5 py-3 text-sm text-muted">
+        {fmtDecimal(g.weather.weeklyDegreeDays)} grados-día frente a {REF_WEEKLY_DEGREE_DAYS} de una semana normal:{" "}
+        {change === 0
+          ? "la fruta madura a ritmo normal."
+          : `la fruta madura un ${Math.abs(change)} % más ${change > 0 ? "deprisa" : "despacio"}.`}{" "}
+        Se obtendrá de Open-Meteo con la localización del invernadero.
+      </p>
+    </Panel>
   );
 }
 
@@ -196,7 +284,7 @@ export default function GreenhousePage() {
         title={g.info.name}
         description={
           <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-            {g.cropName} · {g.variety} · Captura: {fmtDate(g.capturedAt)}
+            {g.familyName} · {g.growerName} · Técnico: {g.technicianName} · Captura: {fmtDate(g.capturedAt)}
             <StatusPill status={g.status} />
           </span>
         }
@@ -240,6 +328,11 @@ export default function GreenhousePage() {
             <WarningList warnings={g.warnings} />
           </Panel>
         )}
+
+        <div className="grid items-start gap-5 lg:grid-cols-2">
+          <DailyPanel g={g} />
+          <WeatherPanel g={g} />
+        </div>
 
         <Panel title="Por hilera y tramo" description="Abre una hilera para ver sus tramos. No se da detalle por planta porque no hay marcadores físicos.">
           <div className="overflow-x-auto">
