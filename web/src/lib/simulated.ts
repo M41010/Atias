@@ -118,14 +118,22 @@ export const GROWERS: Grower[] = [
 ];
 
 /** Localización del invernadero: de ella sale la meteorología (Open-Meteo cuando se conecte). */
-export type Location = { municipality: string; latitude: number; longitude: number };
+export type Location = {
+  municipality: string;
+  latitude: number;
+  longitude: number;
+  /** Diferencia SIMULADA de temperatura frente a Motril, en °C. */
+  offsetC: number;
+};
 
+// Casi todos los invernaderos están en la costa de Granada.
 const PLACES: Record<string, Location> = {
-  ejido: { municipality: "El Ejido", latitude: 36.776, longitude: -2.814 },
-  mojonera: { municipality: "La Mojonera", latitude: 36.788, longitude: -2.703 },
-  roquetas: { municipality: "Roquetas de Mar", latitude: 36.764, longitude: -2.615 },
-  vicar: { municipality: "Vícar", latitude: 36.831, longitude: -2.642 },
-  nijar: { municipality: "Níjar", latitude: 36.967, longitude: -2.206 },
+  motril: { municipality: "Motril", latitude: 36.745, longitude: -3.52, offsetC: 0 },
+  carchuna: { municipality: "Carchuna (Motril)", latitude: 36.7, longitude: -3.443, offsetC: 0.2 },
+  castell: { municipality: "Castell de Ferro", latitude: 36.725, longitude: -3.358, offsetC: 0.3 },
+  salobrena: { municipality: "Salobreña", latitude: 36.746, longitude: -3.587, offsetC: 0.1 },
+  almunecar: { municipality: "Almuñécar", latitude: 36.734, longitude: -3.69, offsetC: 0.5 },
+  mamola: { municipality: "La Mamola (Polopos)", latitude: 36.749, longitude: -3.205, offsetC: 0.2 },
 };
 
 export type GreenhouseInfo = {
@@ -137,8 +145,8 @@ export type GreenhouseInfo = {
   location: Location;
   hileras: number;
   tramosPorHilera: number;
-  temperaturaC: number;
-  humedadPct: number;
+  /** Si tiene sensor de temperatura dentro. Mientras no, se usa la temperatura exterior. */
+  interiorSensor: boolean;
 };
 
 function greenhouse(
@@ -146,8 +154,6 @@ function greenhouse(
   growerId: string,
   family: FamilyId,
   place: keyof typeof PLACES,
-  temperaturaC: number,
-  humedadPct: number,
 ): GreenhouseInfo {
   return {
     id: `inv-${n}`,
@@ -158,20 +164,19 @@ function greenhouse(
     location: PLACES[place],
     hileras: 4,
     tramosPorHilera: 8,
-    temperaturaC,
-    humedadPct,
+    interiorSensor: false,
   };
 }
 
 export const GREENHOUSES: GreenhouseInfo[] = [
-  greenhouse(1, "agr-1", "cherry_redondo_rojo", "ejido", 24, 68),
-  greenhouse(2, "agr-1", "padron", "ejido", 23, 71),
-  greenhouse(3, "agr-2", "pepino_holandes", "mojonera", 26, 74),
-  greenhouse(4, "agr-2", "cherry_pera", "mojonera", 24, 69),
-  greenhouse(5, "agr-3", "cherry_colores", "roquetas", 23, 70),
-  greenhouse(6, "agr-4", "sweetbites", "vicar", 25, 66),
-  greenhouse(7, "agr-5", "cherry_rama", "nijar", 22, 67),
-  greenhouse(8, "agr-5", "jalapeno", "nijar", 24, 65),
+  greenhouse(1, "agr-1", "cherry_redondo_rojo", "carchuna"),
+  greenhouse(2, "agr-1", "padron", "carchuna"),
+  greenhouse(3, "agr-2", "pepino_holandes", "motril"),
+  greenhouse(4, "agr-2", "cherry_pera", "motril"),
+  greenhouse(5, "agr-3", "cherry_colores", "castell"),
+  greenhouse(6, "agr-4", "sweetbites", "salobrena"),
+  greenhouse(7, "agr-5", "cherry_rama", "mamola"),
+  greenhouse(8, "agr-5", "jalapeno", "almunecar"),
 ];
 
 export type FamilyParams = { ripeningPct: number; kgPerWorkday: number };
@@ -213,11 +218,17 @@ function seedOf(text: string): number {
 
 // ---- Meteorología ----
 
+/** Dónde se tomó la temperatura. Exterior viene de Open-Meteo; interior, de un sensor cuando lo haya. */
+export type ReadingPlace = "exterior" | "interior";
+
 export type DayWeather = {
   date: string;
-  tempMaxC: number;
-  tempMinC: number;
+  /** Temperatura de cada hora, de 00:00 a 23:00 (hora de España). */
+  hourlyTempC: number[];
+  /** Lo normal en esa fecha y lugar, también por horas (media de años anteriores). */
+  normalHourlyTempC: number[];
   precipitationMm: number;
+  place: ReadingPlace;
   kind: "prevision" | "observado";
 };
 
@@ -225,20 +236,42 @@ const DAY_MS = 86_400_000;
 export const addDays = (isoDate: string, days: number) =>
   new Date(Date.parse(`${isoDate}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
 
-/** Tiempo SIMULADO de sábado a viernes en un municipio, con algo de interior más fresco en Níjar. */
+const dayOfYear = (isoDate: string) =>
+  Math.floor((Date.parse(`${isoDate}T00:00:00Z`) - Date.parse(`${isoDate.slice(0, 4)}-01-01T00:00:00Z`)) / DAY_MS) + 1;
+
+/**
+ * Temperatura media normal de la costa de Granada según la época del año. SIMULADA a partir de
+ * valores aproximados de Motril: unos 12 °C de media en enero y 25 °C en agosto.
+ */
+function normalMeanC(isoDate: string, offsetC: number): number {
+  return 18.5 + offsetC - 6.5 * Math.cos((2 * Math.PI * (dayOfYear(isoDate) - 20)) / 365);
+}
+
+/** Curva del día: lo más frío hacia las 7:00 y lo más cálido hacia las 15:00. */
+function dailyCurve(meanC: number, rangeC: number): number[] {
+  return Array.from({ length: 24 }, (_, hour) =>
+    Math.round((meanC + (rangeC / 2) * Math.cos((2 * Math.PI * (hour - 15)) / 24)) * 10) / 10,
+  );
+}
+
+/**
+ * Temperatura exterior SIMULADA, hora a hora, de sábado a viernes. Cada día se aparta de lo normal
+ * un poco al azar; cada lugar tiene su pequeña diferencia (más templado al oeste, en Almuñécar).
+ */
 export function simulatedWeather(location: Location, monday: string, today: string): DayWeather[] {
-  const inland = location.municipality === "Níjar" ? -1.2 : 0;
   return Array.from({ length: 7 }, (_, i) => {
     const date = addDays(monday, i - 2);
     const random = seeded(seedOf(`${location.municipality}/${date}`));
-    const tempMaxC = Math.round((22 + inland + (random() - 0.5) * 5) * 10) / 10;
-    const tempMinC = Math.round((13.5 + inland + (random() - 0.5) * 4) * 10) / 10;
+    const normal = normalMeanC(date, location.offsetC);
+    const anomaly = (random() - 0.5) * 5;
+    const range = 7 + random() * 4;
     const rain = random();
     return {
       date,
-      tempMaxC,
-      tempMinC,
+      hourlyTempC: dailyCurve(normal + anomaly, range),
+      normalHourlyTempC: dailyCurve(normal, 9),
       precipitationMm: rain > 0.85 ? Math.round(rain * 60) / 10 : 0,
+      place: "exterior",
       kind: date < today ? "observado" : "prevision",
     };
   });
