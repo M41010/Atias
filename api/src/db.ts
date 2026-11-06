@@ -135,12 +135,12 @@ const MIGRATIONS: { id: string; sql: string }[] = [
         ('cherry_redondo_rojo', 'Cherry redondo rojo', 'tomate_cherry'),
         ('cherry_colores', 'Cherry colores', 'tomate_cherry'),
         ('cherry_rama', 'Cherry rama', 'tomate_cherry'),
-        ('katrina', 'Katrina', 'tomate_cherry'),
-        ('tatayoyo', 'Tatayoyo', 'tomate_cherry'),
+        ('katrina', 'Katrina', 'pepino'),
+        ('tatayoyo', 'Tatayoyo', 'pimiento'),
         ('jalapeno', 'Jalapeño', 'pimiento'),
         ('padron', 'Padrón', 'pimiento'),
         ('chilis', 'Chilis', 'pimiento'),
-        ('snack', 'Snack', 'pimiento'),
+        ('snack', 'Snack', 'pepino'),
         ('sweetbites', 'Sweetbites', 'pimiento'),
         ('pepino_holandes', 'Pepino holandés', 'pepino');
 

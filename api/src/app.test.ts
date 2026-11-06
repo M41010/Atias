@@ -519,7 +519,7 @@ describe("API", () => {
   describe("técnicos, familias y datos diarios", () => {
     it("carga las doce familias de la empresa con su tipo de cultivo", async () => {
       const { rows } = await pool.query("SELECT crop, count(*)::int AS n FROM families GROUP BY crop ORDER BY crop");
-      assert.deepEqual(rows, [{ crop: "pepino", n: 1 }, { crop: "pimiento", n: 5 }, { crop: "tomate_cherry", n: 6 }]);
+      assert.deepEqual(rows, [{ crop: "pepino", n: 3 }, { crop: "pimiento", n: 5 }, { crop: "tomate_cherry", n: 4 }]);
     });
 
     it("cada invernadero de prueba tiene agricultor, técnico, familia y localización", async () => {

@@ -29,7 +29,7 @@ export type FamilyId =
 
 export type Family = {
   name: string;
-  /** Tipo de cultivo de cada familia. Katrina, Tatayoyo y Snack están POR CONFIRMAR con la empresa. */
+  /** Tipo de cultivo de cada familia, confirmado por la empresa. */
   crop: CropId;
   criterion: "Color" | "Calibre";
   classes: { name: string; share: number }[];
@@ -55,8 +55,8 @@ export const FAMILIES: Record<FamilyId, Family> = {
   cherry_redondo_rojo: { name: "Cherry redondo rojo", crop: "tomate_cherry", criterion: "Color", classes: RED, grams: 15, baseKg: 42 },
   jalapeno: { name: "Jalapeño", crop: "pimiento", criterion: "Calibre", classes: SIZES, grams: 25, baseKg: 30 },
   padron: { name: "Padrón", crop: "pimiento", criterion: "Calibre", classes: SIZES, grams: 8, baseKg: 22 },
-  snack: { name: "Snack", crop: "pimiento", criterion: "Color", classes: MIXED, grams: 30, baseKg: 28 },
-  tatayoyo: { name: "Tatayoyo", crop: "tomate_cherry", criterion: "Color", classes: RED, grams: 20, baseKg: 40 },
+  snack: { name: "Snack", crop: "pepino", criterion: "Calibre", classes: SIZES, grams: 60, baseKg: 36 },
+  tatayoyo: { name: "Tatayoyo", crop: "pimiento", criterion: "Calibre", classes: SIZES, grams: 30, baseKg: 28 },
   cherry_colores: {
     name: "Cherry colores",
     crop: "tomate_cherry",
@@ -82,7 +82,7 @@ export const FAMILIES: Record<FamilyId, Family> = {
     grams: 6,
     baseKg: 18,
   },
-  katrina: { name: "Katrina", crop: "tomate_cherry", criterion: "Color", classes: RED, grams: 18, baseKg: 40 },
+  katrina: { name: "Katrina", crop: "pepino", criterion: "Calibre", classes: SIZES, grams: 150, baseKg: 40 },
   pepino_holandes: {
     name: "Pepino holandés",
     crop: "pepino",
@@ -177,8 +177,9 @@ export const GREENHOUSES: GreenhouseInfo[] = [
 export type FamilyParams = { ripeningPct: number; kgPerWorkday: number };
 export type Params = { days: number; families: Record<FamilyId, FamilyParams> };
 
-const ripening: Partial<Record<FamilyId, number>> = { pepino_holandes: 40, padron: 30, jalapeno: 30, chilis: 30 };
-const workday: Partial<Record<FamilyId, number>> = { pepino_holandes: 350, padron: 150, chilis: 120 };
+const ripening: Record<CropId, number> = { tomate_cherry: 35, pimiento: 30, pepino: 40 };
+const workday: Record<CropId, number> = { tomate_cherry: 180, pimiento: 300, pepino: 350 };
+const workdayByFamily: Partial<Record<FamilyId, number>> = { padron: 150, chilis: 120 };
 
 export const DEFAULT_PARAMS: Params = {
   days: 5,
@@ -186,8 +187,8 @@ export const DEFAULT_PARAMS: Params = {
     FAMILY_ORDER.map((id) => [
       id,
       {
-        ripeningPct: ripening[id] ?? 35,
-        kgPerWorkday: workday[id] ?? (FAMILIES[id].crop === "pimiento" ? 300 : 180),
+        ripeningPct: ripening[FAMILIES[id].crop],
+        kgPerWorkday: workdayByFamily[id] ?? workday[FAMILIES[id].crop],
       },
     ]),
   ) as Record<FamilyId, FamilyParams>,
