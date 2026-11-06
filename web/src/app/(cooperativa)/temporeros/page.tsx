@@ -3,17 +3,17 @@
 import { NumberField } from "@/components/Field";
 import { ResetControl } from "@/components/ResetControl";
 import { AnimatedNumber, EmptyState, ErrorState, ForecastHeader, PageHeader, PartialNote, Panel, Pill, ProvisionalNote, Skeleton } from "@/components/ui";
-import { type CropId, DEFAULT_PARAMS, LATEST_HARVEST_ID, type Params } from "@/lib/api";
+import { DEFAULT_PARAMS, type FamilyId, LATEST_HARVEST_ID, type Params } from "@/lib/api";
 import { fmtKg } from "@/lib/format";
 import { useDocumentTitle, useReport } from "@/lib/hooks";
 import { useParamsEditor } from "@/lib/useParamsEditor";
 
 function withDefaults(params: Params): Params {
-  const crops = { ...params.crops };
-  for (const crop of Object.keys(crops) as CropId[]) {
-    crops[crop] = { ...crops[crop], kgPerWorkday: DEFAULT_PARAMS.crops[crop].kgPerWorkday };
+  const families = { ...params.families };
+  for (const family of Object.keys(families) as FamilyId[]) {
+    families[family] = { ...families[family], kgPerWorkday: DEFAULT_PARAMS.families[family].kgPerWorkday };
   }
-  return { days: DEFAULT_PARAMS.days, crops };
+  return { days: DEFAULT_PARAMS.days, families };
 }
 
 export default function TemporerosPage() {
@@ -77,7 +77,7 @@ export default function TemporerosPage() {
               label="Días de recolección"
               value={params.days}
               min={1}
-              max={7}
+              max={5}
               unit="días"
               onCommit={(days) => edit({ ...params, days })}
             />
@@ -86,12 +86,12 @@ export default function TemporerosPage() {
 
         <ProvisionalNote missing={data.missingHileras} />
 
-        <Panel title="Por cultivo" description="Personas = previsión ÷ (kg por jornal × días), redondeado hacia arriba. Los kg por jornal son valores de ejemplo: sustitúyelos por los vuestros.">
+        <Panel title="Por familia" description="Personas = previsión ÷ (kg por jornal × días), redondeado hacia arriba. Los kg por jornal son valores de ejemplo: sustitúyelos por los vuestros.">
           <div className="overflow-x-auto">
             <table className="data-table">
               <thead>
                 <tr>
-                  <th scope="col">Cultivo</th>
+                  <th scope="col">Familia</th>
                   <th scope="col" className="num"><ForecastHeader /></th>
                   <th scope="col" className="num">Kg por jornal</th>
                   <th scope="col" className="num">Personas</th>
@@ -99,8 +99,8 @@ export default function TemporerosPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.crops.map((crop) => (
-                  <tr key={crop.crop}>
+                {data.families.map((crop) => (
+                  <tr key={crop.family}>
                     <th scope="row">{crop.name}</th>
                     <td className="num">
                       {fmtKg(crop.forecast.kg)}
@@ -110,13 +110,13 @@ export default function TemporerosPage() {
                       <NumberField
                         hideLabel
                         label={`Kg por jornal de ${crop.name}`}
-                        value={params.crops[crop.crop].kgPerWorkday}
+                        value={params.families[crop.family].kgPerWorkday}
                         min={1}
                         max={5000}
                         onCommit={(kgPerWorkday) =>
                           edit({
                             ...params,
-                            crops: { ...params.crops, [crop.crop]: { ...params.crops[crop.crop], kgPerWorkday } },
+                            families: { ...params.families, [crop.family]: { ...params.families[crop.family], kgPerWorkday } },
                           })
                         }
                       />

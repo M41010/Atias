@@ -27,24 +27,28 @@ La estimación sale de la propia fruta filmada en cada hilera, no de medias hist
 
 ## Operating Context
 
-- Ciclo semanal: captura el viernes o el sábado, y recolección de lunes a jueves.
+- Ciclo semanal: captura el sábado y recolección de lunes a viernes. El sábado no se cosecha.
 - El agricultor graba un vídeo por hilera y lado, y al subirlo indica invernadero, hilera y lado.
-- Parámetros: cultivo y variedad, dimensiones, cosechas anteriores y clima interior.
+- Organización: cada técnico lleva varios agricultores y cada agricultor uno o varios invernaderos. Por ahora el técnico es un filtro; más adelante la empresa dará de alta sus técnicos, agricultores e invernaderos.
+- Parámetros: familia (así llama la empresa al cultivo y la variedad), dimensiones, localización, cosechas anteriores y clima interior.
+- La empresa ya hace previsiones: los técnicos las meten en una aplicación conectada al ERP, y un Power BI compara previsión y kilos reales por día, familia y técnico. Atias se prepara para conectarse a ese ERP.
 - La cooperativa indica los kg que recoge una persona por jornal en cada cultivo y los días disponibles.
 - La conexión en el invernadero puede ser inestable: la subida no debe perder trabajo.
 - Unos 600 invernaderos de dimensiones distintas en la visión final. El piloto es un solo invernadero.
 
 ## Capabilities and Constraints
 
-- Cultivos iniciales: tomate cherry y pimiento (madurez por color) y pepino (madurez por calibre).
+- Cultivos iniciales: tomate cherry y pimiento (madurez por color) y pepino (madurez por calibre). Cada familia de la empresa pertenece a uno de ellos.
+- Previsión diaria de lunes a viernes, por familia y técnico, junto a la previsión del técnico y los kilos reales, para comparar y aprender. Cada día se recoge una zona del invernadero: lo maduro al grabar se reparte entre los cinco días y lo que madura después, según el calor de cada día.
+- La meteorología de la localización de cada invernadero (Open-Meteo) acelera o frena la maduración mediante grados-día. Ahora está simulada.
 - Cada resultado distingue dos cifras que nunca se mezclan: **kg maduros observados** en la captura y **previsión de la semana siguiente**, rotulada como experimental.
 - La cifra para planificar la venta es la previsión, destacada como valor central con su rango, mientras esté sin validar se rotula como experimental. Lo observado queda como dato de apoyo.
-- Temporeros: kg previstos ÷ (kg por jornal × días disponibles), por cultivo y ajustable por la cooperativa.
+- Temporeros: kg previstos ÷ (kg por jornal × días disponibles), por familia y ajustable por la cooperativa.
 - Desglose por cultivo, invernadero, hilera y tramo de hilera. No se da detalle por planta exacta porque no hay marcadores físicos.
 - Muestra fecha y hora de captura, estado del análisis, advertencias y comparación con la cosecha real cuando exista.
 - La maduración inicial la indica el agricultor o agrónomo, y se corrige cada semana con lo cosechado.
 - El agricultor entra con un enlace personal que le da la cooperativa, sin contraseña. Quien tenga el enlace puede subir vídeos. El servidor valida cada enlace y lo limita a su invernadero y recolección.
-- La cooperativa registra la cosecha real por invernadero y recolección, separando la recolección de lunes a jueves de la cosecha de control.
+- La cooperativa registra la cosecha real por invernadero y recolección, separando la recolección de lunes a viernes de la cosecha de control.
 - Cada vídeo recibido se revisa automáticamente: poca luz, exceso de luz, desenfoque, duración muy corta o archivo ilegible. Es un aviso orientativo, con umbrales provisionales; no cuenta frutos.
 - La cooperativa conserva una copia de solo lectura de la última recolección en su dispositivo, durante 7 días como máximo. Se borra al cerrar sesión. Sin conexión no se pueden guardar cambios ni ver vídeos, y la pantalla indica la fecha de los datos.
 - Las subidas son reanudables. Un vídeo sustituido o quitado se conserva 7 días antes de borrarse.

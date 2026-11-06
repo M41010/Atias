@@ -402,7 +402,7 @@ export function UploadScreen({ token, link }: { token: string; link: LinkInfo })
           ) : (
             <p className="mt-3 flex gap-2 text-sm text-muted">
               <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
-              Graba el viernes o el sábado un vídeo por cada lado. Recorre toda la hilera a paso lento, sin volver atrás.
+              Graba el sábado un vídeo por cada lado. Recorre toda la hilera a paso lento, sin volver atrás.
             </p>
           )}
           {interrupted && (

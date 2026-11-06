@@ -4,11 +4,15 @@ import { harvestWeek, isValidMonday, upcomingHarvests } from "./harvests.js";
 
 describe("recolecciones", () => {
   it("genera etiqueta e identificador de semana", () => {
-    assert.deepEqual(harvestWeek("2026-11-09"), { inicio: "2026-11-09", id: "2026-W46", etiqueta: "Recolección 9–12 nov" });
+    assert.deepEqual(harvestWeek("2026-11-09"), { inicio: "2026-11-09", id: "2026-W46", etiqueta: "Recolección 9–13 nov" });
   });
 
   it("nombra los dos meses si la recolección los cruza", () => {
-    assert.equal(harvestWeek("2026-11-30").etiqueta, "Recolección 30 nov–3 dic");
+    assert.equal(harvestWeek("2026-11-30").etiqueta, "Recolección 30 nov–4 dic");
+  });
+
+  it("termina el viernes aunque ese día sea de otro mes y otro año", () => {
+    assert.equal(harvestWeek("2026-12-28").etiqueta, "Recolección 28 dic–1 ene");
   });
 
   it("usa la semana ISO del jueves al cruzar de año", () => {

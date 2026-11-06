@@ -23,14 +23,14 @@ class Semantics(StrEnum):
     """Qué representa una estimación. Nunca deben mezclarse."""
 
     OBSERVED = "observado_en_captura"
-    FORECAST_MON_THU = "prevision_lunes_jueves"  # Fase 3: todavía no existe en el sistema.
+    FORECAST_MON_FRI = "prevision_lunes_viernes"  # Fase 3: todavía no existe en el sistema.
 
 
 class HarvestScope(StrEnum):
     """Qué cosecha se pesó. Determina con qué estimación es comparable."""
 
     IMMEDIATE = "cosecha_inmediata"  # Se recoge todo lo maduro justo tras la captura.
-    MON_THU = "lunes_jueves"  # Recolección habitual: incluye fruta que maduró después.
+    MON_FRI = "lunes_viernes"  # Recolección habitual: incluye fruta que maduró después.
 
 
 class Severity(StrEnum):

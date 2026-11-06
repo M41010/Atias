@@ -41,12 +41,12 @@ def test_one_simulated_pair_taints_the_whole_evaluation():
 
 
 def test_observed_is_not_comparable_with_monday_thursday_harvest():
-    pairs = [pair(scope=HarvestScope.MON_THU) for _ in range(50)]
+    pairs = [pair(scope=HarvestScope.MON_FRI) for _ in range(50)]
     assert evaluate(pairs).verdict == Verdict.NOT_COMPARABLE
 
 
 def test_forecast_is_comparable_with_monday_thursday_harvest():
-    pairs = [pair(scope=HarvestScope.MON_THU, semantics=Semantics.FORECAST_MON_THU)
+    pairs = [pair(scope=HarvestScope.MON_FRI, semantics=Semantics.FORECAST_MON_FRI)
              for _ in range(50)]
     assert evaluate(pairs).verdict == Verdict.MET
 

@@ -75,7 +75,7 @@ export function createCooperativeRouter(pool: Pool, videoDir: string): Router {
         nombre: g.name,
         cultivo: g.crop,
         registros: {
-          lunes_jueves: record(g.id, "lunes_jueves"),
+          lunes_viernes: record(g.id, "lunes_viernes"),
           cosecha_inmediata: record(g.id, "cosecha_inmediata"),
         },
       })),
@@ -87,7 +87,7 @@ export function createCooperativeRouter(pool: Pool, videoDir: string): Router {
     const user: SessionUser = res.locals.user;
     const { id, invernaderoId, alcance } = req.params;
     const kg = (req.body as Record<string, unknown> | undefined)?.kg;
-    if (alcance !== "lunes_jueves" && alcance !== "cosecha_inmediata") {
+    if (alcance !== "lunes_viernes" && alcance !== "cosecha_inmediata") {
       res.status(400).json({ error: "Tipo de cosecha no válido" });
       return;
     }

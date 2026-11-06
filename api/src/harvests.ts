@@ -1,4 +1,4 @@
-/** Recolecciones: empiezan en lunes y duran hasta el jueves. Fechas de calendario de España. */
+/** Recolecciones: empiezan en lunes y duran hasta el viernes. Fechas de calendario de España. */
 
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 const DAY_MS = 86_400_000;
@@ -17,10 +17,11 @@ export function isValidMonday(isoDate: string): boolean {
 
 export function harvestWeek(monday: string): HarvestWeek {
   const start = toUtc(monday);
-  const end = new Date(start.getTime() + 3 * DAY_MS);
-  // Semana ISO: la define el jueves, que es el último día de la recolección.
-  const year = end.getUTCFullYear();
-  const week = Math.floor((end.getTime() - Date.UTC(year, 0, 1)) / (7 * DAY_MS)) + 1;
+  const end = new Date(start.getTime() + 4 * DAY_MS);
+  // Semana ISO: la define su jueves, aunque la recolección siga hasta el viernes.
+  const thursday = new Date(start.getTime() + 3 * DAY_MS);
+  const year = thursday.getUTCFullYear();
+  const week = Math.floor((thursday.getTime() - Date.UTC(year, 0, 1)) / (7 * DAY_MS)) + 1;
   const sameMonth = start.getUTCMonth() === end.getUTCMonth();
   const label = sameMonth
     ? `${start.getUTCDate()}–${end.getUTCDate()} ${MONTHS[end.getUTCMonth()]}`

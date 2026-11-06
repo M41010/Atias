@@ -31,3 +31,10 @@ export function fmtCaptureSpan(isoDates: string[]): string {
   const hours = sorted.length === 1 ? timeFormat.format(first) : `${timeFormat.format(first)}–${timeFormat.format(last)}`;
   return `${dayFormat.format(first)}, ${hours}`;
 }
+
+const shortDayFormat = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+const decimalFormat = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+/** Día de calendario sin hora, por ejemplo: lun, 2 nov. */
+export const fmtDay = (isoDate: string) => shortDayFormat.format(new Date(`${isoDate}T00:00:00Z`));
+export const fmtDecimal = (value: number) => decimalFormat.format(value);

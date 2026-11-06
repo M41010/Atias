@@ -13,7 +13,7 @@ invernadero piloto, y ninguna cifra de precisión está medida.
 | Resultado | Kg observados y previsión experimental por cultivo, con desglose por invernadero, hilera y tramo, y total |
 | Cálculo de temporeros | Previsión ÷ (kg por jornal × días), por cultivo y ajustable |
 | Cultivos | Tomate cherry y pimiento (madurez por color); pepino (madurez por calibre) |
-| Frecuencia | Semanal. Captura viernes o sábado, recolección de lunes a jueves |
+| Frecuencia | Semanal. Captura el sábado, recolección de lunes a viernes (el sábado no se cosecha) |
 | Objetivo | Error ≤ 10 % en kg por invernadero, comparado con lo cosechado. Sin afirmarlo antes de medirlo |
 | Escala | Unos 600 invernaderos de dimensiones distintas |
 | Captura final | Automática. La idea inicial son raíles con cámara por ambos lados, a comparar con alternativas |
@@ -34,15 +34,15 @@ invernadero piloto, y ninguna cifra de precisión está medida.
 | H5. El color separa madurez en cada variedad bajo la luz del invernadero | Ni el umbral ni la variedad están definidos | Etiquetado con criterio del agrónomo |
 | H6. El calibre del pepino se puede medir con una sola cámara | La escala cambia con la distancia y el fruto puede estar tapado | Fruto medido a mano frente a estimado |
 | H7. Un factor de corrección es estable entre semanas e invernaderos | Determina si se puede escalar sin calibrar cada uno | Calibrar en unas semanas, evaluar en otras |
-| H8. Lo recolectado lunes–jueves se relaciona de forma estable con lo observado | De ello depende que el resultado sirva para planificar | Datos del piloto; Fase 3 |
+| H8. Lo recolectado de lunes a viernes se relaciona de forma estable con lo observado | De ello depende que el resultado sirva para planificar | Datos del piloto; Fase 3 |
 
 ## 2. Una distinción que condiciona el proyecto
 
-El sistema de la Fase 1 mide **lo que está maduro al capturar** (viernes o sábado). La recolección
-de lunes a jueves incluye además **lo que madure entre la captura y la recogida**, y en semanas de
+El sistema de la Fase 1 mide **lo que está maduro al capturar** (sábado). La recolección
+de lunes a viernes incluye además **lo que madure entre la captura y la recogida**, y en semanas de
 calor esa diferencia puede ser grande. En consecuencia:
 
-- Comparar directamente lo observado con la cosecha de lunes a jueves da un error que **no mide**
+- Comparar directamente lo observado con la cosecha de lunes a viernes da un error que **no mide**
   el sistema de visión. La simulación lo muestra: la misma estimación da mucho más error contra esa
   cosecha, sin que el detector haya cambiado.
 - La aplicación rotula siempre el dato como «fruta madura observada» y marca esa comparación como
@@ -133,7 +133,7 @@ Después, ampliar a un segundo invernadero **distinto** antes de planificar el d
 Datos necesarios:
 
 - **Capturas repetidas del mismo fruto**, idealmente varias por semana en una muestra de plantas: una
-  captura semanal solo muestra el inicio y el final. Con capturas viernes/sábado y lunes y jueves, se ve
+  captura semanal solo muestra el inicio y el final. Con capturas el sábado y a mitad de semana, se ve
   la transición dentro de la ventana que interesa.
 - **Color o calibre por fruto a lo largo del tiempo**, para medir la velocidad de cambio.
 - **Clima interior** (temperatura, radiación, humedad), probablemente el factor principal.

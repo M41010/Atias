@@ -1,21 +1,21 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { NumberField, TextField } from "@/components/Field";
+import { NumberField } from "@/components/Field";
 import { ResetControl } from "@/components/ResetControl";
 import { AnimatedNumber, ErrorState, ForecastHeader, PageHeader, PartialNote, Panel, Pill, Skeleton } from "@/components/ui";
-import { type CropId, DEFAULT_PARAMS, LATEST_HARVEST_ID, listPastHarvests, type Params } from "@/lib/api";
+import { DEFAULT_PARAMS, type FamilyId, LATEST_HARVEST_ID, listPastHarvests, type Params } from "@/lib/api";
 import { fmtBetween, fmtKg, fmtPct } from "@/lib/format";
 import { useDocumentTitle, useReport } from "@/lib/hooks";
-import { CROPS, GREENHOUSES } from "@/lib/simulated";
+import { CROPS, FAMILIES, FAMILY_ORDER, GREENHOUSES, GROWERS, TECHNICIANS } from "@/lib/simulated";
 import { useParamsEditor } from "@/lib/useParamsEditor";
 
 function withDefaults(params: Params): Params {
-  const crops = { ...params.crops };
-  for (const crop of Object.keys(crops) as CropId[]) {
-    crops[crop] = { ...DEFAULT_PARAMS.crops[crop], kgPerWorkday: crops[crop].kgPerWorkday };
+  const families = { ...params.families };
+  for (const family of Object.keys(families) as FamilyId[]) {
+    families[family] = { ...DEFAULT_PARAMS.families[family], kgPerWorkday: families[family].kgPerWorkday };
   }
-  return { ...params, crops };
+  return { ...params, families };
 }
 
 export default function ParametrosPage() {
@@ -32,7 +32,7 @@ export default function ParametrosPage() {
       description="Datos con los que se calcula la previsión de la recolección actual. Las semanas pasadas no cambian."
       actions={params && (
         <ResetControl
-          label="Restablecer maduración y variedades"
+          label="Restablecer maduración"
           changed={changed}
           canUndo={editor.undoTo !== null}
           onReset={() => editor.restore(params, withDefaults(params))}
@@ -46,9 +46,9 @@ export default function ParametrosPage() {
   if (editor.isError) return <>{header}<ErrorState message={editor.error.message} onRetry={editor.refetch} /></>;
 
   const current = params as Params;
-  const update = (crop: CropId, patch: Partial<Params["crops"][CropId]>) => {
+  const update = (family: FamilyId, patch: Partial<Params["families"][FamilyId]>) => {
     editor.clearUndo();
-    save.mutate({ ...current, crops: { ...current.crops, [crop]: { ...current.crops[crop], ...patch } } });
+    save.mutate({ ...current, families: { ...current.families, [family]: { ...current.families[family], ...patch } } });
   };
 
   return (
@@ -57,34 +57,28 @@ export default function ParametrosPage() {
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
         <div className="grid gap-5">
           <Panel
-            title="Cultivo y maduración"
-            description="Parte de los frutos inmaduros que se espera recoger. La indica el agricultor o agrónomo y se corregirá con lo cosechado."
+            title="Familias y maduración"
+            description="Parte de los frutos inmaduros que se espera recoger en una semana de tiempo normal. La indica el agricultor o agrónomo y se corregirá con lo cosechado. Con más calor madura más deprisa."
           >
             <div className="overflow-x-auto">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th scope="col">Cultivo</th>
-                    <th scope="col">Variedad</th>
+                    <th scope="col">Familia</th>
+                    <th scope="col">Tipo de cultivo</th>
                     <th scope="col" className="num">Maduración</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(Object.keys(CROPS) as CropId[]).map((crop) => (
+                  {FAMILY_ORDER.map((crop) => (
                     <tr key={crop}>
-                      <th scope="row" className="whitespace-nowrap">{CROPS[crop].name}</th>
-                      <td>
-                        <TextField
-                          label={`Variedad de ${CROPS[crop].name}`}
-                          value={current.crops[crop].variety}
-                          onCommit={(variety) => update(crop, { variety })}
-                        />
-                      </td>
+                      <th scope="row" className="whitespace-nowrap">{FAMILIES[crop].name}</th>
+                      <td className="text-muted">{CROPS[FAMILIES[crop].crop].name}</td>
                       <td className="num">
                         <NumberField
                           hideLabel
-                          label={`Maduración de ${CROPS[crop].name}`}
-                          value={current.crops[crop].ripeningPct}
+                          label={`Maduración de ${FAMILIES[crop].name}`}
+                          value={current.families[crop].ripeningPct}
                           min={0}
                           max={100}
                           unit="%"
@@ -98,12 +92,14 @@ export default function ParametrosPage() {
             </div>
           </Panel>
 
-          <Panel title="Invernaderos" description="Dimensiones y clima interior de ejemplo. Se editarán cuando se conecten datos reales.">
+          <Panel title="Invernaderos" description="Datos de ejemplo con nombres inventados. Cuando esté listo, la empresa dará de alta sus técnicos, agricultores e invernaderos. La localización sirve para obtener la meteorología.">
             <div className="overflow-x-auto">
               <table className="data-table">
                 <thead>
                   <tr>
                     <th scope="col">Invernadero</th>
+                    <th scope="col">Agricultor</th>
+                    <th scope="col">Localización</th>
                     <th scope="col" className="num">Hileras</th>
                     <th scope="col" className="num">Tramos por hilera</th>
                     <th scope="col" className="num">Temperatura</th>
@@ -115,8 +111,18 @@ export default function ParametrosPage() {
                     <tr key={g.id}>
                       <th scope="row" className="whitespace-nowrap">
                         {g.name}
-                        <span className="block text-xs font-normal text-muted">{CROPS[g.crop].name}</span>
+                        <span className="block text-xs font-normal text-muted">{FAMILIES[g.family].name}</span>
                       </th>
+                      <td className="whitespace-nowrap">
+                        {GROWERS.find((a) => a.id === g.growerId)?.name}
+                        <span className="block text-xs text-muted">
+                          Técnico: {TECHNICIANS.find((t) => t.id === GROWERS.find((a) => a.id === g.growerId)?.technicianId)?.name}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap">
+                        {g.location.municipality}
+                        <span className="block text-xs text-muted tabular-nums">{g.location.latitude.toFixed(3)}, {g.location.longitude.toFixed(3)}</span>
+                      </td>
                       <td className="num">{g.hileras}</td>
                       <td className="num">{g.tramosPorHilera}</td>
                       <td className="num">{g.temperaturaC} °C</td>
@@ -141,17 +147,21 @@ export default function ParametrosPage() {
                   <thead>
                     <tr>
                       <th scope="col">Recolección</th>
-                      <th scope="col" className="num"><ForecastHeader /></th>
                       <th scope="col" className="num">Cosechado (kg)</th>
-                      <th scope="col" className="num">Error</th>
+                      <th scope="col" className="num">Técnico (kg)</th>
+                      <th scope="col" className="num">Error técnico</th>
+                      <th scope="col" className="num"><ForecastHeader /></th>
+                      <th scope="col" className="num">Error Atias</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(past.data ?? []).map((h) => (
                       <tr key={h.id}>
                         <th scope="row" className="whitespace-nowrap">{h.label.replace("Recolección ", "")}</th>
-                        <td className="num">{fmtKg(h.forecastKg)}</td>
                         <td className="num">{fmtKg(h.realKg)}</td>
+                        <td className="num">{fmtKg(h.technicianKg)}</td>
+                        <td className="num">{h.technicianErrorPct === null ? "—" : fmtPct(h.technicianErrorPct)}</td>
+                        <td className="num">{fmtKg(h.forecastKg)}</td>
                         <td className="num">{h.errorPct === null ? "—" : fmtPct(h.errorPct)}</td>
                       </tr>
                     ))}
