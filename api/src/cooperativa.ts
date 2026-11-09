@@ -3,14 +3,15 @@ import { resolve } from "node:path";
 import express, { type Router } from "express";
 import { requireSession, type SessionUser } from "./auth.js";
 import { hashToken, type Pool } from "./db.js";
-import { harvestWeek, upcomingHarvests } from "./harvests.js";
+import { harvestWeek, isValidMonday, upcomingHarvests } from "./harvests.js";
 import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
+import { WeatherUnavailable, type WeatherService } from "./weather.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const CROPS = new Set(["tomate_cherry", "pimiento", "pepino"]);
 
 /** Rutas de la cooperativa. Todas exigen haber iniciado sesión. */
-export function createCooperativeRouter(pool: Pool, videoDir: string): Router {
+export function createCooperativeRouter(pool: Pool, videoDir: string, weather: WeatherService): Router {
   const router = express.Router();
   router.use(requireSession(pool));
 
@@ -147,6 +148,40 @@ export function createCooperativeRouter(pool: Pool, videoDir: string): Router {
       if (error.status === 404) res.status(404).json({ error: "Archivo no encontrado" });
       else next(error);
     });
+  });
+
+  // ---- Meteorología ----
+  // Temperatura por hora de sábado a viernes en un lugar, y lo normal en esas fechas.
+  router.get("/meteorologia", async (req, res) => {
+    const coordinate = (value: unknown) =>
+      typeof value === "string" && /^-?\d{1,3}(\.\d{1,6})?$/.test(value) ? Number(value) : Number.NaN;
+    const lat = coordinate(req.query.lat);
+    const lon = coordinate(req.query.lon);
+    const monday = typeof req.query.inicio === "string" ? req.query.inicio : "";
+    if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180
+      || !isValidMonday(monday)) {
+      res.status(400).json({ error: "Indica latitud, longitud y el lunes de la recolección" });
+      return;
+    }
+    try {
+      const week = await weather.week(lat, lon, monday);
+      res.json({
+        fuente: "open-meteo",
+        anosNormal: week.normalsYears,
+        actualizado: week.updatedAt,
+        desactualizado: week.stale,
+        dias: week.days.map((d) => ({
+          fecha: d.date,
+          tipo: d.kind,
+          temperaturaHoraria: d.hourlyTempC,
+          normalHoraria: d.normalHourlyTempC,
+          lluviaMm: d.precipitationMm,
+        })),
+      });
+    } catch (error) {
+      if (!(error instanceof WeatherUnavailable)) throw error;
+      res.status(503).json({ error: "La meteorología no está disponible ahora" });
+    }
   });
 
   // ---- Invernaderos ----

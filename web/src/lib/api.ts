@@ -4,7 +4,6 @@
  */
 
 import {
-  degreeDaysFromHourly,
   errorPct,
   forecastRange,
   harvestDayShares,
@@ -13,13 +12,11 @@ import {
   roundKeepingTotal,
   splitByDay,
   sumRanges,
-  weatherFactor,
   workersNeeded,
 } from "./calc";
 import {
   addDays,
   type AppWarning,
-  type DayWeather,
   DEFAULT_PARAMS,
   FAMILIES,
   FAMILY_ORDER,
@@ -36,6 +33,9 @@ import {
   TECHNICIANS,
   type Video,
 } from "./simulated";
+import { fetchRealWeather, type RealWeather, summarizeWeather, weatherKey, type WeatherSummary } from "./weather";
+
+export type { WeatherDay, WeatherSummary } from "./weather";
 
 // v2: los parámetros pasan de ir por cultivo a ir por familia.
 const PARAMS_KEY = "atias.params.v2";
@@ -65,23 +65,6 @@ export type DayRow = {
   real: number | null;
   technician: number;
   atias: number;
-};
-
-export type WeatherDay = DayWeather & {
-  tempMaxC: number;
-  tempMinC: number;
-  tempMeanC: number;
-  degreeDays: number;
-  normalDegreeDays: number;
-};
-
-export type WeatherSummary = {
-  days: WeatherDay[];
-  weeklyDegreeDays: number;
-  /** Grados-día normales de esa semana en ese lugar: la referencia. */
-  normalWeeklyDegreeDays: number;
-  /** Cuánto más (o menos) madura la fruta que en una semana normal. */
-  factor: number;
 };
 
 export type GreenhouseRow = {
@@ -227,21 +210,36 @@ function classesOf(family: FamilyId, fruits: number) {
 
 const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
 
-function weatherOf(info: GreenhouseInfo, monday: string): WeatherSummary {
-  const days = simulatedWeather(info.location, monday, SIMULATED_TODAY).map((d) => ({
-    ...d,
-    tempMaxC: Math.max(...d.hourlyTempC),
-    tempMinC: Math.min(...d.hourlyTempC),
-    tempMeanC: sum(d.hourlyTempC) / d.hourlyTempC.length,
-    degreeDays: degreeDaysFromHourly(d.hourlyTempC) ?? 0,
-    normalDegreeDays: degreeDaysFromHourly(d.normalHourlyTempC) ?? 0,
-  }));
-  const perDay = days.map((d) => d.degreeDays);
-  const normal = sum(days.map((d) => d.normalDegreeDays));
-  return { days, weeklyDegreeDays: sum(perDay), normalWeeklyDegreeDays: normal, factor: weatherFactor(perDay, normal) };
+type WeatherMap = Map<string, RealWeather | null>;
+
+/** Meteorología real si la hay; si no, la simulada, marcada como tal. */
+function weatherOf(info: GreenhouseInfo, monday: string, real: WeatherMap): WeatherSummary {
+  const found = real.get(weatherKey(info.location, monday));
+  if (found) return summarizeWeather(found.days, { source: "open-meteo", normalsYears: found.normalsYears, stale: found.stale });
+  return summarizeWeather(simulatedWeather(info.location, monday, SIMULATED_TODAY), {
+    source: "simulada",
+    normalsYears: null,
+    stale: false,
+  });
 }
 
-function buildReport(id: string, params: Params): HarvestReport | null {
+/** Pide a la API la semana de cada lugar distinto, todas a la vez. */
+async function loadWeather(harvestIds: string[]): Promise<WeatherMap> {
+  const wanted = new Map<string, { location: GreenhouseInfo["location"]; monday: string }>();
+  for (const harvest of HARVESTS.filter((h) => harvestIds.includes(h.id))) {
+    for (const capture of harvest.captures) {
+      const info = GREENHOUSES.find((g) => g.id === capture.greenhouseId) as GreenhouseInfo;
+      wanted.set(weatherKey(info.location, harvest.monday), { location: info.location, monday: harvest.monday });
+    }
+  }
+  if (demoMode() === "sin-meteo") return new Map();
+  const entries = await Promise.all(
+    [...wanted].map(async ([key, { location, monday }]) => [key, await fetchRealWeather(location, monday)] as const),
+  );
+  return new Map(entries);
+}
+
+function buildReport(id: string, params: Params, real: WeatherMap): HarvestReport | null {
   const harvest = HARVESTS.find((h) => h.id === id);
   if (!harvest) return null;
   const isLatest = id === LATEST_HARVEST_ID;
@@ -255,7 +253,7 @@ function buildReport(id: string, params: Params): HarvestReport | null {
     const grower = GROWERS.find((a) => a.id === info.growerId);
     const technician = TECHNICIANS.find((t) => t.id === grower?.technicianId);
     const settings = used.families[info.family];
-    const weather = weatherOf(info, harvest.monday);
+    const weather = weatherOf(info, harvest.monday, real);
     const hileras = capture.hileras.map((h) => buildHilera(h, settings.ripeningPct, weather.factor));
     const analyzed = hileras.filter((h) => h.observed);
     const observed = sumRanges(analyzed.map((h) => h.observed as KgRange));
@@ -380,16 +378,18 @@ export function listHarvests(): Promise<HarvestOption[]> {
   );
 }
 
-export function getReport(id: string): Promise<HarvestReport | null> {
-  return simulateLatency(() => buildReport(id, currentParams()));
+export async function getReport(id: string): Promise<HarvestReport | null> {
+  const real = await loadWeather([id]);
+  return simulateLatency(() => buildReport(id, currentParams(), real));
 }
 
 /** Todas las recolecciones con datos, para comparar previsiones semana a semana. */
-export function listReports(): Promise<HarvestReport[]> {
+export async function listReports(): Promise<HarvestReport[]> {
+  const real = await loadWeather(HARVESTS.map((h) => h.id));
   return simulateLatency(() => {
     const params = currentParams();
     return HARVESTS.flatMap((h) => {
-      const report = buildReport(h.id, params);
+      const report = buildReport(h.id, params, real);
       return report && !report.empty ? [report] : [];
     });
   });
@@ -406,10 +406,11 @@ export type PastHarvest = {
 };
 
 /** Recolecciones ya pesadas, siempre con los parámetros que se usaron entonces. */
-export function listPastHarvests(): Promise<PastHarvest[]> {
+export async function listPastHarvests(): Promise<PastHarvest[]> {
+  const real = await loadWeather(HARVESTS.map((h) => h.id));
   return simulateLatency(() =>
     HARVESTS.flatMap((h) => {
-      const report = buildReport(h.id, DEFAULT_PARAMS);
+      const report = buildReport(h.id, DEFAULT_PARAMS, real);
       if (!report || report.realKg === null) return [];
       const technicianKg = report.greenhouses.reduce((total, g) => total + g.technicianKg, 0);
       return [{

@@ -16,6 +16,7 @@ import { createPool, hashToken, migrate, type Pool, seedDemo } from "./db.js";
 import { harvestWeek, upcomingHarvests } from "./harvests.js";
 import { createQualityRunner, reviewPendingVideos } from "./quality.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
+import { localDateHour, localMidnight } from "./weather.js";
 
 const databaseUrl = process.env.TEST_DATABASE_URL;
 if (!databaseUrl) throw new Error("Falta TEST_DATABASE_URL: usa compose.test.yaml");
@@ -42,6 +43,35 @@ describe("API", () => {
   let analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
   let analysisCalls: string[] = [];
   let analysisUrl = "";
+  // Open-Meteo falso: el histórico da la hora del día como temperatura; la previsión, 20 °C y 0,1 mm/h.
+  let meteoDown = false;
+  let meteoCalls: string[] = [];
+  let weatherNow = Date.parse("2026-11-11T12:00:00Z");
+  let meteoUrl = "";
+  const meteo = createServer((req, res) => {
+    const url = new URL(req.url ?? "/", "http://meteo");
+    const start = url.searchParams.get("start_date") as string;
+    const end = url.searchParams.get("end_date") as string;
+    meteoCalls.push(`${url.pathname} ${start} ${end}`);
+    if (meteoDown) {
+      res.statusCode = 500;
+      res.end("{}");
+      return;
+    }
+    const archive = url.pathname === "/v1/archive";
+    const endMs = localMidnight(new Date(Date.parse(`${end}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10));
+    const time: number[] = [];
+    for (let t = localMidnight(start); t < endMs; t += 3_600_000) time.push(t / 1000);
+    res.setHeader("content-type", "application/json");
+    res.end(JSON.stringify({
+      hourly: {
+        time,
+        temperature_2m: time.map((t) => (archive ? localDateHour(t * 1000).hour : 20)),
+        precipitation: time.map(() => 0.1),
+      },
+    }));
+  });
+
   const analysis = createServer((req, res) => {
     let body = "";
     req.on("data", (chunk) => { body += chunk; });
@@ -123,7 +153,16 @@ describe("API", () => {
     videoDir = await mkdtemp(join(tmpdir(), "atias-videos-"));
     store = createVideoStore(videoDir);
     analysisUrl = await listen(analysis);
-    apiServer = createServer(createApp({ analysisUrl, pool, store, limiter }));
+    meteoUrl = await listen(meteo);
+    apiServer = createServer(createApp({
+      analysisUrl, pool, store, limiter,
+      weather: {
+        forecastUrl: `${meteoUrl}/v1/forecast`,
+        archiveUrl: `${meteoUrl}/v1/archive`,
+        normalsYears: 1,
+        now: () => weatherNow,
+      },
+    }));
     api = await listen(apiServer);
   });
 
@@ -144,7 +183,7 @@ describe("API", () => {
   });
 
   after(async () => {
-    await Promise.all([close(apiServer), close(analysis)]);
+    await Promise.all([close(apiServer), close(analysis), close(meteo)]);
     await pool.end();
     await rm(videoDir, { recursive: true, force: true });
   });
@@ -777,6 +816,91 @@ describe("API", () => {
       ]) {
         assert.equal((await add(bad)).status, 400, JSON.stringify(bad));
       }
+    });
+  });
+
+  describe("meteorología", () => {
+    // Carchuna. "Hoy" es el miércoles 11 de noviembre a las 13:00 en España.
+    const week = (inicio = "2026-11-09", lat = "36.7", lon = "-3.443") =>
+      coop(`/meteorologia?lat=${lat}&lon=${lon}&inicio=${inicio}`);
+    type Day = { fecha: string; tipo: string; temperaturaHoraria: number[]; normalHoraria: number[]; lluviaMm: number };
+    const days = async (response: Response) => {
+      assert.equal(response.status, 200);
+      return (await response.json() as { dias: Day[]; desactualizado: boolean }).dias;
+    };
+
+    beforeEach(async () => {
+      await pool.query("DELETE FROM weather_points");
+      meteoDown = false;
+      meteoCalls = [];
+      weatherNow = Date.parse("2026-11-11T12:00:00Z");
+    });
+
+    it("exige sesión y valida lugar y fecha", async () => {
+      const anonymous = await fetch(`${api}/api/cooperativa/meteorologia?lat=36.7&lon=-3.443&inicio=2026-11-09`);
+      assert.equal(anonymous.status, 401);
+      assert.equal((await week("2026-11-10")).status, 400);
+      assert.equal((await week("2026-11-09", "100")).status, 400);
+      assert.equal((await week("2026-11-09", "")).status, 400);
+      assert.equal((await coop("/meteorologia?lat=36.7&inicio=2026-11-09")).status, 400);
+      assert.deepEqual(meteoCalls, []);
+    });
+
+    it("da de sábado a viernes la temperatura por hora, lo normal y la lluvia", async () => {
+      const dias = await days(await week());
+      assert.deepEqual(dias.map((d) => d.fecha), [
+        "2026-11-07", "2026-11-08", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13",
+      ]);
+      assert.deepEqual(dias.map((d) => d.tipo), [
+        "observado", "observado", "observado", "observado", "prevision", "prevision", "prevision",
+      ]);
+      assert.ok(dias.every((d) => d.temperaturaHoraria.length === 24 && d.temperaturaHoraria.every((t) => t === 20)));
+      assert.deepEqual(dias[0].normalHoraria, Array.from({ length: 24 }, (_, h) => h));
+      assert.equal(dias[0].lluviaMm, 2.4);
+    });
+
+    it("guarda lo pedido y solo vuelve a pedir la previsión cuando caduca", async () => {
+      await week();
+      await week();
+      assert.equal(meteoCalls.filter((c) => c.startsWith("/v1/archive")).length, 1);
+      assert.equal(meteoCalls.filter((c) => c.startsWith("/v1/forecast")).length, 1);
+      weatherNow += 2 * 3_600_000;
+      await week();
+      assert.equal(meteoCalls.filter((c) => c.startsWith("/v1/forecast")).length, 2);
+    });
+
+    it("una semana ya pasada no se vuelve a pedir", async () => {
+      await week("2026-11-02");
+      weatherNow += 5 * 3_600_000;
+      await week("2026-11-02");
+      assert.equal(meteoCalls.filter((c) => c.startsWith("/v1/forecast")).length, 1);
+    });
+
+    it("el día del cambio de hora tiene 25 horas", async () => {
+      const dias = await days(await week("2026-10-26"));
+      assert.equal(dias.find((d) => d.fecha === "2026-10-25")?.temperaturaHoraria.length, 25);
+    });
+
+    it("más allá de la previsión usa lo normal y lo indica", async () => {
+      const dias = await days(await week("2027-01-04"));
+      assert.ok(dias.every((d) => d.tipo === "normal"));
+      assert.deepEqual(dias[0].temperaturaHoraria, dias[0].normalHoraria);
+      assert.ok(!meteoCalls.some((c) => c.startsWith("/v1/forecast")));
+    });
+
+    it("lo muy antiguo se pide al histórico", async () => {
+      await week("2026-06-01");
+      assert.ok(meteoCalls.includes("/v1/archive 2026-05-30 2026-06-05"));
+    });
+
+    it("si Open-Meteo falla, sirve lo guardado avisando, y sin nada guardado responde 503", async () => {
+      await week();
+      weatherNow += 2 * 3_600_000;
+      meteoDown = true;
+      const stale = await week();
+      assert.equal(stale.status, 200);
+      assert.equal((await stale.json() as { desactualizado: boolean }).desactualizado, true);
+      assert.equal((await week("2026-11-09", "37.5", "-4")).status, 503);
     });
   });
 

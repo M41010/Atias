@@ -2,7 +2,7 @@
   "name": "atias-api",
   "version": "0.1.0",
   "scripts": {
-    "test": "tsx --test --test-concurrency=1 src/harvests.test.ts src/app.test.ts",
+    "test": "tsx --test --test-concurrency=1 src/harvests.test.ts src/weather.test.ts src/app.test.ts",
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"

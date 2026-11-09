@@ -219,6 +219,38 @@ const MIGRATIONS: { id: string; sql: string }[] = [
       );
     `,
   },
+  {
+    id: "006_meteorologia_real",
+    sql: `
+      -- La temperatura exterior depende del lugar, no del invernadero: varios invernaderos cercanos
+      -- comparten punto. Las coordenadas se redondean a 0,01° (unos 1 km); Open-Meteo trabaja a unos 10 km.
+      CREATE TABLE weather_points (
+        id text PRIMARY KEY,
+        latitude double precision NOT NULL CHECK (latitude BETWEEN -90 AND 90),
+        longitude double precision NOT NULL CHECK (longitude BETWEEN -180 AND 180),
+        normals_years integer CHECK (normals_years > 0),
+        normals_computed_at timestamptz
+      );
+      -- Temperatura exterior por hora de Open-Meteo. prevision pasa a observado al volver a pedirla.
+      CREATE TABLE point_weather (
+        point_id text NOT NULL REFERENCES weather_points(id) ON DELETE CASCADE,
+        measured_at timestamptz NOT NULL CHECK (date_trunc('hour', measured_at) = measured_at),
+        kind text NOT NULL CHECK (kind IN ('prevision', 'observado')),
+        temp_c double precision NOT NULL CHECK (temp_c BETWEEN -30 AND 60),
+        precipitation_mm double precision CHECK (precipitation_mm >= 0),
+        fetched_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (point_id, measured_at)
+      );
+      -- Lo normal en cada fecha y hora (hora de España): media de los años anteriores.
+      CREATE TABLE point_normals (
+        point_id text NOT NULL REFERENCES weather_points(id) ON DELETE CASCADE,
+        month_day text NOT NULL CHECK (month_day ~ '^[0-1][0-9]-[0-3][0-9]$'),
+        hour smallint NOT NULL CHECK (hour BETWEEN 0 AND 23),
+        temp_c double precision NOT NULL,
+        PRIMARY KEY (point_id, month_day, hour)
+      );
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */
