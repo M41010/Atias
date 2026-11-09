@@ -2,8 +2,16 @@
 #   docker compose up --build
 name: atias
 
+# Menos privilegios: los procesos no pueden ganar permisos ni usar capacidades especiales del sistema.
+x-endurecido: &endurecido
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
 services:
   web:
+    <<: *endurecido
     build:
       context: ./web
       target: produccion
@@ -24,6 +32,7 @@ services:
       context: ./api
       target: produccion
     image: atias-api
+    <<: *endurecido
     init: true
     restart: unless-stopped
     environment:
@@ -31,10 +40,16 @@ services:
       ANALISIS_URL: http://analisis:8000
       DATABASE_URL: postgres://atias:${POSTGRES_PASSWORD:-atias_local}@db:5432/atias
       VIDEO_DIR: /data/videos
-      # Crea los invernaderos y enlaces de prueba. Debe desactivarse fuera del entorno local.
-      ATIAS_DATOS_DEMO: "${ATIAS_DATOS_DEMO:-1}"
+      # Enlaces de prueba públicos (/subir/demo-invernadero-1…). Apagados salvo que se pidan:
+      # en este equipo se activan desde el archivo .env. Al apagarlos se retiran de la base de datos.
+      ATIAS_DATOS_DEMO: "${ATIAS_DATOS_DEMO:-0}"
+      # No acepta un vídeo que deje el disco con menos de estos GB libres.
+      ATIAS_ESPACIO_LIBRE_GB: "${ATIAS_ESPACIO_LIBRE_GB:-10}"
       # Actívala (1) en cuanto haya HTTPS.
       ATIAS_COOKIE_SEGURA: "${ATIAS_COOKIE_SEGURA:-0}"
+      # 1 solo si delante hay un proxy (HTTPS en la nube) que escribe X-Forwarded-For con la
+      # dirección real. Así los bloqueos de acceso van por equipo y no por cuenta.
+      ATIAS_PROXY_DE_CONFIANZA: "${ATIAS_PROXY_DE_CONFIANZA:-0}"
     volumes:
       - videos:/data/videos
     ports:
@@ -54,6 +69,8 @@ services:
   # Sin puerto publicado: solo la API puede hablar con la base de datos.
   db:
     image: postgres:17.6-alpine
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
     environment:
       POSTGRES_DB: atias
@@ -74,8 +91,17 @@ services:
       context: .
       dockerfile: analisis.Dockerfile
     image: atias-analisis
+    <<: *endurecido
     init: true
     restart: unless-stopped
+    # Abre vídeos que no son de confianza: un archivo preparado para colgar o agotar el equipo
+    # solo puede afectar a este contenedor. Además no puede escribir fuera de /tmp.
+    read_only: true
+    tmpfs:
+      - /tmp
+    mem_limit: 3g
+    cpus: 2
+    pids_limit: 256
     environment:
       PORT: "8000"
       VIDEO_DIR: /data/videos

@@ -5,6 +5,7 @@ import { requireSession, type SessionUser } from "./auth.js";
 import { hashToken, type Pool } from "./db.js";
 import { harvestWeek, isValidMonday, upcomingHarvests } from "./harvests.js";
 import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
+import { VIDEO_TYPES } from "./uploads.js";
 import { WeatherUnavailable, type WeatherService } from "./weather.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -136,8 +137,11 @@ export function createCooperativeRouter(pool: Pool, videoDir: string, weather: W
       res.status(404).json({ error: "Vídeo no encontrado" });
       return;
     }
-    res.setHeader("Content-Type", rows[0].mime_type);
+    // Un tipo guardado antes de exigir la lista de vídeos se sirve como descarga, nunca tal cual.
+    res.setHeader("Content-Type", VIDEO_TYPES.has(rows[0].mime_type) ? rows[0].mime_type : "application/octet-stream");
     res.setHeader("X-Content-Type-Options", "nosniff");
+    // Segunda barrera: aunque el navegador lo abriera como página, no podría ejecutar nada.
+    res.setHeader("Content-Security-Policy", "sandbox; default-src 'none'");
     res.setHeader("Cache-Control", "private, no-store");
     res.sendFile(req.params.id, { root: resolve(videoDir) }, (error?: Error & { status?: number }) => {
       if (!error) return;

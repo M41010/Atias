@@ -1,6 +1,7 @@
 # Abre SOLO la web a tu red local, para probarla desde el móvil. Úsalo mientras haga falta:
 #   docker compose -f compose.yaml -f compose.red-local.yaml up --build
-# Cualquier equipo de la misma red podrá entrar mientras esté activo, y la app no tiene contraseña.
+# Cualquier equipo de la misma red podrá entrar mientras esté activo y usar los enlaces de prueba,
+# si están activos en .env. La cooperativa pide contraseña, pero sin HTTPS viaja sin cifrar.
 services:
   web:
     ports: !override

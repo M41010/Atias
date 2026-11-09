@@ -1,11 +1,34 @@
 import { randomUUID } from "node:crypto";
+import { statfs } from "node:fs/promises";
 import { FileStore } from "@tus/file-store";
 import { Server } from "@tus/server";
 import type { Pool } from "./db.js";
 import { currentHileras, LINK_HEADER, resolveLink } from "./links.js";
 
+// Un vídeo de 10 minutos grabado en 4K con el móvil ocupa unos 4-6 GB.
 export const MAX_VIDEO_BYTES = 8 * 1024 ** 3;
 export const UPLOADS_PATH = "/api/subidas";
+/** Versiones guardadas a la vez por cada lado de hilera, de media, contando sustituidas y quitadas. */
+export const MAX_VERSIONS_PER_SIDE = 4;
+export const DEFAULT_MIN_FREE_BYTES = 10 * 1024 ** 3;
+
+/**
+ * Solo estos tipos se aceptan, y solo estos se sirven tal cual. Cualquier otro valor podría hacer
+ * que el navegador tratase el archivo como una página web y ejecutase su código.
+ */
+export const VIDEO_TYPES = new Set(["video/mp4", "video/quicktime", "video/webm", "video/3gpp", "video/x-matroska"]);
+
+/** Espacio libre en la carpeta de vídeos, en bytes. */
+export async function freeBytes(directory: string): Promise<number> {
+  const stats = await statfs(directory);
+  return stats.bavail * stats.bsize;
+}
+
+export type UploadLimits = {
+  /** Espacio que siempre debe quedar libre en el disco tras aceptar una subida. */
+  minFreeBytes?: number;
+  freeSpace?: (directory: string) => Promise<number>;
+};
 
 const reject = (status_code: number, body: string) => ({ status_code, body });
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -18,7 +41,11 @@ export function createVideoStore(directory: string): FileStore {
  * Servidor de subidas reanudables (protocolo tus). Cada petición se valida contra el enlace,
  * y una subida solo es accesible desde el enlace de su propio invernadero y recolección.
  */
-export function createUploadServer(pool: Pool, store: FileStore): Server {
+export function createUploadServer(
+  pool: Pool,
+  store: FileStore,
+  { minFreeBytes = DEFAULT_MIN_FREE_BYTES, freeSpace = freeBytes }: UploadLimits = {},
+): Server {
   return new Server({
     path: UPLOADS_PATH,
     datastore: store,
@@ -53,11 +80,26 @@ export function createUploadServer(pool: Pool, store: FileStore): Server {
 
       const { filename, filetype, hilera: rawHilera, lado } = upload.metadata ?? {};
       const hilera = Number(rawHilera);
+      const mimeType = filetype?.trim().toLowerCase() ?? "";
       if (!upload.size) throw reject(400, "Falta el tamaño del vídeo\n");
-      if (!filetype?.startsWith("video/")) throw reject(415, "El archivo no es un vídeo\n");
+      if (!VIDEO_TYPES.has(mimeType)) throw reject(415, "El archivo no es un vídeo\n");
       if (lado !== "A" && lado !== "B") throw reject(400, "Lado no válido\n");
-      if (!Number.isInteger(hilera) || hilera < 1 || hilera > (await currentHileras(pool, link))) {
+      const hileras = await currentHileras(pool, link);
+      if (!Number.isInteger(hilera) || hilera < 1 || hilera > hileras) {
         throw reject(400, "Hilera no válida\n");
+      }
+
+      // Cada versión sustituida o quitada sigue en el disco hasta 7 días: sin límite, un enlace
+      // podría llenarlo subiendo una y otra vez.
+      const stored = await pool.query(
+        "SELECT count(*)::int AS total FROM videos WHERE greenhouse_id = $1 AND harvest_id = $2",
+        [link.greenhouseId, link.harvestId],
+      );
+      if (stored.rows[0].total >= hileras * 2 * MAX_VERSIONS_PER_SIDE) {
+        throw reject(429, "Demasiados vídeos guardados para este invernadero\n");
+      }
+      if ((await freeSpace(store.directory)) - upload.size < minFreeBytes) {
+        throw reject(507, "No queda espacio para guardar el vídeo\n");
       }
       const fileName = (filename ?? "video").replace(/[\p{Cc}]/gu, "").slice(0, 255) || "video";
 
@@ -70,7 +112,7 @@ export function createUploadServer(pool: Pool, store: FileStore): Server {
       await pool.query(
         `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'subiendo')`,
-        [upload.id, link.greenhouseId, link.harvestId, hilera, lado, fileName, filetype, upload.size],
+        [upload.id, link.greenhouseId, link.harvestId, hilera, lado, fileName, mimeType, upload.size],
       );
       return {};
     },

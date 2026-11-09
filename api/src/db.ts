@@ -286,6 +286,18 @@ export function hashToken(token: string): string {
 
 export const DEMO_TOKENS = ["demo-invernadero-1", "demo-invernadero-2", "demo-invernadero-3"];
 
+/**
+ * Quita los enlaces de prueba. Son públicos (aparecen en la documentación), así que no deben
+ * seguir valiendo cuando se arranca sin datos de prueba, aunque se cargaran en otro arranque.
+ */
+export async function removeDemoLinks(pool: Pool): Promise<number> {
+  const { rowCount } = await pool.query(
+    "DELETE FROM upload_links WHERE token_sha256 = ANY($1)",
+    [DEMO_TOKENS.map(hashToken)],
+  );
+  return rowCount ?? 0;
+}
+
 /** Datos de prueba para el prototipo. Solo se cargan si se pide expresamente. */
 export async function seedDemo(pool: Pool): Promise<void> {
   await pool.query(`
