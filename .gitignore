@@ -12,6 +12,9 @@ data/
 *.sqlite
 *.db
 
+# Modelos entrenados: pesados, se generan con notebooks/entrenar_detector.ipynb.
+modelos/
+
 # Configuración local y material de trabajo del diseño.
 .env
 .impeccable/mocks/

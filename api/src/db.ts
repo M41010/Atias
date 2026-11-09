@@ -251,6 +251,22 @@ const MIGRATIONS: { id: string; sql: string }[] = [
       );
     `,
   },
+  {
+    id: "007_conteo_frutos",
+    sql: `
+      -- Frutos contados por el detector en cada vídeo, por tramo y clase. pendiente sigue así
+      -- mientras no haya modelo para ese cultivo; error, si el vídeo no se pudo contar.
+      ALTER TABLE videos
+        ADD COLUMN count_status text NOT NULL DEFAULT 'pendiente'
+          CHECK (count_status IN ('pendiente', 'ok', 'error')),
+        ADD COLUMN count jsonb,
+        ADD COLUMN count_attempts integer NOT NULL DEFAULT 0,
+        ADD COLUMN counted_at timestamptz;
+      -- Cada hilera se divide en tramos iguales para el desglose (sin marcadores físicos).
+      ALTER TABLE greenhouses
+        ADD COLUMN tramos smallint NOT NULL DEFAULT 8 CHECK (tramos BETWEEN 1 AND 50);
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */

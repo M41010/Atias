@@ -14,6 +14,7 @@ import { createApp } from "./app.js";
 import { disableUser, LoginLimiter, setUserPassword } from "./auth.js";
 import { createPool, hashToken, migrate, type Pool, removeDemoLinks, seedDemo } from "./db.js";
 import { harvestWeek, upcomingHarvests } from "./harvests.js";
+import { countPendingVideos } from "./counting.js";
 import { createQualityRunner, reviewPendingVideos } from "./quality.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
 import { localDateHour, localMidnight } from "./weather.js";
@@ -72,10 +73,22 @@ describe("API", () => {
     }));
   });
 
+  // Conteo: cada prueba decide la respuesta según el cultivo pedido.
+  type CountRequest = { video: string; cultivo: string; tramos: number };
+  let countCalls: CountRequest[] = [];
+  let countReply: (request: CountRequest) => { status: number; body: unknown } = () => ({ status: 200, body: {} });
   const analysis = createServer((req, res) => {
     let body = "";
     req.on("data", (chunk) => { body += chunk; });
     req.on("end", () => {
+      if (req.url === "/conteo") {
+        const request = JSON.parse(body) as CountRequest;
+        countCalls.push(request);
+        const reply = countReply(request);
+        res.statusCode = reply.status;
+        res.end(JSON.stringify(reply.body));
+        return;
+      }
       if (req.url === "/calidad") analysisCalls.push(JSON.parse(body).video);
       res.statusCode = analysisStatus;
       res.end(analysisBody);
@@ -928,6 +941,83 @@ describe("API", () => {
       ]) {
         assert.equal((await add(bad)).status, 400, JSON.stringify(bad));
       }
+    });
+  });
+
+  describe("conteo de frutos", () => {
+    const result = (maduros: number) => ({
+      detector: "rfdetr-prueba",
+      maduros,
+      frutos: maduros + 3,
+      tramos: [{ n: 1, maduros, clases: { rojo: maduros, inmaduro: 3 } }],
+      fotogramasAnalizados: 900,
+      duracionS: 300,
+      posicion: "desplazamiento",
+      avisos: [],
+    });
+    const countOf = async (id: string) =>
+      (await pool.query("SELECT count_status, count_attempts, count FROM videos WHERE id = $1", [id])).rows[0];
+
+    beforeEach(() => {
+      countCalls = [];
+      countReply = () => ({ status: 200, body: result(12) });
+    });
+
+    it("cuenta cada vídeo recibido con el cultivo y los tramos de su invernadero", async () => {
+      const id = await uploadComplete();
+      assert.equal(await countPendingVideos(pool, analysisUrl), 1);
+      assert.deepEqual(countCalls, [{ video: id, cultivo: "tomate_cherry", tramos: 8 }]);
+      assert.equal((await countOf(id)).count_status, "ok");
+      // La cooperativa lo ve; el detalle interno del análisis no se envía.
+      const overview = await (await coop(`/recolecciones/${HARVEST}`)).json() as {
+        invernaderos: { id: string; videos: { conteo: { estado: string; resultado: Record<string, unknown> } }[] }[];
+      };
+      const video = overview.invernaderos.find((g) => g.id === "inv-1")?.videos[0];
+      assert.equal(video?.conteo.estado, "ok");
+      assert.equal(video?.conteo.resultado.maduros, 12);
+      assert.equal(video?.conteo.resultado.fotogramasAnalizados, undefined);
+    });
+
+    it("sin modelo para un cultivo lo deja pendiente sin gastar intentos y sigue con los demás", async () => {
+      countReply = ({ cultivo }) => (cultivo === "tomate_cherry"
+        ? { status: 503, body: { error: "sin_detector" } }
+        : { status: 200, body: result(5) });
+      const cherry = await uploadComplete();
+      const pepper = await uploadComplete({ token: OTHER_TOKEN });
+      assert.equal(await countPendingVideos(pool, analysisUrl), 1);
+      assert.deepEqual(await countOf(cherry), { count_status: "pendiente", count_attempts: 0, count: null });
+      assert.equal((await countOf(pepper)).count_status, "ok");
+    });
+
+    it("un vídeo ilegible queda en error sin más intentos", async () => {
+      countReply = () => ({ status: 422, body: { error: "Vídeo ilegible" } });
+      const id = await uploadComplete();
+      await countPendingVideos(pool, analysisUrl);
+      assert.equal((await countOf(id)).count_status, "error");
+      assert.equal(countCalls.length, 1);
+    });
+
+    it("tras 3 errores del servicio se rinde", async () => {
+      countReply = () => ({ status: 500, body: {} });
+      const id = await uploadComplete();
+      await countPendingVideos(pool, analysisUrl);
+      assert.deepEqual(await countOf(id), { count_status: "error", count_attempts: 3, count: null });
+    });
+
+    it("con el servicio caído o reiniciándose sigue pendiente, sin gastar intentos", async () => {
+      const id = await uploadComplete();
+      assert.equal(await countPendingVideos(pool, "http://127.0.0.1:1"), 0);
+      countReply = () => ({ status: 503, body: { error: "otro" } });
+      await countPendingVideos(pool, analysisUrl);
+      assert.deepEqual(await countOf(id), { count_status: "pendiente", count_attempts: 0, count: null });
+    });
+
+    it("no cuenta subidas a medias ni vídeos quitados", async () => {
+      await createUpload({ size: 10 });
+      const id = await uploadComplete({ hilera: 2 });
+      await link(`/videos/${id}`, { method: "DELETE" });
+      assert.equal(await countPendingVideos(pool, analysisUrl), 0);
+      assert.deepEqual(countCalls, []);
     });
   });
 

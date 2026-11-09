@@ -100,14 +100,18 @@ services:
     tmpfs:
       - /tmp
     mem_limit: 3g
-    cpus: 2
+    # Contar frutos usa toda la CPU que se le dé: súbelo si el equipo tiene más núcleos libres.
+    cpus: ${ATIAS_CPUS_ANALISIS:-2}
     pids_limit: 256
     environment:
       PORT: "8000"
       VIDEO_DIR: /data/videos
+      # Un modelo por cultivo: modelos/<cultivo>/modelo.onnx y modelo.json (ver notebooks/).
+      ATIAS_MODELOS: /modelos
     # Solo lectura: el análisis nunca modifica los vídeos.
     volumes:
       - videos:/data/videos:ro
+      - ./modelos:/modelos:ro
     healthcheck:
       test: ["CMD", ".venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/salud', timeout=3)"]
       interval: 10s

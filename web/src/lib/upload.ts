@@ -1,5 +1,6 @@
 /** Estado de las subidas del agricultor, sin dependencias de la interfaz ni de la red. */
 
+import type { VideoCount } from "./count";
 import type { VideoQuality } from "./quality";
 
 export type Side = "A" | "B";
@@ -31,6 +32,8 @@ export type ServerVideo = {
   status: "recibido" | "subiendo";
   receivedAt: string | null;
   calidad: VideoQuality;
+  /** Frutos contados por el detector. */
+  conteo?: VideoCount;
 };
 
 export const MAX_VIDEO_BYTES = 8 * 1024 ** 3;
