@@ -163,9 +163,12 @@ export function RailLabels({ t, locale }: { t: Texts; locale: string }) {
             fontSize: 22,
             fontWeight: 700,
             whiteSpace: "nowrap",
-            borderLeft: `5px solid ${C.sproutLight}`,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
           }}
         >
+          <span style={{ width: 12, height: 12, borderRadius: 999, background: C.sproutLight }} />
           T{l.i + 1} · {fmt(l.fruits, locale)} {t.chips[0]}
         </div>
       ))}
