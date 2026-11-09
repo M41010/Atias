@@ -1,0 +1,26 @@
+{
+  "name": "atias-video",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vídeo de presentación de Atias, generado con Remotion.",
+  "scripts": {
+    "estudio": "remotion studio src/index.ts",
+    "render": "node render.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.8.2",
+    "@remotion/cli": "4.0.538",
+    "@remotion/google-fonts": "4.0.538",
+    "@remotion/three": "4.0.538",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.538",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "@types/three": "0.186.0",
+    "typescript": "5.9.3"
+  }
+}
