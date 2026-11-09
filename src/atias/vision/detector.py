@@ -23,6 +23,8 @@ class Detection:
     y2: int
     score: float = 1.0
     truncated: bool = False  # Toca el borde del encuadre: sus medidas no son fiables.
+    # Clase que da el propio detector (id de clase del perfil del cultivo). None si solo detecta.
+    label: str | None = None
 
     @property
     def center(self) -> tuple[float, float]:

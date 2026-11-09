@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir uv==0.13.6
 COPY pyproject.toml uv.lock .python-version README.md LICENSE ./
 RUN uv sync --frozen --no-dev --no-install-project
 COPY src ./src
+COPY config/cultivos.plantilla.json ./config/cultivos.plantilla.json
 RUN uv sync --frozen --no-dev
 
 RUN useradd --create-home --uid 1000 atias && chown -R atias /app

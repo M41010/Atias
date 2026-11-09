@@ -46,8 +46,13 @@ class CenterTracker:
         self._motion = np.zeros(2)  # Desplazamiento global estimado por fotograma.
 
     def update(self, frame: int, detections: list[Detection],
-               attributes: list[dict[str, Any]] | None = None) -> None:
+               attributes: list[dict[str, Any]] | None = None,
+               motion: tuple[float, float] | None = None) -> None:
+        """``motion``: desplazamiento de la imagen medido aparte (px por fotograma). Con pocos
+        fotogramas por segundo un fruto salta lejos y sin esta pista no se reconocería."""
         attributes = attributes or [{} for _ in detections]
+        if motion is not None:
+            self._motion = np.array(motion, dtype=float)
         centers = [np.array(d.center) for d in detections]
 
         candidates = []

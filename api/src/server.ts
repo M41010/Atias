@@ -1,11 +1,13 @@
 import { createApp } from "./app.js";
 import { purgeExpiredSessions } from "./auth.js";
 import { createPool, migrate, removeDemoLinks, seedDemo } from "./db.js";
+import { createCountRunner } from "./counting.js";
 import { createQualityRunner } from "./quality.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
 
 const PURGE_INTERVAL_MS = 60 * 60 * 1000;
 const QUALITY_INTERVAL_MS = 5000;
+const COUNT_INTERVAL_MS = 30_000;
 
 const port = Number(process.env.PORT ?? 4000);
 const analysisUrl = process.env.ANALISIS_URL ?? "http://localhost:8000";
@@ -33,6 +35,8 @@ const purge = () =>
 void purge();
 const purgeTimer = setInterval(purge, PURGE_INTERVAL_MS);
 const qualityTimer = setInterval(createQualityRunner(pool, analysisUrl), QUALITY_INTERVAL_MS);
+// Aparte de la calidad: un conteo puede tardar mucho y no debe retrasar los avisos de calidad.
+const countTimer = setInterval(createCountRunner(pool, analysisUrl), COUNT_INTERVAL_MS);
 
 const server = createApp({
   analysisUrl,
@@ -51,6 +55,7 @@ for (const signal of ["SIGTERM", "SIGINT"] as const) {
   process.on(signal, () => {
     clearInterval(purgeTimer);
     clearInterval(qualityTimer);
+    clearInterval(countTimer);
     server.close(() => {
       void pool.end().finally(() => process.exit(0));
     });

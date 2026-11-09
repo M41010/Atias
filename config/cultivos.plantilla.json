@@ -5,8 +5,8 @@
       "label": "Tomate cherry",
       "criterion": "color",
       "classes": [
-        { "id": "rojo", "label": "Rojo", "mature": true, "hue_ranges": null },
-        { "id": "inmaduro", "label": "Inmaduro", "mature": false, "hue_ranges": null }
+        { "id": "rojo", "label": "Rojo", "mature": true, "hue_ranges": [[0, 10], [170, 179]] },
+        { "id": "inmaduro", "label": "Inmaduro", "mature": false, "hue_ranges": [[11, 85]] }
       ],
       "weights": { "rojo": null },
       "calibration": null,

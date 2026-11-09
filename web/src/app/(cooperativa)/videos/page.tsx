@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, Play, X } from "lucide-react";
 import { useState } from "react";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
+import { countMessages, countSummary } from "@/lib/count";
 import { fmtDate } from "@/lib/format";
 import { qualityMessages } from "@/lib/quality";
 import { useDocumentTitle, useOnline } from "@/lib/hooks";
@@ -72,6 +73,7 @@ function SideCell({ video, onPlay }: { video?: ServerVideo; onPlay: (video: Serv
           {message}
         </span>
       ))}
+      <CountLine video={video} />
       <button
         type="button"
         onClick={() => onPlay(video)}
@@ -82,6 +84,27 @@ function SideCell({ video, onPlay }: { video?: ServerVideo; onPlay: (video: Serv
         Ver
       </button>
     </td>
+  );
+}
+
+/** Frutos maduros que ha contado el detector, con su reparto por tramos. */
+function CountLine({ video }: { video: ServerVideo }) {
+  const result = video.conteo?.estado === "ok" ? video.conteo.resultado : null;
+  return (
+    <span className="mt-1 block text-xs">
+      <span className={result ? "font-medium text-ink" : "text-muted"}>{countSummary(video.conteo)}</span>
+      {result && result.tramos.length > 1 && (
+        <span className="block text-muted tabular-nums" title="Frutos maduros en cada tramo, desde la cabecera">
+          Por tramo: {result.tramos.map((t) => t.maduros).join(" · ")}
+        </span>
+      )}
+      {countMessages(video.conteo).map((message) => (
+        <span key={message} className="mt-0.5 flex items-center gap-1 font-medium text-warn-ink">
+          <AlertTriangle size={13} className="shrink-0" aria-hidden />
+          {message}
+        </span>
+      ))}
+    </span>
   );
 }
 
