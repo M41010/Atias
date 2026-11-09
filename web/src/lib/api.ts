@@ -4,7 +4,7 @@
  */
 
 import {
-  degreeDays,
+  degreeDaysFromHourly,
   errorPct,
   forecastRange,
   harvestDayShares,
@@ -67,9 +67,19 @@ export type DayRow = {
   atias: number;
 };
 
+export type WeatherDay = DayWeather & {
+  tempMaxC: number;
+  tempMinC: number;
+  tempMeanC: number;
+  degreeDays: number;
+  normalDegreeDays: number;
+};
+
 export type WeatherSummary = {
-  days: (DayWeather & { degreeDays: number })[];
+  days: WeatherDay[];
   weeklyDegreeDays: number;
+  /** Grados-día normales de esa semana en ese lugar: la referencia. */
+  normalWeeklyDegreeDays: number;
   /** Cuánto más (o menos) madura la fruta que en una semana normal. */
   factor: number;
 };
@@ -215,16 +225,21 @@ function classesOf(family: FamilyId, fruits: number) {
   return [...counted, { name: classes[classes.length - 1].name, fruits: rest }];
 }
 
+const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
+
 function weatherOf(info: GreenhouseInfo, monday: string): WeatherSummary {
   const days = simulatedWeather(info.location, monday, SIMULATED_TODAY).map((d) => ({
     ...d,
-    degreeDays: degreeDays(d.tempMaxC, d.tempMinC),
+    tempMaxC: Math.max(...d.hourlyTempC),
+    tempMinC: Math.min(...d.hourlyTempC),
+    tempMeanC: sum(d.hourlyTempC) / d.hourlyTempC.length,
+    degreeDays: degreeDaysFromHourly(d.hourlyTempC) ?? 0,
+    normalDegreeDays: degreeDaysFromHourly(d.normalHourlyTempC) ?? 0,
   }));
   const perDay = days.map((d) => d.degreeDays);
-  return { days, weeklyDegreeDays: perDay.reduce((a, b) => a + b, 0), factor: weatherFactor(perDay) };
+  const normal = sum(days.map((d) => d.normalDegreeDays));
+  return { days, weeklyDegreeDays: sum(perDay), normalWeeklyDegreeDays: normal, factor: weatherFactor(perDay, normal) };
 }
-
-const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
 
 function buildReport(id: string, params: Params): HarvestReport | null {
   const harvest = HARVESTS.find((h) => h.id === id);

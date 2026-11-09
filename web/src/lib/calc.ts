@@ -54,25 +54,27 @@ export function errorPct(estimatedKg: number, realKg: number): number | null {
 
 /** Temperatura base de los grados-día. SIMULADA: se ajustará por familia con datos reales. */
 export const BASE_TEMP_C = 10;
-/**
- * Grados-día de una semana normal. El porcentaje de maduración que indica el agricultor se
- * entiende para una semana así. SIMULADO: saldrá de comparar con cosechas reales.
- */
-export const REF_WEEKLY_DEGREE_DAYS = 56;
 /** Límites del factor meteorológico, para que un dato raro no dispare la previsión. */
 export const WEATHER_FACTOR_MIN = 0.5;
 export const WEATHER_FACTOR_MAX = 1.5;
 
-/** Grados-día de un día: cuánto calor útil para madurar hubo por encima de la temperatura base. */
-export function degreeDays(tempMaxC: number, tempMinC: number, baseC: number = BASE_TEMP_C): number {
-  return Math.max(0, (tempMaxC + tempMinC) / 2 - baseC);
+/**
+ * Grados-día de un día a partir de lecturas por hora: la temperatura cambia a lo largo del día,
+ * así que se suma el calor útil de cada hora por encima de la base y se divide entre las horas.
+ * Sin lecturas devuelve null: no se inventa el dato.
+ */
+export function degreeDaysFromHourly(hourlyTempC: number[], baseC: number = BASE_TEMP_C): number | null {
+  const valid = hourlyTempC.filter(Number.isFinite);
+  if (valid.length === 0) return null;
+  return valid.reduce((sum, t) => sum + Math.max(0, t - baseC), 0) / valid.length;
 }
 
 /**
  * Cuánto más o menos madura la fruta que en una semana normal: con más calor, más deprisa.
+ * La referencia es la normal de esa semana en ese lugar (media de años anteriores).
  * Devuelve 1 si no hay datos de tiempo, para no inventar un efecto.
  */
-export function weatherFactor(weeklyDegreeDays: number[], reference: number = REF_WEEKLY_DEGREE_DAYS): number {
+export function weatherFactor(weeklyDegreeDays: number[], reference: number): number {
   const total = weeklyDegreeDays.reduce((sum, d) => sum + d, 0);
   if (weeklyDegreeDays.length === 0 || !(reference > 0) || !Number.isFinite(total)) return 1;
   return Math.min(WEATHER_FACTOR_MAX, Math.max(WEATHER_FACTOR_MIN, total / reference));

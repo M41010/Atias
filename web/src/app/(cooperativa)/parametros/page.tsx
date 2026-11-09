@@ -102,8 +102,7 @@ export default function ParametrosPage() {
                     <th scope="col">Localización</th>
                     <th scope="col" className="num">Hileras</th>
                     <th scope="col" className="num">Tramos por hilera</th>
-                    <th scope="col" className="num">Temperatura</th>
-                    <th scope="col" className="num">Humedad</th>
+                    <th scope="col">Temperatura</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -125,8 +124,10 @@ export default function ParametrosPage() {
                       </td>
                       <td className="num">{g.hileras}</td>
                       <td className="num">{g.tramosPorHilera}</td>
-                      <td className="num">{g.temperaturaC} °C</td>
-                      <td className="num">{g.humedadPct} %</td>
+                      <td className="whitespace-nowrap">
+                        {g.interiorSensor ? "Sensor interior" : "Exterior, por horas"}
+                        {!g.interiorSensor && <span className="block text-xs text-muted">Sin sensor dentro</span>}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

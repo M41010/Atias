@@ -190,19 +190,32 @@ const MIGRATIONS: { id: string; sql: string }[] = [
         PRIMARY KEY (greenhouse_id, day)
       );
 
-      -- Meteorología diaria en la localización del invernadero (Open-Meteo).
-      -- observado sustituye a prevision cuando el día ya ha pasado.
-      CREATE TABLE daily_weather (
+      -- La temperatura depende del día y de la hora: se guarda una lectura por hora.
+      -- exterior viene de Open-Meteo con la localización; interior, de un sensor dentro del invernadero.
+      -- El cálculo usa interior cuando existe y, si no, exterior. observado sustituye a prevision al pasar la hora.
+      CREATE TABLE hourly_weather (
         greenhouse_id text NOT NULL REFERENCES greenhouses(id),
-        day date NOT NULL,
+        measured_at timestamptz NOT NULL CHECK (date_trunc('hour', measured_at) = measured_at),
+        place text NOT NULL CHECK (place IN ('exterior', 'interior')),
         kind text NOT NULL CHECK (kind IN ('prevision', 'observado')),
-        temp_max_c double precision NOT NULL,
-        temp_min_c double precision NOT NULL CHECK (temp_min_c <= temp_max_c),
+        temp_c double precision NOT NULL CHECK (temp_c BETWEEN -30 AND 60),
+        humidity_pct double precision CHECK (humidity_pct BETWEEN 0 AND 100),
         precipitation_mm double precision CHECK (precipitation_mm >= 0),
-        radiation_mj_m2 double precision CHECK (radiation_mj_m2 >= 0),
-        source text NOT NULL CHECK (source IN ('open-meteo', 'simulado')),
+        source text NOT NULL CHECK (source IN ('open-meteo', 'sensor', 'simulado')),
         fetched_at timestamptz NOT NULL DEFAULT now(),
-        PRIMARY KEY (greenhouse_id, day)
+        PRIMARY KEY (greenhouse_id, measured_at, place)
+      );
+
+      -- Lo normal en cada lugar y semana del año (media de años anteriores, histórico de Open-Meteo).
+      -- Es la referencia para saber si una semana madura más deprisa o más despacio.
+      CREATE TABLE weather_normals (
+        greenhouse_id text NOT NULL REFERENCES greenhouses(id),
+        iso_week integer NOT NULL CHECK (iso_week BETWEEN 1 AND 53),
+        degree_days double precision NOT NULL CHECK (degree_days >= 0),
+        base_temp_c double precision NOT NULL,
+        years integer NOT NULL CHECK (years > 0),
+        computed_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (greenhouse_id, iso_week)
       );
     `,
   },
@@ -263,7 +276,7 @@ export async function seedDemo(pool: Pool): Promise<void> {
   `);
   await pool.query(`
     UPDATE greenhouses g SET grower_id = '00000000-0000-4000-8000-000000000101', family_id = v.family,
-      municipality = 'El Ejido', latitude = 36.776, longitude = -2.814
+      municipality = 'Motril', latitude = 36.745, longitude = -3.520
     FROM (VALUES ('inv-1', 'cherry_redondo_rojo'), ('inv-2', 'padron'), ('inv-3', 'pepino_holandes')) AS v(id, family)
     WHERE g.id = v.id AND g.grower_id IS NULL
   `);

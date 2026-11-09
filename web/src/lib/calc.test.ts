@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  degreeDays,
+  degreeDaysFromHourly,
   errorPct,
   forecastRange,
   harvestDayShares,
@@ -82,10 +82,17 @@ describe("forecastRange con meteorología", () => {
   });
 });
 
-describe("degreeDays y weatherFactor", () => {
-  it("cuenta solo el calor por encima de la base", () => {
-    expect(degreeDays(24, 14)).toBeCloseTo(9);
-    expect(degreeDays(12, 4)).toBe(0);
+describe("degreeDaysFromHourly y weatherFactor", () => {
+  it("cuenta hora a hora solo el calor por encima de la base", () => {
+    expect(degreeDaysFromHourly(Array(24).fill(19))).toBeCloseTo(9);
+    // 12 horas a 22 °C y 12 a 8 °C: las frías no restan, aunque la media diaria sea 15 °C.
+    expect(degreeDaysFromHourly([...Array(12).fill(22), ...Array(12).fill(8)])).toBeCloseTo(6);
+    expect(degreeDaysFromHourly(Array(24).fill(6))).toBe(0);
+  });
+
+  it("sin lecturas no inventa el dato", () => {
+    expect(degreeDaysFromHourly([])).toBeNull();
+    expect(degreeDaysFromHourly([Number.NaN])).toBeNull();
   });
 
   it("vale 1 en una semana normal y se limita en semanas extremas", () => {
@@ -95,7 +102,8 @@ describe("degreeDays y weatherFactor", () => {
   });
 
   it("sin datos de tiempo no inventa un efecto", () => {
-    expect(weatherFactor([])).toBe(1);
+    expect(weatherFactor([], 56)).toBe(1);
+    expect(weatherFactor([8, 8], 0)).toBe(1);
   });
 });
 

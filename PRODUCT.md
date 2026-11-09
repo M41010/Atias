@@ -40,7 +40,9 @@ La estimación sale de la propia fruta filmada en cada hilera, no de medias hist
 
 - Cultivos iniciales: tomate cherry y pimiento (madurez por color) y pepino (madurez por calibre). Cada familia de la empresa pertenece a uno de ellos.
 - Previsión diaria de lunes a viernes, por familia y técnico, junto a la previsión del técnico y los kilos reales, para comparar y aprender. Cada día se recoge una zona del invernadero: lo maduro al grabar se reparte entre los cinco días y lo que madura después, según el calor de cada día.
-- La meteorología de la localización de cada invernadero (Open-Meteo) acelera o frena la maduración mediante grados-día. Ahora está simulada.
+- Casi todos los invernaderos están en la costa de Granada (Motril, Carchuna, Castell de Ferro, Salobreña, Almuñécar, La Mamola…).
+- La temperatura depende del día y de la hora, así que se toma hora a hora. Por ahora es la exterior de Open-Meteo en la localización del invernadero; cuando haya sensores dentro, se usará la interior. La temperatura media dentro del invernadero aún no se conoce.
+- Los grados-día (calor útil por encima de 10 °C, hora a hora) aceleran o frenan la maduración frente a lo normal en esa semana y ese lugar (media de años anteriores). Ahora todo está simulado.
 - Cada resultado distingue dos cifras que nunca se mezclan: **kg maduros observados** en la captura y **previsión de la semana siguiente**, rotulada como experimental.
 - La cifra para planificar la venta es la previsión, destacada como valor central con su rango, mientras esté sin validar se rotula como experimental. Lo observado queda como dato de apoyo.
 - Temporeros: kg previstos ÷ (kg por jornal × días disponibles), por familia y ajustable por la cooperativa.

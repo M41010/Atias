@@ -543,6 +543,21 @@ describe("API", () => {
       await pool.query("DELETE FROM daily_forecasts");
     });
 
+    it("guarda la temperatura por hora, de fuera o de dentro, y rechaza lecturas imposibles", async () => {
+      await pool.query("DELETE FROM hourly_weather");
+      const insert = (at: string, place: string, temp: number, source = "simulado") =>
+        pool.query(
+          "INSERT INTO hourly_weather (greenhouse_id, measured_at, place, kind, temp_c, source) VALUES ('inv-1', $1, $2, 'observado', $3, $4)",
+          [at, place, temp, source],
+        );
+      await insert("2026-11-07T14:00:00+01:00", "exterior", 21.4, "open-meteo");
+      await insert("2026-11-07T14:00:00+01:00", "interior", 27.9, "sensor");
+      await assert.rejects(insert("2026-11-07T14:30:00+01:00", "exterior", 21));
+      await assert.rejects(insert("2026-11-07T15:00:00+01:00", "exterior", 90));
+      await assert.rejects(insert("2026-11-07T15:00:00+01:00", "tejado", 20));
+      await pool.query("DELETE FROM hourly_weather");
+    });
+
     it("ya no acepta el alcance antiguo de lunes a jueves", async () => {
       assert.equal(
         (await coop(`/recolecciones/${HARVEST}/cosecha/inv-1/lunes_jueves`, { method: "PUT", body: JSON.stringify({ kg: 1 }) })).status,

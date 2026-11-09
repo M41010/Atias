@@ -22,7 +22,6 @@ import {
 } from "@/components/ui";
 import { type GreenhouseRow, type HileraRow, markSeen } from "@/lib/api";
 import { fmtBetween, fmtDate, fmtDay, fmtDecimal, fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
-import { REF_WEEKLY_DEGREE_DAYS } from "@/lib/calc";
 import { queryKeys, useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
 import type { Video } from "@/lib/simulated";
 
@@ -146,23 +145,39 @@ function DailyPanel({ g }: { g: GreenhouseRow }) {
   );
 }
 
+/** Curva de las 24 horas del día, sobre una escala común para comparar días. */
+function HourlyCurve({ temps, min, max }: { temps: number[]; min: number; max: number }) {
+  const span = max - min || 1;
+  const points = temps.map((t, h) => `${(h / 23) * 72},${20 - ((t - min) / span) * 18 - 1}`).join(" ");
+  return (
+    <svg viewBox="0 0 72 20" width="72" height="20" aria-hidden className="inline-block text-warn-ink">
+      <polyline points={points} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function WeatherPanel({ g }: { g: GreenhouseRow }) {
+  const all = g.weather.days.flatMap((d) => d.hourlyTempC);
+  const low = Math.min(...all);
+  const high = Math.max(...all);
   const change = Math.round((g.weather.factor - 1) * 100);
   return (
     <Panel
       title={`Meteorología en ${g.info.location.municipality}`}
-      description="De sábado, día de la grabación, a viernes."
+      description="Temperatura exterior hora a hora, de sábado (día de la grabación) a viernes. Cuando haya un sensor dentro del invernadero, se usará su temperatura."
       actions={<Pill tone="warn">Simulada</Pill>}
     >
       <div className="overflow-x-auto">
-        <table className="data-table">
+        <table className="data-table compact">
           <thead>
             <tr>
               <th scope="col">Día</th>
-              <th scope="col" className="num">Máx.</th>
+              <th scope="col" className="hidden sm:table-cell">0–23 h</th>
               <th scope="col" className="num">Mín.</th>
-              <th scope="col" className="num">Lluvia</th>
+              <th scope="col" className="num">Máx.</th>
+              <th scope="col" className="num hidden sm:table-cell">Lluvia</th>
               <th scope="col" className="num">Grados-día</th>
+              <th scope="col" className="num">Normal</th>
             </tr>
           </thead>
           <tbody>
@@ -172,21 +187,24 @@ function WeatherPanel({ g }: { g: GreenhouseRow }) {
                   {fmtDay(d.date)}
                   {d.kind === "prevision" && <span className="ml-1.5 text-xs text-muted">previsto</span>}
                 </th>
-                <td className="num">{fmtDecimal(d.tempMaxC)} °C</td>
+                <td className="hidden sm:table-cell"><HourlyCurve temps={d.hourlyTempC} min={low} max={high} /></td>
                 <td className="num">{fmtDecimal(d.tempMinC)} °C</td>
-                <td className="num">{d.precipitationMm > 0 ? `${fmtDecimal(d.precipitationMm)} mm` : "—"}</td>
+                <td className="num">{fmtDecimal(d.tempMaxC)} °C</td>
+                <td className="num hidden sm:table-cell">{d.precipitationMm > 0 ? `${fmtDecimal(d.precipitationMm)} mm` : "—"}</td>
                 <td className="num">{fmtDecimal(d.degreeDays)}</td>
+                <td className="num text-muted">{fmtDecimal(d.normalDegreeDays)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <p className="border-t border-line px-5 py-3 text-sm text-muted">
-        {fmtDecimal(g.weather.weeklyDegreeDays)} grados-día frente a {REF_WEEKLY_DEGREE_DAYS} de una semana normal:{" "}
+        Grados-día: calor útil hora a hora por encima de 10 °C. Esta semana suma {fmtDecimal(g.weather.weeklyDegreeDays)}, frente a{" "}
+        {fmtDecimal(g.weather.normalWeeklyDegreeDays)} de lo normal en estas fechas en {g.info.location.municipality}:{" "}
         {change === 0
           ? "la fruta madura a ritmo normal."
           : `la fruta madura un ${Math.abs(change)} % más ${change > 0 ? "deprisa" : "despacio"}.`}{" "}
-        Se obtendrá de Open-Meteo con la localización del invernadero.
+        La temperatura y lo normal saldrán de Open-Meteo con la localización del invernadero.
       </p>
     </Panel>
   );
@@ -329,7 +347,7 @@ export default function GreenhousePage() {
           </Panel>
         )}
 
-        <div className="grid items-start gap-5 lg:grid-cols-2">
+        <div className="grid gap-5">
           <DailyPanel g={g} />
           <WeatherPanel g={g} />
         </div>
