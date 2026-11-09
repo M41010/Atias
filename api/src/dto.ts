@@ -32,11 +32,12 @@ function countDto(row: Record<string, unknown>) {
     resultado: count
       ? {
         detector: count.detector,
-        maduros: count.maduros,
-        frutos: count.frutos,
-        tramos: count.tramos.map((t) => ({ n: t.n, maduros: t.maduros, clases: t.clases })),
+        maduros: count.maduros ?? 0,
+        frutos: count.frutos ?? 0,
+        // Un conteo guardado a medias no debe tumbar la lista de vídeos.
+        tramos: (count.tramos ?? []).map((t) => ({ n: t.n, maduros: t.maduros, clases: t.clases })),
         posicion: count.posicion,
-        avisos: count.avisos,
+        avisos: count.avisos ?? [],
       }
       : null,
   };

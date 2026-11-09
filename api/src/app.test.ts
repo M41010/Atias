@@ -189,7 +189,8 @@ describe("API", () => {
     analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
     analysisCalls = [];
     freeSpace = Number.MAX_SAFE_INTEGER;
-    await pool.query("DELETE FROM videos; DELETE FROM weekly_data; DELETE FROM harvest_records;");
+    await pool.query("DELETE FROM videos; DELETE FROM weekly_data; DELETE FROM harvest_records; DELETE FROM control_counts;");
+    await pool.query("DELETE FROM daily_forecasts; DELETE FROM daily_harvests;");
     await pool.query("DELETE FROM upload_links WHERE created_by IS NOT NULL OR expires_at IS NOT NULL");
     await pool.query("DELETE FROM sessions; DELETE FROM users;");
     await pool.query("DELETE FROM greenhouses WHERE id NOT IN ('inv-1', 'inv-2', 'inv-3')");
@@ -1018,6 +1019,108 @@ describe("API", () => {
       await link(`/videos/${id}`, { method: "DELETE" });
       assert.equal(await countPendingVideos(pool, analysisUrl), 0);
       assert.deepEqual(countCalls, []);
+    });
+  });
+
+  describe("datos de campo", () => {
+    type Field = {
+      dias: string[];
+      invernaderos: {
+        id: string;
+        familia: { id: string } | null;
+        ubicacion: { latitud: number } | null;
+        longitudHileraM: number | null;
+        muestra: { frutos: number; gramos: number } | null;
+        previsiones: { agricultor: (number | null)[]; tecnico: (number | null)[] };
+        real: (number | null)[];
+        controles: { etiqueta: string; visibles: number; atias: { frutos: number | null; motivo: string | null } }[];
+      }[];
+    };
+    const field = async () => (await (await coop(`/recolecciones/${HARVEST}/campo`)).json()) as Field;
+    const inv1 = async () => (await field()).invernaderos.find((g) => g.id === "inv-1") as Field["invernaderos"][number];
+    const put = (path: string, body: unknown) =>
+      coop(`/recolecciones/${HARVEST}/campo/inv-1${path}`, { method: "PUT", body: JSON.stringify(body) });
+    const ficha = {
+      familia: "cherry_pera", municipio: "Motril", latitud: 36.7, longitud: -3.5, hileras: 4, longitudHileraM: 50, muestra: null,
+    };
+    const control = (extra: Record<string, unknown> = {}) => ({
+      etiqueta: "T1", hilera: 1, lado: "A", inicioM: 10, finM: 15, visibles: 20, total: 26, recogidos: null, pesoG: null, nota: "", ...extra,
+    });
+
+    it("guarda las previsiones del agricultor y del técnico por separado, día a día", async () => {
+      assert.equal((await put("/previsiones/agricultor", { dias: [100, 80, null, 90, 70] })).status, 204);
+      assert.equal((await put("/previsiones/tecnico", { dias: [120, 90, 90, 90, 90] })).status, 204);
+      const g = await inv1();
+      assert.deepEqual(g.previsiones.agricultor, [100, 80, null, 90, 70]);
+      assert.deepEqual(g.previsiones.tecnico, [120, 90, 90, 90, 90]);
+      assert.deepEqual((await field()).dias, ["2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13"]);
+      // Vaciar un día lo borra.
+      await put("/previsiones/agricultor", { dias: [null, 80, null, 90, 70] });
+      assert.equal((await inv1()).previsiones.agricultor[0], null);
+    });
+
+    it("rechaza fuentes y valores no válidos", async () => {
+      assert.equal((await put("/previsiones/atias", { dias: [1, 1, 1, 1, 1] })).status, 400);
+      assert.equal((await put("/previsiones/agricultor", { dias: [1, 1, 1] })).status, 400);
+      assert.equal((await put("/previsiones/agricultor", { dias: [-1, 1, 1, 1, 1] })).status, 400);
+      assert.equal((await put("/real", { dias: ["10", 1, 1, 1, 1] })).status, 400);
+      const missing = await coop(`/recolecciones/${HARVEST}/campo/no-existe/real`, { method: "PUT", body: JSON.stringify({ dias: [1, 1, 1, 1, 1] }) });
+      assert.equal(missing.status, 404);
+    });
+
+    it("guarda los kilos reales a mano sin pisar lo que llegó del ERP", async () => {
+      await pool.query("INSERT INTO daily_harvests (greenhouse_id, day, kg, source) VALUES ('inv-1', '2026-11-09', 500, 'erp')");
+      assert.equal((await put("/real", { dias: [1, 110, 95, null, null] })).status, 204);
+      assert.deepEqual((await inv1()).real, [500, 110, 95, null, null]);
+    });
+
+    it("guarda la ficha, la longitud de la hilera y la muestra de peso", async () => {
+      assert.equal((await put("/ficha", { ...ficha, muestra: { frutos: 50, gramos: 640 } })).status, 204);
+      const g = await inv1();
+      assert.equal(g.familia?.id, "cherry_pera");
+      assert.equal(g.ubicacion?.latitud, 36.7);
+      assert.equal(g.longitudHileraM, 50);
+      assert.deepEqual(g.muestra, { frutos: 50, gramos: 640 });
+      // Una familia de otro cultivo no vale.
+      assert.equal((await put("/ficha", { ...ficha, familia: "padron" })).status, 400);
+      assert.equal((await put("/ficha", { ...ficha, latitud: 36.7, longitud: null })).status, 400);
+    });
+
+    it("cuenta los frutos que Atias vio entre las dos cintas", async () => {
+      await put("/ficha", ficha);
+      const id = await uploadComplete({ hilera: 1, lado: "A" });
+      // Hilera de 50 m: la cinta va de 10 a 15 m, es decir, de 0,2 a 0,3 del recorrido.
+      await pool.query("UPDATE videos SET count_status = 'ok', count = $2 WHERE id = $1", [
+        id, JSON.stringify({ maduros: 5, frutos: 5, tramos: [], posicion: "desplazamiento", avisos: [], detector: "x",
+          posicionesMaduros: [0.05, 0.2, 0.25, 0.29, 0.31] }),
+      ]);
+      assert.equal((await put("/controles", { controles: [control(), control({ etiqueta: "T2", lado: "B" })] })).status, 204);
+      const [t1, t2] = (await inv1()).controles;
+      assert.deepEqual(t1.atias, { frutos: 3, motivo: null });
+      assert.deepEqual(t2.atias, { frutos: null, motivo: "sin_video" });
+    });
+
+    it("sin longitud de hilera no inventa el conteo del tramo", async () => {
+      await put("/controles", { controles: [control()] });
+      assert.equal((await inv1()).controles[0].atias.motivo, "sin_video");
+      await uploadComplete({ hilera: 1, lado: "A" });
+      await pool.query("UPDATE videos SET count_status = 'ok', count = $1", [JSON.stringify({ posicionesMaduros: [0.2] })]);
+      assert.equal((await inv1()).controles[0].atias.motivo, "sin_longitud");
+    });
+
+    it("valida los tramos de control y los sustituye enteros", async () => {
+      assert.equal((await put("/controles", { controles: [control({ finM: 5 })] })).status, 400);
+      assert.equal((await put("/controles", { controles: [control({ total: 10 })] })).status, 400);
+      assert.equal((await put("/controles", { controles: [control(), control()] })).status, 400);
+      assert.equal((await put("/controles", { controles: [control({ lado: "C" })] })).status, 400);
+      await put("/controles", { controles: [control(), control({ etiqueta: "T2" })] });
+      await put("/controles", { controles: [control({ etiqueta: "T3" })] });
+      assert.deepEqual((await inv1()).controles.map((c) => c.etiqueta), ["T3"]);
+    });
+
+    it("exige sesión", async () => {
+      const response = await fetch(`${api}/api/cooperativa/recolecciones/${HARVEST}/campo`);
+      assert.equal(response.status, 401);
     });
   });
 

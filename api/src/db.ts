@@ -267,6 +267,41 @@ const MIGRATIONS: { id: string; sql: string }[] = [
         ADD COLUMN tramos smallint NOT NULL DEFAULT 8 CHECK (tramos BETWEEN 1 AND 50);
     `,
   },
+  {
+    id: "008_datos_de_campo",
+    sql: `
+      -- La previsión humana puede venir del agricultor o del técnico: se guardan aparte para compararlas.
+      ALTER TABLE daily_forecasts DROP CONSTRAINT daily_forecasts_source_check;
+      ALTER TABLE daily_forecasts ADD CONSTRAINT daily_forecasts_source_check
+        CHECK (source IN ('tecnico', 'agricultor', 'atias'));
+
+      -- Tramos de control: un trozo de hilera entre dos cintas, contado a mano justo después de grabar.
+      -- inicio_m y fin_m son los metros desde la cabecera; así se cuentan los frutos que Atias vio entre ellas.
+      CREATE TABLE control_counts (
+        greenhouse_id text NOT NULL REFERENCES greenhouses(id),
+        harvest_id text NOT NULL REFERENCES harvests(id),
+        label text NOT NULL CHECK (length(label) BETWEEN 1 AND 20),
+        hilera integer NOT NULL CHECK (hilera > 0),
+        lado text NOT NULL CHECK (lado IN ('A', 'B')),
+        inicio_m double precision NOT NULL CHECK (inicio_m >= 0),
+        fin_m double precision NOT NULL,
+        visibles integer NOT NULL CHECK (visibles >= 0),
+        total integer CHECK (total >= 0),
+        recogidos integer CHECK (recogidos >= 0),
+        peso_g double precision CHECK (peso_g >= 0),
+        nota text CHECK (length(nota) <= 300),
+        recorded_by uuid NOT NULL REFERENCES users(id),
+        recorded_at timestamptz NOT NULL DEFAULT now(),
+        CHECK (fin_m > inicio_m),
+        PRIMARY KEY (greenhouse_id, harvest_id, label)
+      );
+
+      -- Muestra pesada para el peso medio por fruto (p. ej. 50 frutos maduros de plantas distintas).
+      ALTER TABLE weekly_data
+        ADD COLUMN muestra_frutos integer CHECK (muestra_frutos > 0),
+        ADD COLUMN muestra_g double precision CHECK (muestra_g > 0);
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */
