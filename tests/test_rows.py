@@ -136,6 +136,21 @@ class TestTramos:
         assert [t["n"] for t in data["tramos"]] == [1, 2]
         assert data["posicion"] == "desplazamiento"
 
+    def test_guarda_la_posicion_de_cada_fruto_maduro(self, tmp_path):
+        """Para comparar con el conteo a mano entre dos cintas: solo maduros, de 0 a 1."""
+        fruits = [(700, 120, RED), (1500, 120, GREEN), (3300, 120, RED)]
+        path = tmp_path / "hilera.avi"
+        write_video(path, world_image(fruits), [12] * 320)
+        data = analyze_row_video(
+            path, PROFILE, ColorBaselineDetector(), tramos=4, analysis_fps=10
+        ).to_dict(PROFILE)
+        positions = data["posicionesMaduros"]
+        assert len(positions) == data["maduros"] == 2
+        assert positions == sorted(positions)
+        assert all(0 <= p <= 1 for p in positions)
+        expected = [(x - FRAME_W / 2) / (WORLD_W - FRAME_W) for x in (700, 3300)]
+        assert positions == pytest.approx(expected, abs=0.05)
+
 
 class FakeSession:
     """Imita la salida de RF-DETR exportado: dets en cxcywh normalizado y logits por

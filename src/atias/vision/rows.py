@@ -42,6 +42,9 @@ class RowResult:
     position: str  # "desplazamiento" | "tiempo"
     detector: str
     warnings: list[str] = field(default_factory=list)
+    # Posición de cada fruto a lo largo del recorrido (0 = cabecera, 1 = final) y su clase.
+    # Sirve para comparar con el conteo a mano entre dos cintas medidas en metros.
+    fruit_positions: list[tuple[float, str]] = field(default_factory=list)
 
     def mature(self, profile: CropProfile) -> list[int]:
         return [
@@ -62,6 +65,9 @@ class RowResult:
             "duracionS": round(self.duration_s, 1),
             "posicion": self.position,
             "avisos": self.warnings,
+            "posicionesMaduros": sorted(
+                round(p, 4) for p, label in self.fruit_positions if label in profile.mature_ids
+            ),
         }
 
 
@@ -82,6 +88,13 @@ def _flow_gray(frame: np.ndarray) -> np.ndarray:
     )
     gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY).astype(np.float32)
     return gray * cv2.createHanningWindow(gray.shape[::-1], cv2.CV_32F)
+
+
+def fraction_of(position: float, total: float) -> float:
+    """Posición relativa (0 a 1) a lo largo del recorrido."""
+    if total <= 0:
+        return 0.0
+    return min(1.0, max(0.0, position / total))
 
 
 def tramo_of(position: float, total: float, tramos: int) -> int:
@@ -166,14 +179,17 @@ def analyze_row_video(
     reached = np.maximum.accumulate(np.array(positions) * sign)
 
     counts = [Counter() for _ in range(tramos)]
+    fruit_positions: list[tuple[float, str]] = []
     for track in tracker.finish():
         middle = track.observations[len(track.observations) // 2].frame
         if by_time:
-            tramo = tramo_of(middle, analyzed - 1, tramos)
+            fraction = fraction_of(middle, analyzed - 1)
         else:
-            tramo = tramo_of(float(reached[middle]), float(reached[-1]), tramos)
+            fraction = fraction_of(float(reached[middle]), float(reached[-1]))
+        tramo = min(tramos - 1, int(fraction * tramos))
         label = vote_color([o.attributes["clase"] for o in track.observations])
         counts[tramo][label] += 1
+        fruit_positions.append((fraction, label))
 
     if np.mean(brightness) < MIN_MEAN_BRIGHTNESS:
         warnings.append("POCA_LUZ")
@@ -192,4 +208,5 @@ def analyze_row_video(
         position="tiempo" if by_time else "desplazamiento",
         detector=getattr(detector, "name", "desconocido"),
         warnings=warnings,
+        fruit_positions=fruit_positions,
     )

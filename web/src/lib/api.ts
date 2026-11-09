@@ -1,6 +1,7 @@
 /**
- * Capa de datos de la web. Ahora resuelve sobre datos simulados; cuando exista la API de Express,
- * solo cambia este archivo y las pantallas siguen igual.
+ * Capa de datos de la web. Con datos reales, se calcula a partir de lo que guarda la API (vídeos
+ * contados, previsiones del agricultor y del técnico, cosecha pesada). En el modo demostración, a
+ * partir de los datos simulados. Las pantallas reciben siempre la misma forma.
  */
 
 import {
@@ -14,9 +15,13 @@ import {
   sumRanges,
   workersNeeded,
 } from "./calc";
+import { countMessages } from "./count";
+import { getDataMode } from "./mode";
+import { type ControlWithAtias, fetchFieldData, fetchHarvestList, type FieldData, type FieldGreenhouse } from "./serverApi";
 import {
   addDays,
   type AppWarning,
+  CROPS,
   DEFAULT_PARAMS,
   FAMILIES,
   FAMILY_ORDER,
@@ -26,11 +31,13 @@ import {
   GROWERS,
   HARVESTS,
   type Hilera,
-  LATEST_HARVEST_ID,
+  LATEST_HARVEST_ID as DEMO_LATEST_ID,
+  type Location,
   type Params,
   SIMULATED_TODAY,
   simulatedWeather,
   TECHNICIANS,
+  type Tramo,
   type Video,
 } from "./simulated";
 import { fetchRealWeather, type RealWeather, summarizeWeather, weatherKey, type WeatherSummary } from "./weather";
@@ -40,6 +47,9 @@ export type { WeatherDay, WeatherSummary } from "./weather";
 // v2: los parámetros pasan de ir por cultivo a ir por familia.
 const PARAMS_KEY = "atias.params.v2";
 const SEEN_KEY = "atias.vistos.v1";
+
+/** Recolección «la última»: cada modo la resuelve a la suya. */
+export const LATEST_HARVEST_ID = "ultima";
 
 export type HarvestOption = { id: string; label: string; hasData: boolean };
 
@@ -58,14 +68,18 @@ export type HileraRow = {
 };
 export type GreenhouseStatus = "analizado" | "con_advertencias" | "analizando";
 
-/** Un día de recolección: real, previsión del técnico y previsión de Atias. */
+/** Un día de recolección: real, previsiones humanas y previsión de Atias. */
 export type DayRow = {
   date: string;
-  /** Kg reales del ERP. Null si ese día aún no se ha recogido. */
+  /** Kg reales. Null si ese día aún no se ha recogido o no se ha apuntado. */
   real: number | null;
-  technician: number;
+  technician: number | null;
+  farmer: number | null;
   atias: number;
 };
+
+/** De dónde sale el peso medio por fruto con el que se pasan frutos a kilos. */
+export type GramsSource = "muestra" | "control" | "provisional" | "simulado";
 
 export type GreenhouseRow = {
   info: GreenhouseInfo;
@@ -87,10 +101,18 @@ export type GreenhouseRow = {
   hileras: HileraRow[];
   videos: Video[];
   warnings: AppWarning[];
+  /** Kg recogidos de lunes a viernes. */
   realKg: number | null;
   errorPct: number | null;
-  technicianKg: number;
+  technicianKg: number | null;
   technicianErrorPct: number | null;
+  farmerKg: number | null;
+  farmerErrorPct: number | null;
+  /** Kg recogidos justo después de grabar: se comparan con lo observado, no con la previsión. */
+  immediateKg: number | null;
+  gramsPerFruit: number;
+  gramsSource: GramsSource;
+  controls: ControlWithAtias[];
   ripeningPct: number;
   weather: WeatherSummary;
   daily: DayRow[];
@@ -119,6 +141,8 @@ export type HarvestReport = {
   dates: string[];
   updatedAt: string;
   isLatest: boolean;
+  /** Datos simulados (modo demostración): ninguna cifra indica la precisión real. */
+  simulated: boolean;
   empty: boolean;
   partial: boolean;
   totalHileras: number;
@@ -138,13 +162,13 @@ export type HarvestReport = {
   warnings: AppWarning[];
 };
 
-function demoMode(): string | null {
+function demoQuery(): string | null {
   if (typeof window === "undefined") return null;
   return new URLSearchParams(window.location.search).get("demo");
 }
 
 async function simulateLatency<T>(value: () => T): Promise<T> {
-  const demo = demoMode();
+  const demo = demoQuery();
   if (demo === "carga") await new Promise(() => {});
   await new Promise((resolve) => setTimeout(resolve, 180));
   if (demo === "error") throw new Error("El servidor no ha respondido.");
@@ -177,15 +201,15 @@ function currentParams(): Params {
 }
 
 function roundRange(range: KgRange): KgRange {
-  return { kg: Math.round(range.kg), min: Math.round(range.min), max: Math.round(range.max) };
+  // Una décima: con datos reales un tramo puede tener pocos kilos y redondear a enteros los borraría.
+  const r = (v: number) => Math.round(v * 10) / 10;
+  return { kg: r(range.kg), min: r(range.min), max: r(range.max) };
 }
 
 function buildHilera(h: Hilera, ripeningPct: number, factor: number): HileraRow {
   if (!h.tramos) {
     return { n: h.n, observed: null, forecast: null, matureFruits: null, tramos: [] };
   }
-  // Se redondea a kg enteros en el nivel más bajo: así los totales cuadran con lo que se ve
-  // y no se sugiere una precisión que estos datos no tienen.
   const tramos = h.tramos.map((t) => ({
     n: t.n,
     observed: roundRange(observedRange(t.observedKg)),
@@ -209,11 +233,28 @@ function classesOf(family: FamilyId, fruits: number) {
 }
 
 const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
+/** Suma de una semana solo si están los cinco días. */
+const fullWeek = (values: (number | null)[]) => (values.every((v) => v !== null) ? sum(values as number[]) : null);
 
 type WeatherMap = Map<string, RealWeather | null>;
 
-/** Meteorología real si la hay; si no, la simulada, marcada como tal. */
-function weatherOf(info: GreenhouseInfo, monday: string, real: WeatherMap): WeatherSummary {
+/** Sin ubicación o sin respuesta no se inventa el tiempo: factor 1 y reparto por igual. */
+const NO_WEATHER: WeatherSummary = {
+  days: [],
+  weeklyDegreeDays: 0,
+  normalWeeklyDegreeDays: 0,
+  factor: 1,
+  source: "sin_datos",
+  normalsYears: null,
+  stale: false,
+};
+
+function dayShares(weather: WeatherSummary): number[] {
+  return weather.days.length === 7 ? harvestDayShares(weather.days.map((d) => d.degreeDays)) : [0.2, 0.2, 0.2, 0.2, 0.2];
+}
+
+/** Meteorología real si la hay; si no, la simulada (solo en demostración), marcada como tal. */
+function demoWeatherOf(info: GreenhouseInfo, monday: string, real: WeatherMap): WeatherSummary {
   const found = real.get(weatherKey(info.location, monday));
   if (found) return summarizeWeather(found.days, { source: "open-meteo", normalsYears: found.normalsYears, stale: found.stale });
   return summarizeWeather(simulatedWeather(info.location, monday, SIMULATED_TODAY), {
@@ -223,88 +264,30 @@ function weatherOf(info: GreenhouseInfo, monday: string, real: WeatherMap): Weat
   });
 }
 
-/** Pide a la API la semana de cada lugar distinto, todas a la vez. */
-async function loadWeather(harvestIds: string[]): Promise<WeatherMap> {
-  const wanted = new Map<string, { location: GreenhouseInfo["location"]; monday: string }>();
-  for (const harvest of HARVESTS.filter((h) => harvestIds.includes(h.id))) {
-    for (const capture of harvest.captures) {
-      const info = GREENHOUSES.find((g) => g.id === capture.greenhouseId) as GreenhouseInfo;
-      wanted.set(weatherKey(info.location, harvest.monday), { location: info.location, monday: harvest.monday });
-    }
-  }
-  if (demoMode() === "sin-meteo") return new Map();
+async function loadWeather(wanted: Map<string, { location: Location; monday: string }>): Promise<WeatherMap> {
+  if (demoQuery() === "sin-meteo") return new Map();
   const entries = await Promise.all(
     [...wanted].map(async ([key, { location, monday }]) => [key, await fetchRealWeather(location, monday)] as const),
   );
   return new Map(entries);
 }
 
-function buildReport(id: string, params: Params, real: WeatherMap): HarvestReport | null {
-  const harvest = HARVESTS.find((h) => h.id === id);
-  if (!harvest) return null;
-  const isLatest = id === LATEST_HARVEST_ID;
-  // Las semanas pasadas se calcularon con los parámetros de entonces: no cambian al ajustar los actuales.
-  const used = isLatest ? params : DEFAULT_PARAMS;
-  const dates = Array.from({ length: 5 }, (_, i) => addDays(harvest.monday, i));
+/** Pide a la API la semana de cada lugar distinto de los datos simulados, todas a la vez. */
+function loadDemoWeather(harvestIds: string[]): Promise<WeatherMap> {
+  const wanted = new Map<string, { location: Location; monday: string }>();
+  for (const harvest of HARVESTS.filter((h) => harvestIds.includes(h.id))) {
+    for (const capture of harvest.captures) {
+      const info = GREENHOUSES.find((g) => g.id === capture.greenhouseId) as GreenhouseInfo;
+      wanted.set(weatherKey(info.location, harvest.monday), { location: info.location, monday: harvest.monday });
+    }
+  }
+  return loadWeather(wanted);
+}
 
-  const greenhouses: GreenhouseRow[] = harvest.captures.map((capture) => {
-    const info = GREENHOUSES.find((g) => g.id === capture.greenhouseId) as GreenhouseInfo;
-    const family = FAMILIES[info.family];
-    const grower = GROWERS.find((a) => a.id === info.growerId);
-    const technician = TECHNICIANS.find((t) => t.id === grower?.technicianId);
-    const settings = used.families[info.family];
-    const weather = weatherOf(info, harvest.monday, real);
-    const hileras = capture.hileras.map((h) => buildHilera(h, settings.ripeningPct, weather.factor));
-    const analyzed = hileras.filter((h) => h.observed);
-    const observed = sumRanges(analyzed.map((h) => h.observed as KgRange));
-    const forecast = sumRanges(analyzed.map((h) => h.forecast as KgRange));
-    const matureFruits = analyzed.reduce((total, h) => total + (h.matureFruits ?? 0), 0);
-    const partial = analyzed.length < hileras.length;
-    const status: GreenhouseStatus = partial
-      ? "analizando"
-      : capture.warnings.length > 0
-        ? "con_advertencias"
-        : "analizado";
-    const atiasDays = roundKeepingTotal(
-      splitByDay(observed, forecast, harvestDayShares(weather.days.map((d) => d.degreeDays))).map((d) => d.kg),
-    );
-    const realKg = capture.realDailyKg?.every((kg) => kg !== null) ? sum(capture.realDailyKg as number[]) : null;
-    const technicianKg = sum(capture.technicianKg);
-    return {
-      info,
-      familyName: family.name,
-      growerName: grower?.name ?? "—",
-      technicianId: technician?.id ?? "",
-      technicianName: technician?.name ?? "—",
-      criterion: family.criterion,
-      capturedAt: capture.capturedAt,
-      status,
-      isNew: capture.isNew && !readStorage<string[]>(SEEN_KEY, []).includes(`${id}/${info.id}`),
-      partial,
-      missingHileras: hileras.length - analyzed.length,
-      warnedHileras: capture.warnings.filter((w) => w.severity === "alta").map((w) => w.hilera),
-      observed,
-      forecast,
-      matureFruits,
-      classes: classesOf(info.family, matureFruits),
-      hileras,
-      videos: capture.videos,
-      warnings: capture.warnings,
-      realKg,
-      errorPct: realKg === null ? null : errorPct(forecast.kg, realKg),
-      technicianKg,
-      technicianErrorPct: realKg === null ? null : errorPct(technicianKg, realKg),
-      ripeningPct: settings.ripeningPct,
-      weather,
-      daily: dates.map((date, i) => ({
-        date,
-        real: capture.realDailyKg?.[i] ?? null,
-        technician: capture.technicianKg[i],
-        atias: atiasDays[i],
-      })),
-    };
-  });
+type ReportMeta = Pick<HarvestReport, "id" | "label" | "isoWeek" | "year" | "dates" | "updatedAt" | "isLatest" | "simulated">;
 
+/** Agrupa por familia y suma: igual con datos reales que simulados. */
+function assemble(meta: ReportMeta, greenhouses: GreenhouseRow[], used: Params): HarvestReport {
   const families: FamilyRow[] = FAMILY_ORDER.flatMap((family) => {
     const rows = greenhouses.filter((g) => g.info.family === family);
     if (rows.length === 0) return [];
@@ -345,13 +328,7 @@ function buildReport(id: string, params: Params, real: WeatherMap): HarvestRepor
   const forecast = sumRanges(families.map((c) => c.forecast));
 
   return {
-    id,
-    label: harvest.label,
-    isoWeek: harvest.isoWeek,
-    year: harvest.year,
-    dates,
-    updatedAt: harvest.updatedAt,
-    isLatest,
+    ...meta,
     empty: greenhouses.length === 0,
     partial: greenhouses.some((g) => g.partial),
     totalHileras: greenhouses.reduce((total, g) => total + g.hileras.length, 0),
@@ -372,58 +349,383 @@ function buildReport(id: string, params: Params, real: WeatherMap): HarvestRepor
   };
 }
 
-export function listHarvests(): Promise<HarvestOption[]> {
-  return simulateLatency(() =>
-    HARVESTS.map((h) => ({ id: h.id, label: h.label, hasData: h.captures.length > 0 })),
+// ---- Modo demostración: datos simulados ----
+
+function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestReport | null {
+  const harvest = HARVESTS.find((h) => h.id === id);
+  if (!harvest) return null;
+  const isLatest = id === DEMO_LATEST_ID;
+  // Las semanas pasadas se calcularon con los parámetros de entonces: no cambian al ajustar los actuales.
+  const used = isLatest ? params : DEFAULT_PARAMS;
+  const dates = Array.from({ length: 5 }, (_, i) => addDays(harvest.monday, i));
+
+  const greenhouses: GreenhouseRow[] = harvest.captures.map((capture) => {
+    const info = GREENHOUSES.find((g) => g.id === capture.greenhouseId) as GreenhouseInfo;
+    const family = FAMILIES[info.family];
+    const grower = GROWERS.find((a) => a.id === info.growerId);
+    const technician = TECHNICIANS.find((t) => t.id === grower?.technicianId);
+    const settings = used.families[info.family];
+    const weather = demoWeatherOf(info, harvest.monday, real);
+    const hileras = capture.hileras.map((h) => buildHilera(h, settings.ripeningPct, weather.factor));
+    const analyzed = hileras.filter((h) => h.observed);
+    const observed = sumRanges(analyzed.map((h) => h.observed as KgRange));
+    const forecast = sumRanges(analyzed.map((h) => h.forecast as KgRange));
+    const matureFruits = analyzed.reduce((total, h) => total + (h.matureFruits ?? 0), 0);
+    const partial = analyzed.length < hileras.length;
+    const atiasDays = roundKeepingTotal(splitByDay(observed, forecast, dayShares(weather)).map((d) => d.kg));
+    const realKg = capture.realDailyKg ? fullWeek(capture.realDailyKg) : null;
+    const technicianKg = sum(capture.technicianKg);
+    return {
+      info,
+      familyName: family.name,
+      growerName: grower?.name ?? "—",
+      technicianId: technician?.id ?? "",
+      technicianName: technician?.name ?? "—",
+      criterion: family.criterion,
+      capturedAt: capture.capturedAt,
+      status: partial ? "analizando" : capture.warnings.length > 0 ? "con_advertencias" : "analizado",
+      isNew: capture.isNew && !readStorage<string[]>(SEEN_KEY, []).includes(`${id}/${info.id}`),
+      partial,
+      missingHileras: hileras.length - analyzed.length,
+      warnedHileras: capture.warnings.filter((w) => w.severity === "alta").map((w) => w.hilera),
+      observed,
+      forecast,
+      matureFruits,
+      classes: classesOf(info.family, matureFruits),
+      hileras,
+      videos: capture.videos,
+      warnings: capture.warnings,
+      realKg,
+      errorPct: realKg === null ? null : errorPct(forecast.kg, realKg),
+      technicianKg,
+      technicianErrorPct: realKg === null ? null : errorPct(technicianKg, realKg),
+      farmerKg: null,
+      farmerErrorPct: null,
+      immediateKg: null,
+      gramsPerFruit: family.grams,
+      gramsSource: "simulado",
+      controls: [],
+      ripeningPct: settings.ripeningPct,
+      weather,
+      daily: dates.map((date, i) => ({
+        date,
+        real: capture.realDailyKg?.[i] ?? null,
+        technician: capture.technicianKg[i],
+        farmer: null,
+        atias: atiasDays[i],
+      })),
+    };
+  });
+
+  return assemble(
+    {
+      id,
+      label: harvest.label,
+      isoWeek: harvest.isoWeek,
+      year: harvest.year,
+      dates,
+      updatedAt: harvest.updatedAt,
+      isLatest,
+      simulated: true,
+    },
+    greenhouses,
+    used,
   );
 }
 
+// ---- Datos reales ----
+
+/** Semana ISO de una recolección: los identificadores son del tipo 2026-W47. */
+function isoWeekOf(id: string, monday: string): { week: number; year: number } {
+  const match = /^(\d{4})-W(\d{1,2})$/.exec(id);
+  return match ? { year: Number(match[1]), week: Number(match[2]) } : { year: Number(monday.slice(0, 4)), week: 0 };
+}
+
+const placeOf = (g: FieldGreenhouse): Location | null =>
+  g.ubicacion ? { municipality: g.ubicacion.municipio, latitude: g.ubicacion.latitud, longitude: g.ubicacion.longitud, offsetC: 0 } : null;
+
+/** Sin familia indicada se usa la primera de su cultivo, y se avisa. */
+const familyOf = (g: FieldGreenhouse): FamilyId =>
+  (g.familia && g.familia.id in FAMILIES ? g.familia.id : FAMILY_ORDER.find((f) => FAMILIES[f].crop === g.cultivo)) as FamilyId;
+
+/**
+ * Peso medio por fruto: primero la muestra pesada; si no, lo recogido y pesado en los tramos de
+ * control; si no, el valor de partida de la familia, que es provisional.
+ */
+export function gramsPerFruit(g: FieldGreenhouse, family: FamilyId): { grams: number; source: GramsSource } {
+  if (g.muestra) return { grams: g.muestra.gramos / g.muestra.frutos, source: "muestra" };
+  const picked = g.controles.filter((c) => c.recogidos && c.pesoG);
+  const fruits = sum(picked.map((c) => c.recogidos as number));
+  if (fruits > 0) return { grams: sum(picked.map((c) => c.pesoG as number)) / fruits, source: "control" };
+  return { grams: FAMILIES[family].grams, source: "provisional" };
+}
+
+type SideCount = { mature: number[]; immature: number[] };
+
+function sideCount(video: FieldGreenhouse["videos"][number] | undefined, tramos: number): SideCount | null {
+  const result = video?.conteo?.estado === "ok" ? video.conteo.resultado : null;
+  if (!result) return null;
+  const mature = Array.from({ length: tramos }, (_, i) => result.tramos.find((t) => t.n === i + 1)?.maduros ?? 0);
+  const immature = Array.from({ length: tramos }, (_, i) => {
+    const tramo = result.tramos.find((t) => t.n === i + 1);
+    return tramo ? Math.max(0, sum(Object.values(tramo.clases)) - tramo.maduros) : 0;
+  });
+  return { mature, immature };
+}
+
+/**
+ * Hileras a partir de los vídeos contados. Los dos lados de una hilera ven en parte la misma fruta:
+ * mientras no se mida cuánta comparten, se toma el lado que más ve (docs/DISENO.md, riesgo R2b).
+ */
+export function realHileras(g: FieldGreenhouse, grams: number): { hileras: Hilera[]; videos: Video[]; warnings: AppWarning[] } {
+  const hileras: Hilera[] = [];
+  const videos: Video[] = [];
+  const warnings: AppWarning[] = [];
+  for (let n = 1; n <= g.hileras; n += 1) {
+    const sides = (["A", "B"] as const).map((lado) => ({ lado, video: g.videos.find((v) => v.hilera === n && v.lado === lado) }));
+    if (sides.every((s) => !s.video)) {
+      warnings.push({
+        severity: "media",
+        message: "Faltan los vídeos de los dos lados: esta hilera no tiene kilos.",
+        scope: `${g.nombre} · Hilera ${n}`,
+        greenhouseId: g.id,
+        hilera: n,
+        action: "Pide al agricultor que grabe esta hilera.",
+      });
+    }
+    for (const { lado, video } of sides) {
+      const scope = `${g.nombre} · Hilera ${n} · Lado ${lado}`;
+      if (!video && sides.some((s) => s.video)) {
+        warnings.push({
+          severity: "media",
+          message: "Falta el vídeo de este lado. Los kg de la hilera salen solo del otro lado.",
+          scope,
+          greenhouseId: g.id,
+          hilera: n,
+          action: "Pide al agricultor que grabe este lado.",
+        });
+        continue;
+      }
+      if (!video) continue;
+      const state = video.conteo?.estado ?? "pendiente";
+      if (state === "ok") {
+        videos.push({ hilera: n, lado, status: "analizado" });
+        for (const message of countMessages(video.conteo)) {
+          warnings.push({ severity: "media", message, scope, greenhouseId: g.id, hilera: n, action: "Revisa el vídeo y, si hace falta, pide repetirlo." });
+        }
+      } else if (state === "error") {
+        videos.push({ hilera: n, lado, status: "problema", note: "No se han podido contar los frutos" });
+        warnings.push({
+          severity: "alta",
+          message: "No se han podido contar los frutos de este vídeo.",
+          scope,
+          greenhouseId: g.id,
+          hilera: n,
+          action: "Pide al agricultor que repita la grabación de este lado.",
+        });
+      } else {
+        videos.push({ hilera: n, lado, status: "analizando" });
+      }
+    }
+    const counted = sides.map(({ video }) => sideCount(video, g.tramos)).filter((c): c is SideCount => c !== null);
+    if (counted.length === 0) {
+      hileras.push({ n, tramos: null });
+      continue;
+    }
+    const tramos: Tramo[] = Array.from({ length: g.tramos }, (_, i) => {
+      const mature = Math.max(...counted.map((c) => c.mature[i]));
+      const immature = Math.max(...counted.map((c) => c.immature[i]));
+      return { n: i + 1, matureFruits: mature, observedKg: (mature * grams) / 1000, immatureKg: (immature * grams) / 1000 };
+    });
+    hileras.push({ n, tramos });
+  }
+  return { hileras, videos, warnings };
+}
+
+export function buildRealReport(
+  field: FieldData,
+  params: Params,
+  weather: WeatherMap,
+  isLatest: boolean,
+): HarvestReport {
+  const monday = field.dias[0];
+  const greenhouses: GreenhouseRow[] = field.invernaderos.map((g) => {
+    const familyId = familyOf(g);
+    const family = FAMILIES[familyId];
+    const settings = params.families[familyId];
+    const { grams, source } = gramsPerFruit(g, familyId);
+    const place = placeOf(g);
+    const found = place ? weather.get(weatherKey(place, monday)) : null;
+    const summary = found
+      ? summarizeWeather(found.days, { source: "open-meteo", normalsYears: found.normalsYears, stale: found.stale })
+      : NO_WEATHER;
+    const built = realHileras(g, grams);
+    const hileras = built.hileras.map((h) => buildHilera(h, settings.ripeningPct, summary.factor));
+    const analyzed = hileras.filter((h) => h.observed);
+    const observed = sumRanges(analyzed.map((h) => h.observed as KgRange));
+    const forecast = sumRanges(analyzed.map((h) => h.forecast as KgRange));
+    const matureFruits = analyzed.reduce((total, h) => total + (h.matureFruits ?? 0), 0);
+    const partial = analyzed.length < hileras.length;
+
+    const warnings = [...built.warnings];
+    const sheet = (message: string, action: string, severity: AppWarning["severity"] = "media") =>
+      warnings.unshift({ severity, message, scope: g.nombre, greenhouseId: g.id, hilera: 0, action });
+    if (!g.familia) sheet(`Falta indicar la familia: se calcula como ${family.name}.`, "Complétalo en Datos de campo.", "alta");
+    if (source === "provisional") sheet("Peso por fruto provisional: falta pesar una muestra.", "Pesa 50 frutos maduros y apúntalo en Datos de campo.");
+    if (!place) sheet("Sin ubicación: la previsión no tiene en cuenta el tiempo.", "Añade la ubicación en Datos de campo.");
+
+    const realKg = g.cosecha.lunesViernes ?? fullWeek(g.real);
+    const technicianKg = fullWeek(g.previsiones.tecnico);
+    const farmerKg = fullWeek(g.previsiones.agricultor);
+    const atiasDays = roundKeepingTotal(splitByDay(observed, forecast, dayShares(summary)).map((d) => d.kg));
+    const received = g.videos.map((v) => v.receivedAt).filter((v): v is string => Boolean(v)).sort();
+    return {
+      info: {
+        id: g.id,
+        name: g.nombre,
+        growerId: "",
+        family: familyId,
+        crop: g.cultivo,
+        location: place ?? { municipality: "", latitude: 0, longitude: 0, offsetC: 0 },
+        hileras: g.hileras,
+        tramosPorHilera: g.tramos,
+        interiorSensor: false,
+      },
+      familyName: g.familia?.nombre ?? `${CROPS[g.cultivo].name} (sin familia)`,
+      growerName: g.agricultor ?? "—",
+      technicianId: g.tecnico ?? "",
+      technicianName: g.tecnico ?? "—",
+      criterion: family.criterion,
+      capturedAt: received.at(-1) ?? `${addDays(monday, -2)}T12:00:00+01:00`,
+      status: partial ? "analizando" : warnings.some((w) => w.severity === "alta") ? "con_advertencias" : "analizado",
+      isNew: false,
+      partial,
+      missingHileras: hileras.length - analyzed.length,
+      warnedHileras: warnings.filter((w) => w.severity === "alta" && w.hilera > 0).map((w) => w.hilera),
+      observed,
+      forecast,
+      matureFruits,
+      classes: classesOf(familyId, matureFruits),
+      hileras,
+      videos: built.videos,
+      warnings,
+      realKg,
+      errorPct: realKg === null ? null : errorPct(forecast.kg, realKg),
+      technicianKg,
+      technicianErrorPct: realKg === null || technicianKg === null ? null : errorPct(technicianKg, realKg),
+      farmerKg,
+      farmerErrorPct: realKg === null || farmerKg === null ? null : errorPct(farmerKg, realKg),
+      immediateKg: g.cosecha.inmediata,
+      gramsPerFruit: grams,
+      gramsSource: source,
+      controls: g.controles,
+      ripeningPct: settings.ripeningPct,
+      weather: summary,
+      daily: field.dias.map((date, i) => ({
+        date,
+        real: g.real[i],
+        technician: g.previsiones.tecnico[i],
+        farmer: g.previsiones.agricultor[i],
+        atias: atiasDays[i],
+      })),
+    };
+  });
+  const { week, year } = isoWeekOf(field.id, monday);
+  return assemble(
+    {
+      id: field.id,
+      label: field.etiqueta,
+      isoWeek: week,
+      year,
+      dates: field.dias,
+      updatedAt: new Date().toISOString(),
+      isLatest,
+      simulated: false,
+    },
+    greenhouses,
+    params,
+  );
+}
+
+async function loadRealReport(id: string, isLatest: boolean, params: Params): Promise<HarvestReport> {
+  const field = await fetchFieldData(id);
+  const wanted = new Map<string, { location: Location; monday: string }>();
+  for (const g of field.invernaderos) {
+    const place = placeOf(g);
+    if (place) wanted.set(weatherKey(place, field.dias[0]), { location: place, monday: field.dias[0] });
+  }
+  return buildRealReport(field, params, await loadWeather(wanted), isLatest);
+}
+
+// ---- Lo que usan las pantallas ----
+
+export async function listHarvests(): Promise<HarvestOption[]> {
+  if (getDataMode() === "demo") {
+    return simulateLatency(() => HARVESTS.map((h) => ({ id: h.id, label: h.label, hasData: h.captures.length > 0 })));
+  }
+  return (await fetchHarvestList()).map((h) => ({ id: h.id, label: h.etiqueta, hasData: true }));
+}
+
 export async function getReport(id: string): Promise<HarvestReport | null> {
-  const real = await loadWeather([id]);
-  return simulateLatency(() => buildReport(id, currentParams(), real));
+  if (getDataMode() === "demo") {
+    const resolved = id === LATEST_HARVEST_ID ? DEMO_LATEST_ID : id;
+    const real = await loadDemoWeather([resolved]);
+    return simulateLatency(() => buildDemoReport(resolved, currentParams(), real));
+  }
+  const list = await fetchHarvestList();
+  const latest = list[0]?.id;
+  const resolved = id === LATEST_HARVEST_ID ? latest : id;
+  if (!resolved || !list.some((h) => h.id === resolved)) return null;
+  // Las semanas pasadas se recalculan con los parámetros de partida, como en la demostración.
+  return loadRealReport(resolved, resolved === latest, resolved === latest ? currentParams() : DEFAULT_PARAMS);
 }
 
 /** Todas las recolecciones con datos, para comparar previsiones semana a semana. */
 export async function listReports(): Promise<HarvestReport[]> {
-  const real = await loadWeather(HARVESTS.map((h) => h.id));
-  return simulateLatency(() => {
-    const params = currentParams();
-    return HARVESTS.flatMap((h) => {
-      const report = buildReport(h.id, params, real);
-      return report && !report.empty ? [report] : [];
+  if (getDataMode() === "demo") {
+    const real = await loadDemoWeather(HARVESTS.map((h) => h.id));
+    return simulateLatency(() => {
+      const params = currentParams();
+      return HARVESTS.flatMap((h) => {
+        const report = buildDemoReport(h.id, params, real);
+        return report && !report.empty ? [report] : [];
+      });
     });
-  });
+  }
+  const list = await fetchHarvestList();
+  const reports = await Promise.all(
+    list.map((h, i) => loadRealReport(h.id, i === 0, i === 0 ? currentParams() : DEFAULT_PARAMS)),
+  );
+  return reports.filter((r) => !r.empty);
 }
 
 export type PastHarvest = {
   id: string;
   label: string;
   forecastKg: number;
-  technicianKg: number;
+  technicianKg: number | null;
   realKg: number;
   errorPct: number | null;
   technicianErrorPct: number | null;
 };
 
-/** Recolecciones ya pesadas, siempre con los parámetros que se usaron entonces. */
+/** Recolecciones ya pesadas, siempre con los parámetros de partida. */
 export async function listPastHarvests(): Promise<PastHarvest[]> {
-  const real = await loadWeather(HARVESTS.map((h) => h.id));
-  return simulateLatency(() =>
-    HARVESTS.flatMap((h) => {
-      const report = buildReport(h.id, DEFAULT_PARAMS, real);
-      if (!report || report.realKg === null) return [];
-      const technicianKg = report.greenhouses.reduce((total, g) => total + g.technicianKg, 0);
-      return [{
-        id: h.id,
-        label: h.label,
-        forecastKg: report.forecast.kg,
-        technicianKg,
-        realKg: report.realKg,
-        errorPct: report.errorPct,
-        technicianErrorPct: errorPct(technicianKg, report.realKg),
-      }];
-    }),
-  );
+  const reports = await listReports();
+  return reports.flatMap((report) => {
+    if (report.realKg === null) return [];
+    const technician = report.greenhouses.map((g) => g.technicianKg);
+    const technicianKg = technician.every((v) => v !== null) ? sum(technician as number[]) : null;
+    return [{
+      id: report.id,
+      label: report.label,
+      forecastKg: report.forecast.kg,
+      technicianKg,
+      realKg: report.realKg,
+      errorPct: report.errorPct,
+      technicianErrorPct: technicianKg === null ? null : errorPct(technicianKg, report.realKg),
+    }];
+  });
 }
 
 export function getParams(): Promise<Params> {
@@ -445,5 +747,5 @@ export function markSeen(harvestId: string, greenhouseId: string): Promise<void>
   });
 }
 
-export { DEFAULT_PARAMS, FAMILIES, FAMILY_ORDER, LATEST_HARVEST_ID, TECHNICIANS };
+export { DEFAULT_PARAMS, FAMILIES, FAMILY_ORDER, TECHNICIANS };
 export type { AppWarning, FamilyId, Params };

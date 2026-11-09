@@ -4,10 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getReport, LATEST_HARVEST_ID, listHarvests } from "./api";
+import { type DataMode, useDataMode } from "./mode";
 
+/** El modo va en la clave: los datos reales y los de demostración nunca comparten caché. */
 export const queryKeys = {
-  harvests: ["recolecciones"] as const,
-  report: (id: string) => ["informe", id] as const,
+  harvests: (mode: DataMode) => ["recolecciones", mode] as const,
+  report: (id: string, mode: DataMode) => ["informe", mode, id] as const,
+  reports: (mode: DataMode) => ["informe", mode, "todas"] as const,
   params: ["parametros"] as const,
 };
 
@@ -17,11 +20,13 @@ export function useSelectedHarvest(): string {
 }
 
 export function useHarvests() {
-  return useQuery({ queryKey: queryKeys.harvests, queryFn: listHarvests });
+  const mode = useDataMode();
+  return useQuery({ queryKey: queryKeys.harvests(mode), queryFn: listHarvests });
 }
 
 export function useReport(id: string) {
-  return useQuery({ queryKey: queryKeys.report(id), queryFn: () => getReport(id) });
+  const mode = useDataMode();
+  return useQuery({ queryKey: queryKeys.report(id, mode), queryFn: () => getReport(id) });
 }
 
 /** Cada pantalla tiene su título para orientarse entre pestañas y con lector de pantalla. */

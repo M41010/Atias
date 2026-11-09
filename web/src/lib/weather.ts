@@ -6,7 +6,8 @@
 import { degreeDaysFromHourly, weatherFactor } from "./calc";
 import type { DayWeather, Location } from "./simulated";
 
-export type WeatherSource = "open-meteo" | "simulada";
+/** sin_datos: el invernadero no tiene ubicación o la API no respondió; no se usa el tiempo. */
+export type WeatherSource = "open-meteo" | "simulada" | "sin_datos";
 
 export type WeatherDay = DayWeather & {
   tempMaxC: number;

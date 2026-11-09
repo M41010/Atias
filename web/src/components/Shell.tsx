@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Home, Link2, LogOut, Scale, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
+import { CalendarDays, ClipboardList, Crosshair, Home, Link2, LogOut, Presentation, Scale, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthGate } from "@/components/AuthGate";
 import { fmtDate } from "@/lib/format";
 import { useOnline } from "@/lib/hooks";
+import { setDataMode, useDataMode } from "@/lib/mode";
 import {
   clearOfflineCopy,
   copyStatus,
@@ -26,6 +27,8 @@ const NAV = [
   { href: "/videos", label: "Vídeos recibidos", icon: Video },
   { href: "/enlaces", label: "Enlaces", icon: Link2 },
   { href: "/cosecha", label: "Cosecha real", icon: Scale },
+  { href: "/campo", label: "Datos de campo", icon: ClipboardList },
+  { href: "/precision", label: "Precisión", icon: Crosshair },
   { href: "/temporeros", label: "Temporeros", icon: Users },
   { href: "/parametros", label: "Parámetros", icon: SlidersHorizontal },
 ];
@@ -70,7 +73,7 @@ function NavLinks() {
           <li key={href}>
             <Link
               // Temporeros y Parámetros siempre trabajan sobre la recolección actual.
-              href={href === "/" || href === "/invernaderos" || href === "/prevision" ? `${href}${query}` : href}
+              href={["/", "/invernaderos", "/prevision", "/campo", "/precision"].includes(href) ? `${href}${query}` : href}
               aria-current={active ? "page" : undefined}
               className={`flex min-h-10 items-center gap-2.5 whitespace-nowrap rounded-md px-3 text-sm transition-colors duration-150 ${
                 active
@@ -88,13 +91,38 @@ function NavLinks() {
   );
 }
 
-const SIMULATED_NOTICE = "Datos simulados: ninguna cifra procede de un invernadero real ni indica la precisión del sistema.";
+const SIMULATED_NOTICE = "Modo demostración: datos simulados. Ninguna cifra procede de un invernadero real ni indica la precisión del sistema.";
+const REAL_NOTICE = "Datos reales del piloto. El peso por fruto y la fruta tapada aún se están midiendo: las cifras pueden cambiar.";
 
 function DataNotice() {
-  // Esta pantalla sí muestra lo que han enviado de verdad: no debe decir que es simulada.
+  const mode = useDataMode();
   const pathname = usePathname();
-  const real = ["/videos", "/enlaces", "/cosecha"].some((path) => pathname.startsWith(path));
-  return <>{real ? "Prototipo: vídeos y datos reales de esta prueba. Aún no se cuentan frutos." : SIMULATED_NOTICE}</>;
+  // Vídeos, enlaces, cosecha y datos de campo son siempre reales, también en la demostración.
+  const alwaysReal = ["/videos", "/enlaces", "/cosecha", "/campo"].some((path) => pathname.startsWith(path));
+  return <>{mode === "demo" && !alwaysReal ? SIMULATED_NOTICE : REAL_NOTICE}</>;
+}
+
+/** Interruptor del modo demostración, visible siempre para no confundir datos reales con simulados. */
+function DemoSwitch() {
+  const mode = useDataMode();
+  const demo = mode === "demo";
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={demo}
+      onClick={() => setDataMode(demo ? "real" : "demo")}
+      className={`flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 text-sm transition-colors duration-150 md:mt-4 md:w-full ${
+        demo ? "bg-warn-soft font-semibold text-warn-ink" : "text-muted hover:bg-sunken hover:text-ink"
+      }`}
+    >
+      <Presentation size={16} aria-hidden />
+      Demostración
+      <span className={`ml-auto rounded-full px-2 text-xs ${demo ? "bg-warn-ink text-surface" : "bg-sunken text-muted"}`}>
+        {demo ? "Sí" : "No"}
+      </span>
+    </button>
+  );
 }
 
 /** Lo que hay en pantalla de la copia local, al día con cada cambio en las consultas. */
@@ -140,11 +168,12 @@ function OfflineCopyKeeper() {
 
 function Notices() {
   const online = useOnline();
+  const demo = useDataMode() === "demo";
   const { savedAt, failing } = useShownCopy();
   const saved = savedAt ? `Datos guardados: ${fmtDate(new Date(savedAt).toISOString())}. Pueden no estar actualizados.` : "Los datos pueden no estar actualizados.";
   return (
     <div className="sticky top-0 z-10">
-      <p role="status" className="border-b border-warn-line bg-warn-soft px-4 py-2 text-center text-sm font-medium text-warn-ink">
+      <p role="status" className={`border-b px-4 py-2 text-center text-sm font-medium ${demo ? "border-warn-line bg-warn-soft text-warn-ink" : "border-line bg-sunken text-ink"}`}>
         <Suspense fallback={SIMULATED_NOTICE}>
           <DataNotice />
         </Suspense>
@@ -187,6 +216,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <Suspense fallback={null}>
             <NavLinks />
           </Suspense>
+          <DemoSwitch />
           <UserMenu />
         </div>
       </nav>

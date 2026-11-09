@@ -184,7 +184,7 @@ export default function CosechaPage() {
             </div>
           </dl>
           <p className="border-t border-line px-5 py-3 text-sm text-muted">
-            Aún no se comparan con estimaciones reales, porque los vídeos no se analizan todavía. Estos datos quedan guardados para hacerlo.
+            Se comparan con las estimaciones de Atias en Precisión. Los kilos de cada día y las previsiones del agricultor y del técnico se apuntan en Datos de campo.
           </p>
         </Panel>
       </div>

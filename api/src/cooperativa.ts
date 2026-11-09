@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { resolve } from "node:path";
 import express, { type Router } from "express";
 import { requireSession, type SessionUser } from "./auth.js";
+import { createFieldRouter } from "./campo.js";
 import { hashToken, type Pool } from "./db.js";
 import { harvestWeek, isValidMonday, upcomingHarvests } from "./harvests.js";
 import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
@@ -15,6 +16,7 @@ const CROPS = new Set(["tomate_cherry", "pimiento", "pepino"]);
 export function createCooperativeRouter(pool: Pool, videoDir: string, weather: WeatherService): Router {
   const router = express.Router();
   router.use(requireSession(pool));
+  router.use(createFieldRouter(pool));
 
   router.get("/recolecciones", async (_req, res) => {
     const { rows } = await pool.query("SELECT id, label FROM harvests ORDER BY starts_on DESC");

@@ -23,6 +23,7 @@ import {
 import { type GreenhouseRow, type HileraRow, markSeen } from "@/lib/api";
 import { fmtBetween, fmtDate, fmtDay, fmtDecimal, fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
 import { queryKeys, useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
+import { useDataMode } from "@/lib/mode";
 import type { Video } from "@/lib/simulated";
 
 const STATUS_WORD = { analizado: "analizado", analizando: "analizando", problema: "con problema" };
@@ -110,6 +111,8 @@ function DailyPanel({ g }: { g: GreenhouseRow }) {
     return values.some((v) => v === null) ? null : (values as number[]).reduce((a, b) => a + b, 0);
   };
   const cells = (value: number | null) => (value === null ? "—" : fmtKg(value));
+  // La previsión del agricultor solo aparece si alguien la ha apuntado.
+  const showFarmer = g.daily.some((d) => d.farmer !== null);
   return (
     <Panel title="Por día de recolección" description="Cada día se recoge una zona del invernadero. Lo que madura después de grabar se reparte según el calor de cada día; el del fin de semana, el lunes.">
       <div className="overflow-x-auto">
@@ -118,6 +121,7 @@ function DailyPanel({ g }: { g: GreenhouseRow }) {
             <tr>
               <th scope="col">Día</th>
               <th scope="col" className="num">Real (kg)</th>
+              {showFarmer && <th scope="col" className="num">Agricultor (kg)</th>}
               <th scope="col" className="num">Técnico (kg)</th>
               <th scope="col" className="num"><ForecastHeader unit="Atias, kg" /></th>
             </tr>
@@ -127,14 +131,16 @@ function DailyPanel({ g }: { g: GreenhouseRow }) {
               <tr key={d.date}>
                 <th scope="row" className="whitespace-nowrap font-normal!">{fmtDay(d.date)}</th>
                 <td className="num">{cells(d.real)}</td>
-                <td className="num">{fmtKg(d.technician)}</td>
+                {showFarmer && <td className="num">{cells(d.farmer)}</td>}
+                <td className="num">{cells(d.technician)}</td>
                 <td className="num">{fmtKg(d.atias)}</td>
               </tr>
             ))}
             <tr className="font-semibold">
               <th scope="row">Total</th>
               <td className="num">{cells(total((d) => d.real))}</td>
-              <td className="num">{fmtKg(g.technicianKg)}</td>
+              {showFarmer && <td className="num">{cells(total((d) => d.farmer))}</td>}
+              <td className="num">{cells(g.technicianKg)}</td>
               <td className="num">{fmtKg(g.forecast.kg)}</td>
             </tr>
           </tbody>
@@ -219,7 +225,7 @@ function WeatherPanel({ g }: { g: GreenhouseRow }) {
   );
 }
 
-function Comparison({ g }: { g: GreenhouseRow }) {
+function Comparison({ g, simulated }: { g: GreenhouseRow; simulated: boolean }) {
   if (g.realKg === null) {
     return (
       <p className="px-5 py-4 text-sm text-muted">
@@ -240,11 +246,15 @@ function Comparison({ g }: { g: GreenhouseRow }) {
         </div>
         <div className="p-5">
           <dt className="text-sm text-muted">Error</dt>
-          <dd className="mt-1 text-lg font-semibold tabular-nums">{g.errorPct === null ? "—" : fmtPct(g.errorPct)}</dd>
+          <dd className="mt-1 text-lg font-semibold tabular-nums">{g.errorPct === null || g.partial ? "—" : fmtPct(g.errorPct)}</dd>
         </div>
       </dl>
-      <p className="border-t border-line px-5 py-3 text-sm text-muted">
-        Cosecha simulada: el error comprueba el cálculo, no la precisión real.
+      <p className={`border-t border-line px-5 py-3 text-sm ${g.partial ? "text-warn-ink" : "text-muted"}`}>
+        {simulated
+          ? "Cosecha simulada: el error comprueba el cálculo, no la precisión real."
+          : g.partial
+            ? "Faltan hileras por contar: la previsión se queda corta y no se compara con la cosecha entera."
+            : "Una sola semana no basta para saber cuánto acierta Atias: el conjunto está en Precisión."}
       </p>
     </>
   );
@@ -259,9 +269,10 @@ export default function GreenhousePage() {
   useDocumentTitle(greenhouse?.info.name ?? "Invernadero");
   const isNew = greenhouse?.isNew ?? false;
 
+  const mode = useDataMode();
   const { mutate: seen } = useMutation({
     mutationFn: () => markSeen(harvestId, id),
-    onSuccess: () => client.invalidateQueries({ queryKey: queryKeys.report(harvestId) }),
+    onSuccess: () => client.invalidateQueries({ queryKey: queryKeys.report(harvestId, mode) }),
   });
   useEffect(() => {
     if (isNew) seen();
@@ -415,7 +426,7 @@ export default function GreenhousePage() {
             </Panel>
           </div>
           <Panel title="Cosecha real">
-            <Comparison g={g} />
+            <Comparison g={g} simulated={report?.simulated ?? false} />
           </Panel>
         </div>
       </div>
