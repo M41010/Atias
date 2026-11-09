@@ -37,7 +37,6 @@ export function Header({ locale, nav }: Props) {
 
   return (
     <header className="relative z-30 border-b-[3px] border-ink bg-trap">
-      <span className="hang-hole absolute left-1/2 top-2 hidden -translate-x-1/2 lg:block" aria-hidden />
       <div className="mx-auto flex h-[72px] max-w-[1320px] items-center gap-6 px-4 sm:px-8">
         <Link href={pathFor(locale)} className="no-underline" aria-label="Atias">
           <Wordmark />

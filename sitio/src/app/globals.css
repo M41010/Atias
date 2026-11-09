@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 /*
- * La placa cromática: amarillo de trampa a sangre, cuadrícula impresa en tinta negra (fina cada
- * 24 px, mayor cada 5 celdas), etiquetas blancas para el texto largo. El rojo es solo del fruto;
- * el verde (observado) y el ámbar (previsión) solo viven dentro de las etiquetas.
+ * Paleta «Hoja»: fondo verde muy claro con cuadrícula impresa en verde profundo (fina cada 24 px,
+ * mayor cada 5 celdas), etiquetas blancas para el texto largo y bandas en verde profundo. Los
+ * nombres de los tokens se mantienen (trap = fondo, ink = tinta) para no tocar los componentes.
+ * El rojo es solo del fruto; observado y previsión solo viven dentro de las etiquetas.
  */
 @theme {
   --font-sans: var(--font-archivo), "Archivo", system-ui, sans-serif;
-  --color-trap: #f7da1b;
-  --color-trap-deep: #e9c90a;
-  --color-ink: #141412;
-  --color-ink-soft: #3b3608;
+  --color-trap: #f1f4ec;
+  --color-trap-deep: #dfe7d6;
+  --color-ink: #0f2b20;
+  --color-ink-soft: #3a5446;
   --color-paper: #ffffff;
-  --color-paper-muted: #55524a;
+  --color-paper-muted: #4f5f55;
   --color-fruit: #c8231b;
   --color-fruit-unripe: #6f9a2c;
   --color-leaf: #2f5a2a;
@@ -23,12 +24,19 @@
   --color-forecast: #c98a0c;
   --color-forecast-ink: #77500a;
   --color-forecast-soft: #fdf3d7;
+  --color-sprout: #3f8f2a;
+  --color-sprout-light: #8fd14f;
 }
 
 :root {
   color-scheme: light;
   --cell: 24px;
   --rule: 3px;
+  --mark-accent: var(--color-sprout);
+}
+
+.on-ink {
+  --mark-accent: var(--color-sprout-light);
 }
 
 html {
@@ -77,16 +85,36 @@ a {
 .plate {
   background-color: var(--color-trap);
   background-image:
-    linear-gradient(to right, rgb(20 20 18 / 0.3) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(20 20 18 / 0.3) 1px, transparent 1px),
-    linear-gradient(to right, rgb(20 20 18 / 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(20 20 18 / 0.1) 1px, transparent 1px);
+    linear-gradient(to right, rgb(15 43 32 / 0.22) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(15 43 32 / 0.22) 1px, transparent 1px),
+    linear-gradient(to right, rgb(15 43 32 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(15 43 32 / 0.07) 1px, transparent 1px);
   background-size:
     calc(var(--cell) * 5) calc(var(--cell) * 5),
     calc(var(--cell) * 5) calc(var(--cell) * 5),
     var(--cell) var(--cell),
     var(--cell) var(--cell);
   background-position: -1px -1px;
+}
+
+/* Logotipo: la nave central hace de A, a la altura de las mayúsculas. */
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  font-stretch: 88%;
+  font-weight: 800;
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wordmark svg {
+  height: 0.715em;
+  width: auto;
+  margin-right: 0.06em;
+  flex: none;
 }
 
 /* Titulares: la voz condensada de las placas impresas. */
@@ -170,15 +198,6 @@ a {
 
 .btn-secondary:hover {
   text-decoration-thickness: 4px;
-}
-
-/* El agujero por el que se cuelga la placa. */
-.hang-hole {
-  width: 18px;
-  height: 18px;
-  border-radius: 9999px;
-  background: var(--color-paper);
-  border: var(--rule) solid var(--color-ink);
 }
 
 /* Rango deslizante del contador, en la gramática de la placa. */

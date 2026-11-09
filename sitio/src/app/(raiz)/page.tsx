@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LanguageRedirect } from "@/components/LanguageRedirect";
-import { Wordmark } from "@/components/Mark";
+import { NaveMark, Wordmark } from "@/components/Mark";
 import { LOCALE_NAMES, LOCALES, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 
@@ -9,6 +9,7 @@ export default function Root() {
   return (
     <main className="plate flex min-h-dvh flex-col items-start justify-center gap-8 px-6 py-16 sm:px-12">
       <LanguageRedirect />
+      <NaveMark size={80} className="-ml-1" />
       <Wordmark />
       <ul className="label w-full max-w-md">
         {LOCALES.map((code, index) => (

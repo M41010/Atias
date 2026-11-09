@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { type Locale, pathFor } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/es";
-import { Wordmark } from "./Mark";
+import { NaveMark, Wordmark } from "./Mark";
 
 export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
     <footer className="on-ink bg-ink text-trap">
       <div className="mx-auto flex max-w-[1320px] flex-col gap-8 px-4 py-12 sm:px-8 md:flex-row md:items-end md:justify-between">
         <div className="flex flex-col gap-3">
+          <NaveMark size={72} className="-ml-1" />
           <Wordmark />
           <p className="max-w-[40ch] text-[0.95rem]">{dict.footer.rights}</p>
         </div>
