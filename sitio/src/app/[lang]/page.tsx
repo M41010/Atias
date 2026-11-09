@@ -2,6 +2,7 @@ import { ArrowRight, Check, FlaskConical } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Counter } from "@/components/Counter";
+import { NaveMark } from "@/components/Mark";
 import { isLocale, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 
@@ -140,13 +141,16 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
 
       {/* Cierre. */}
       <section className="plate">
-        <div className="mx-auto flex max-w-[1320px] flex-col items-start gap-8 px-4 py-24 sm:px-8 lg:py-32">
-          <h2 className="display max-w-[16ch] text-[clamp(2.75rem,6vw,5.25rem)]">{home.closeTitle}</h2>
-          <p className="lead text-[1.2rem] font-medium text-ink-soft">{home.closeBody}</p>
-          <Link href={pathFor(lang, "contacto")} className="btn-primary">
-            {cta.demo}
-            <ArrowRight size={18} aria-hidden />
-          </Link>
+        <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-12 px-4 py-24 sm:px-8 lg:py-32">
+          <div className="flex flex-col items-start gap-8">
+            <h2 className="display max-w-[16ch] text-[clamp(2.75rem,6vw,5.25rem)]">{home.closeTitle}</h2>
+            <p className="lead text-[1.2rem] font-medium text-ink-soft">{home.closeBody}</p>
+            <Link href={pathFor(lang, "contacto")} className="btn-primary">
+              {cta.demo}
+              <ArrowRight size={18} aria-hidden />
+            </Link>
+          </div>
+          <NaveMark size={320} className="hidden shrink-0 md:block" />
         </div>
       </section>
     </>

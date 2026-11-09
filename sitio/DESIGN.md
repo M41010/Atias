@@ -1,13 +1,15 @@
 ---
 name: Atias · web pública
-description: La placa cromática de conteo. Escaparate del producto en seis idiomas.
+description: La cuadrícula de campo en verde Hoja con el símbolo de la Nave. Escaparate del producto en seis idiomas.
 colors:
-  trap: "#f7da1b"
-  trap-deep: "#e9c90a"
-  ink: "#141412"
-  ink-soft: "#3b3608"
+  trap: "#f1f4ec"
+  trap-deep: "#dfe7d6"
+  ink: "#0f2b20"
+  ink-soft: "#3a5446"
+  sprout: "#3f8f2a"
+  sprout-light: "#8fd14f"
   paper: "#ffffff"
-  paper-muted: "#55524a"
+  paper-muted: "#4f5f55"
   fruit: "#c8231b"
   fruit-unripe: "#6f9a2c"
   leaf-dark: "#1f3a1d"
@@ -41,8 +43,8 @@ typography:
 grid:
   cell: "24px"
   major: "5 celdas"
-  minorLine: "rgb(20 20 18 / 0.10)"
-  majorLine: "rgb(20 20 18 / 0.30)"
+  minorLine: "rgb(15 43 32 / 0.07)"
+  majorLine: "rgb(15 43 32 / 0.22)"
 rules:
   heavy: "3px solid ink"
   light: "2px solid ink"
@@ -55,7 +57,7 @@ components:
     textColor: "{colors.trap}"
     height: "52px"
     border: "3px solid ink"
-    hover: "se invierte: amarillo con tinta"
+    hover: "se invierte: fondo claro con tinta"
   label:
     backgroundColor: "{colors.paper}"
     border: "3px solid ink"
@@ -70,37 +72,43 @@ components:
 
 ## Idea
 
-**La placa cromática de conteo.** Los técnicos cuelgan en el invernadero placas adhesivas amarillas con una cuadrícula impresa para contar; Atias cuenta fruta. La web entera es esa placa: amarillo a sangre, cuadrícula fina cada 24 px con una línea mayor cada cinco celdas, tinta negra y etiquetas blancas donde va el texto largo y los datos. Rechaza la portada agrícola de degradado verde, foto de dron y tres tarjetas.
+**La cuadrícula de campo.** Una hoja de medición en verde muy claro, con cuadrícula fina cada 24 px y una línea mayor cada cinco celdas, tinta verde profunda y etiquetas blancas donde va el texto largo y los datos. La marca es un especialista del invernadero que mide; no se ata a un cultivo, porque Atias crecerá hacia plagas, riego y seguimiento de plantas. Rechaza la portada agrícola de degradado verde, foto de dron y tres tarjetas.
 
 Es un mundo distinto del panel de la cooperativa (`DESIGN.md` en la raíz). Comparten dos colores con el mismo significado: verde para lo observado y ámbar para la previsión aún sin validar.
 
 ## Color
 
-- **Amarillo trampa** es el suelo de toda la página. Nunca es acento.
-- **Tinta** para texto, bordes, la banda del piloto y el pie. Sobre tinta, el texto es amarillo.
+- **Fondo Hoja** (`trap`, verde muy claro) es el suelo de toda la página. Los tokens conservan el nombre `trap` del diseño anterior para no tocar los componentes.
+- **Tinta** (verde profundo) para texto, bordes, la banda del piloto y el pie. Sobre tinta, el texto va en el fondo claro.
+- **Verde brote** solo en el punto de medida de la marca (`sprout` sobre claro, `sprout-light` sobre tinta).
 - **Etiqueta blanca** solo para texto largo, tablas, el formulario y el contador.
 - **Rojo fruto** solo en frutos maduros y en errores del formulario.
 - **Verde observado** y **ámbar previsión** solo dentro de etiquetas, con su leyenda nombrada al lado.
-- Texto secundario sobre amarillo en `ink-soft`, teñido de la propia placa, nunca gris.
+- Texto secundario en `ink-soft`, teñido de verde, nunca gris.
 
 ## Tipografía
 
-Una familia, **Archivo** variable, alojada con la web. Titulares y cifras en anchura condensada (72-78 %) y peso 850: la voz de las placas y etiquetas impresas. Texto normal a anchura completa. Cifras tabulares en todo dato. Rótulos en minúscula de frase, sin versales ni tracking abierto.
+Una familia, **Archivo** variable, alojada con la web. Titulares y cifras en anchura condensada (72-78 %) y peso 850: la voz de las etiquetas impresas. Texto normal a anchura completa. Cifras tabulares en todo dato. Rótulos en minúscula de frase, sin versales ni tracking abierto.
 
 ## Estructura
 
 - Contenedor de 1320 px con márgenes de 16 px (32 px desde 640 px).
-- Las secciones alternan placa con cuadrícula, amarillo liso para los pasajes de lectura, y banda de tinta para el piloto y el pie. El texto que va directamente sobre el fondo, sin etiqueta, prefiere el amarillo liso.
+- Las secciones alternan fondo con cuadrícula (`.plate`), fondo liso para los pasajes de lectura, y banda de tinta para el piloto y el pie. El texto que va directamente sobre el fondo, sin etiqueta, prefiere el fondo liso.
 - Separación por líneas de 3 px de tinta, nunca por sombras. Sin radios salvo en los frutos.
 - Listas de contenido relacionado (para quién, principios, etapas del producto) como filas de una sola tabla, nunca como tarjetas sueltas.
 
 ## Pieza característica: el contador
 
-Etiqueta blanca con un invernadero de ejemplo dibujado con celdas de la cuadrícula. La tira pasa por delante de una línea de lectura amarilla. Cada fruto maduro que la cruza se enmarca y rellena una celda negra en el recuento; las celdas vacías son lo que queda por contar. Un solo control (el deslizador del recorrido) mueve a la vez frutos, kilos con su margen y temporeros. Se anima una vez al verse (7 s, salida exponencial); con movimiento reducido muestra el resultado directamente. Siempre lleva el rótulo «Datos inventados para mostrar el método».
+Etiqueta blanca con un invernadero de ejemplo dibujado con celdas de la cuadrícula. La tira pasa por delante de una línea de lectura clara. Cada fruto maduro que la cruza se enmarca y rellena una celda negra en el recuento; las celdas vacías son lo que queda por contar. Un solo control (el deslizador del recorrido) mueve a la vez frutos, kilos con su margen y temporeros. Se anima una vez al verse (7 s, salida exponencial); con movimiento reducido muestra el resultado directamente. Siempre lleva el rótulo «Datos inventados para mostrar el método».
 
 ## Marca
 
-Marca de conteo de cinco (cuatro palos y el quinto cruzado) junto a «Atias» en Archivo condensado. El icono de pestaña es la misma marca sobre amarillo.
+Dos piezas (`src/components/Mark.tsx`):
+
+- **Símbolo, la Nave** (`NaveMark`): tres naves de un multitúnel sobre la línea de suelo, una marca en cada pata y el punto de medida en la nave central. Va solo: favicon, cierre de la portada, pie y página de idiomas. No se pone junto al logotipo en la cabecera, para no repetir el dibujo.
+- **Logotipo** (`Wordmark`): «ATIAS» en mayúsculas, Archivo al 88 % de anchura y peso 800, con la nave central del símbolo, sin modificar, haciendo de A.
+
+El favicon (`public/marca.svg`) es el símbolo en claro sobre un cuadrado de tinta.
 
 ## Pendientes y honestidad
 
