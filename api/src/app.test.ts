@@ -12,7 +12,7 @@ import { after, before, beforeEach, describe, it } from "node:test";
 import type { FileStore } from "@tus/file-store";
 import { createApp } from "./app.js";
 import { disableUser, LoginLimiter, setUserPassword } from "./auth.js";
-import { createPool, hashToken, migrate, type Pool, seedDemo } from "./db.js";
+import { createPool, hashToken, migrate, type Pool, removeDemoLinks, seedDemo } from "./db.js";
 import { harvestWeek, upcomingHarvests } from "./harvests.js";
 import { createQualityRunner, reviewPendingVideos } from "./quality.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
@@ -57,10 +57,14 @@ describe("API", () => {
   let now = 0;
   const limiter = new LoginLimiter(() => now);
 
-  const login = (correo = EMAIL, contrasena = PASSWORD) =>
+  let freeSpace = Number.MAX_SAFE_INTEGER;
+  const MIN_FREE = 1000;
+
+  /** `ip` simula la dirección del cliente que la web reenvía en X-Forwarded-For. */
+  const login = (correo = EMAIL, contrasena = PASSWORD, ip?: string) =>
     fetch(`${api}/api/auth/entrar`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...(ip ? { "x-forwarded-for": ip } : {}) },
       body: JSON.stringify({ correo, contrasena }),
     });
 
@@ -123,7 +127,10 @@ describe("API", () => {
     videoDir = await mkdtemp(join(tmpdir(), "atias-videos-"));
     store = createVideoStore(videoDir);
     analysisUrl = await listen(analysis);
-    apiServer = createServer(createApp({ analysisUrl, pool, store, limiter }));
+    apiServer = createServer(createApp({
+      analysisUrl, pool, store, limiter, trustedProxy: true,
+      uploadLimits: { minFreeBytes: MIN_FREE, freeSpace: async () => freeSpace },
+    }));
     api = await listen(apiServer);
   });
 
@@ -131,6 +138,7 @@ describe("API", () => {
     analysisStatus = 200;
     analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
     analysisCalls = [];
+    freeSpace = Number.MAX_SAFE_INTEGER;
     await pool.query("DELETE FROM videos; DELETE FROM weekly_data; DELETE FROM harvest_records;");
     await pool.query("DELETE FROM upload_links WHERE created_by IS NOT NULL OR expires_at IS NOT NULL");
     await pool.query("DELETE FROM sessions; DELETE FROM users;");
@@ -192,6 +200,13 @@ describe("API", () => {
       const { rows } = await pool.query("SELECT token_sha256 FROM upload_links");
       assert.ok(rows.every((r) => !r.token_sha256.includes("demo")));
     });
+
+    it("sin datos de prueba, los enlaces de prueba dejan de valer", async () => {
+      assert.equal(await removeDemoLinks(pool), 3);
+      assert.equal((await link("")).status, 404);
+      await seedDemo(pool);
+      assert.equal((await link("")).status, 200);
+    });
   });
 
   describe("subida", () => {
@@ -227,6 +242,38 @@ describe("API", () => {
     it("rechaza vídeos de más de 8 GB", async () => {
       const response = await createUpload({ size: 8 * 1024 ** 3 + 1 });
       assert.equal(response.status, 413);
+    });
+
+    it("solo admite tipos de vídeo concretos, aunque el tipo empiece por video/", async () => {
+      for (const filetype of ["video/mp4,text/html", "video/html", "video/mp4; text/html", "text/html", ""]) {
+        assert.equal((await createUpload({ filetype })).status, 415, filetype);
+      }
+      assert.equal((await createUpload({ filetype: "video/quicktime" })).status, 201);
+    });
+
+    it("guarda el tipo normalizado", async () => {
+      const id = await uploadComplete({ filetype: " Video/MP4 " });
+      const { rows } = await pool.query("SELECT mime_type FROM videos WHERE id = $1", [id]);
+      assert.equal(rows[0].mime_type, "video/mp4");
+    });
+
+    it("limita cuántas versiones se guardan por invernadero y recolección", async () => {
+      // El invernadero de prueba tiene 4 hileras: 4 x 2 lados x 4 versiones.
+      await pool.query(
+        `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status)
+         SELECT gen_random_uuid(), 'inv-1', $1, 1, 'A', 'v.mp4', 'video/mp4', 10, 'sustituido'
+         FROM generate_series(1, 32)`,
+        [HARVEST],
+      );
+      assert.equal((await createUpload()).status, 429);
+      // Otro invernadero no se ve afectado.
+      assert.equal((await createUpload({ token: OTHER_TOKEN })).status, 201);
+    });
+
+    it("no acepta un vídeo que dejaría el disco sin el espacio mínimo", async () => {
+      freeSpace = MIN_FREE + 50;
+      assert.equal((await createUpload({ size: 51 })).status, 507);
+      assert.equal((await createUpload({ size: 50 })).status, 201);
     });
 
     it("otro enlace no puede ver ni continuar la subida", async () => {
@@ -412,6 +459,64 @@ describe("API", () => {
       });
       assert.equal(response.status, 400);
       assert.equal((await login(EMAIL, "x".repeat(201))).status, 400);
+    });
+
+    it("quien prueba contraseñas desde un equipo no bloquea a la persona desde el suyo", async () => {
+      for (let i = 0; i < 5; i++) await login(EMAIL, "mal-mal-mal-mal", "203.0.113.1");
+      assert.equal((await login(EMAIL, PASSWORD, "203.0.113.1")).status, 429);
+      assert.equal((await login(EMAIL, PASSWORD, "198.51.100.7")).status, 200);
+    });
+
+    it("bloquea un equipo que prueba muchos correos distintos", async () => {
+      for (let i = 0; i < 20; i++) await login(`persona${i}@cooperativa.test`, "mal-mal-mal-mal", "203.0.113.2");
+      assert.equal((await login(EMAIL, PASSWORD, "203.0.113.2")).status, 429);
+      assert.equal((await login(EMAIL, PASSWORD, "198.51.100.8")).status, 200);
+    });
+
+    it("bloquea una cuenta atacada desde muchos equipos", async () => {
+      for (let i = 0; i < 50; i++) await login(EMAIL, "mal-mal-mal-mal", `203.0.113.${100 + i}`);
+      assert.equal((await login(EMAIL, PASSWORD, "198.51.100.9")).status, 429);
+      now += 16 * 60 * 1000;
+      assert.equal((await login(EMAIL, PASSWORD, "198.51.100.9")).status, 200);
+    });
+
+    it("sin proxy de confianza no cree la dirección que dice el cliente", async () => {
+      const server = createServer(createApp({ analysisUrl, pool, store, limiter: new LoginLimiter(() => now) }));
+      const url = await listen(server);
+      try {
+        const attempt = (contrasena: string, ip: string) =>
+          fetch(`${url}/api/auth/entrar`, {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-forwarded-for": ip },
+            body: JSON.stringify({ correo: EMAIL, contrasena }),
+          });
+        for (let i = 0; i < 5; i++) await attempt("mal-mal-mal-mal", `203.0.113.${i}`);
+        // Cambiar la dirección inventada no salta el bloqueo.
+        assert.equal((await attempt(PASSWORD, "198.51.100.10")).status, 429);
+      } finally {
+        await close(server);
+      }
+    });
+
+    it("no acepta peticiones que cambian algo enviadas desde otra web", async () => {
+      const post = (headers: Record<string, string>) =>
+        fetch(`${api}/api/auth/entrar`, {
+          method: "POST",
+          headers: { "content-type": "application/json", ...headers },
+          body: JSON.stringify({ correo: EMAIL, contrasena: PASSWORD }),
+        });
+      assert.equal((await post({ origin: "https://malicioso.test" })).status, 403);
+      assert.equal((await post({ origin: "null" })).status, 403);
+      assert.equal((await post({ "sec-fetch-site": "cross-site" })).status, 403);
+      assert.equal((await post({ "sec-fetch-site": "same-site" })).status, 403);
+      assert.equal((await post({ origin: api, "sec-fetch-site": "same-origin" })).status, 200);
+      // Detrás de la web, el origen se compara con el dominio que pidió el navegador.
+      assert.equal((await post({ origin: "http://atias.test", "x-forwarded-host": "atias.test" })).status, 200);
+      const subida = await fetch(`${api}/api/subidas`, {
+        method: "POST",
+        headers: { ...tusHeaders(), origin: "https://malicioso.test", "upload-length": "10" },
+      });
+      assert.equal(subida.status, 403);
     });
 
     it("/yo identifica la sesión y salir la invalida en el servidor", async () => {
@@ -639,7 +744,16 @@ describe("API", () => {
       assert.equal(response.status, 200);
       assert.equal(response.headers.get("content-type"), "video/mp4");
       assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+      assert.match(response.headers.get("content-security-policy") ?? "", /sandbox/);
       assert.equal((await response.arrayBuffer()).byteLength, 100);
+    });
+
+    it("un tipo no admitido guardado antes se sirve como descarga, no como página", async () => {
+      const id = await uploadComplete({ size: 10 });
+      await pool.query("UPDATE videos SET mime_type = 'video/mp4,text/html' WHERE id = $1", [id]);
+      const response = await content(id);
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get("content-type"), "application/octet-stream");
     });
 
     it("admite peticiones parciales para avanzar en el vídeo", async () => {

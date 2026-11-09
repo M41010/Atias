@@ -5,7 +5,7 @@ import { createCooperativeRouter } from "./cooperativa.js";
 import type { Pool } from "./db.js";
 import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
 import { type Link, LINK_HEADER, resolveLink } from "./links.js";
-import { createUploadServer, UPLOADS_PATH } from "./uploads.js";
+import { createUploadServer, type UploadLimits, UPLOADS_PATH } from "./uploads.js";
 
 const ANALYSIS_TIMEOUT_MS = 2000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -30,16 +30,50 @@ export function createApp({
   store,
   secureCookies = false,
   limiter = new LoginLimiter(),
+  uploadLimits,
+  trustedProxy = false,
 }: {
   analysisUrl: string;
   pool: Pool;
   store: FileStore;
   secureCookies?: boolean;
   limiter?: LoginLimiter;
+  uploadLimits?: UploadLimits;
+  /**
+   * La web reenvía X-Forwarded-For tal como llega, así que el cliente podría inventarse su
+   * dirección. Solo se cree si delante hay un proxy (HTTPS en la nube) que la escribe él mismo.
+   */
+  trustedProxy?: boolean;
 }): Express {
   const app = express();
   app.disable("x-powered-by");
-  const uploads = createUploadServer(pool, store);
+  app.set("trust proxy", trustedProxy ? 1 : false);
+  const uploads = createUploadServer(pool, store, uploadLimits);
+
+  // Las peticiones que cambian algo solo se aceptan desde la propia web, no desde otra página
+  // abierta en el mismo navegador. Se suma a la cookie SameSite como segunda barrera.
+  app.use((req, res, next) => {
+    if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+      next();
+      return;
+    }
+    const site = req.get("sec-fetch-site");
+    const origin = req.get("origin");
+    const host = req.get("x-forwarded-host") ?? req.get("host");
+    let sameOrigin = true;
+    if (origin) {
+      try {
+        sameOrigin = new URL(origin).host === host;
+      } catch {
+        sameOrigin = false;
+      }
+    }
+    if ((site && site !== "same-origin" && site !== "none") || !sameOrigin) {
+      res.status(403).json({ error: "Petición no permitida" });
+      return;
+    }
+    next();
+  });
 
   // Vivo: el proceso responde. No depende de otros servicios.
   app.get("/salud", (_req, res) => {
@@ -175,7 +209,7 @@ export function createApp({
 
   app.use("/api/enlace", linkRoutes);
 
-  app.use("/api/auth", createAuthRouter(pool, limiter, secureCookies));
+  app.use("/api/auth", createAuthRouter(pool, limiter, secureCookies, trustedProxy));
   app.use("/api/cooperativa", createCooperativeRouter(pool, store.directory));
 
   app.use((_req, res) => {

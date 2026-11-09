@@ -36,33 +36,77 @@ const DUMMY_HASH = hashPassword(randomBytes(16).toString("hex"));
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
-/** Bloqueo temporal tras varios fallos. En memoria: sirve mientras haya una sola copia de la API. */
+/** Fallos que bloquean durante 15 minutos, según qué se cuente. */
+const LIMITS = {
+  // Una cuenta desde un mismo equipo: quien prueba contraseñas solo se bloquea a sí mismo.
+  pair: MAX_FAILED_LOGINS,
+  // Un equipo contra cualquier cuenta: frena a quien prueba muchos correos.
+  ip: 20,
+  // Una cuenta desde todos los equipos: frena un ataque repartido entre muchas direcciones.
+  account: 50,
+};
+const MAX_ENTRIES = 10_000;
+
+type Attempts = { fails: number; lastFail: number; lockedUntil: number };
+
+/**
+ * Bloqueo temporal tras varios fallos. Con la dirección del cliente, un atacante no puede dejar
+ * fuera a alguien de la cooperativa con unos pocos intentos desde su equipo. Sin ella (en local,
+ * sin proxy de confianza) solo se puede contar por cuenta: 5 fallos la bloquean 15 minutos.
+ * En memoria: sirve mientras haya una sola copia de la API.
+ */
 export class LoginLimiter {
-  private attempts = new Map<string, { fails: number; lockedUntil: number }>();
+  private attempts = new Map<string, Attempts>();
 
   constructor(private now: () => number = Date.now) {}
 
-  isLocked(email: string): boolean {
-    const entry = this.attempts.get(email);
-    if (!entry) return false;
-    if (entry.lockedUntil && entry.lockedUntil <= this.now()) {
-      this.attempts.delete(email);
-      return false;
+  private keys(email: string, ip: string): [string, number][] {
+    if (!ip) return [[`c:${email}`, MAX_FAILED_LOGINS]];
+    return [[`p:${email}|${ip}`, LIMITS.pair], [`i:${ip}`, LIMITS.ip], [`c:${email}`, LIMITS.account]];
+  }
+
+  private current(key: string): Attempts | undefined {
+    const entry = this.attempts.get(key);
+    if (!entry) return undefined;
+    const now = this.now();
+    // Se olvida al acabar el bloqueo o tras 15 minutos sin fallos.
+    if ((entry.lockedUntil && entry.lockedUntil <= now) || (!entry.lockedUntil && now - entry.lastFail > LOCK_MS)) {
+      this.attempts.delete(key);
+      return undefined;
     }
-    return entry.lockedUntil > 0;
+    return entry;
   }
 
-  fail(email: string): void {
-    // Limita la memoria si alguien prueba muchos correos distintos.
-    if (this.attempts.size > 10_000) this.attempts.clear();
-    const entry = this.attempts.get(email) ?? { fails: 0, lockedUntil: 0 };
-    entry.fails += 1;
-    if (entry.fails >= MAX_FAILED_LOGINS) entry.lockedUntil = this.now() + LOCK_MS;
-    this.attempts.set(email, entry);
+  isLocked(email: string, ip = ""): boolean {
+    return this.keys(email, ip).some(([key]) => (this.current(key)?.lockedUntil ?? 0) > 0);
   }
 
-  succeed(email: string): void {
-    this.attempts.delete(email);
+  fail(email: string, ip = ""): void {
+    this.trim();
+    const now = this.now();
+    for (const [key, limit] of this.keys(email, ip)) {
+      const entry = this.current(key) ?? { fails: 0, lastFail: now, lockedUntil: 0 };
+      entry.fails += 1;
+      entry.lastFail = now;
+      if (entry.fails >= limit) entry.lockedUntil = now + LOCK_MS;
+      // Se vuelve a insertar para que el orden del mapa sea el de la última actividad.
+      this.attempts.delete(key);
+      this.attempts.set(key, entry);
+    }
+  }
+
+  succeed(email: string, ip = ""): void {
+    for (const [key] of this.keys(email, ip)) this.attempts.delete(key);
+  }
+
+  /** Limita la memoria sin borrar todos los bloqueos: primero lo caducado, luego lo más antiguo. */
+  private trim(): void {
+    if (this.attempts.size < MAX_ENTRIES) return;
+    for (const key of [...this.attempts.keys()]) this.current(key);
+    for (const key of this.attempts.keys()) {
+      if (this.attempts.size < MAX_ENTRIES * 0.9) break;
+      this.attempts.delete(key);
+    }
   }
 }
 
@@ -102,7 +146,12 @@ export function requireSession(pool: Pool): RequestHandler {
   };
 }
 
-export function createAuthRouter(pool: Pool, limiter: LoginLimiter, secureCookies: boolean): Router {
+export function createAuthRouter(
+  pool: Pool,
+  limiter: LoginLimiter,
+  secureCookies: boolean,
+  knowsClientIp = false,
+): Router {
   const router = express.Router();
   const cookieOptions = {
     httpOnly: true,
@@ -119,7 +168,9 @@ export function createAuthRouter(pool: Pool, limiter: LoginLimiter, secureCookie
       return;
     }
     const email = normalizeEmail(correo);
-    if (limiter.isLocked(email)) {
+    // Sin una dirección fiable, el bloqueo solo puede ser por cuenta.
+    const ip = knowsClientIp ? req.ip ?? "" : "";
+    if (limiter.isLocked(email, ip)) {
       res.status(429).json({ error: "Demasiados intentos. Vuelve a probar dentro de 15 minutos." });
       return;
     }
@@ -130,11 +181,11 @@ export function createAuthRouter(pool: Pool, limiter: LoginLimiter, secureCookie
     const user = rows[0];
     const valid = await verifyPassword(contrasena, user?.password_hash ?? (await DUMMY_HASH));
     if (!user || !valid) {
-      limiter.fail(email);
+      limiter.fail(email, ip);
       res.status(401).json({ error: "Correo o contraseña incorrectos" });
       return;
     }
-    limiter.succeed(email);
+    limiter.succeed(email, ip);
     const token = randomBytes(32).toString("base64url");
     await pool.query(
       `INSERT INTO sessions (token_sha256, user_id, expires_at)
