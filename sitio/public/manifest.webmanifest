@@ -1,0 +1,14 @@
+{
+  "name": "Atias · Previsión de cosecha en invernadero",
+  "short_name": "Atias",
+  "description": "Previsión de cosecha en invernadero a partir de vídeo.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f1f4ec",
+  "theme_color": "#0f2b20",
+  "icons": [
+    { "src": "/marca.svg", "type": "image/svg+xml", "sizes": "any" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/logo-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}

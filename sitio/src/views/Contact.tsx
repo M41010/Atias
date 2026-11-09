@@ -1,21 +1,10 @@
 import { Mail } from "lucide-react";
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { ContactForm } from "@/components/ContactForm";
 import { PendingValue } from "@/components/Pending";
-import { isLocale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 import { getDictionary, LEGAL_DATA } from "@/i18n";
 
-export async function generateMetadata({ params }: PageProps<"/[lang]/contacto">): Promise<Metadata> {
-  const { lang } = await params;
-  if (!isLocale(lang)) return {};
-  const dict = getDictionary(lang);
-  return { title: `${dict.contact.title} · Atias`, description: dict.contact.lead };
-}
-
-export default async function Contact({ params }: PageProps<"/[lang]/contacto">) {
-  const { lang } = await params;
-  if (!isLocale(lang)) notFound();
+export function Contact({ lang }: { lang: Locale }) {
   const { contact } = getDictionary(lang);
 
   return (

@@ -1,26 +1,20 @@
 import { ArrowRight, ShieldCheck } from "lucide-react";
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { isLocale, pathFor } from "@/i18n/config";
+import { CROPS, type Locale, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
-import panel from "../../../../public/capturas/panel-resumen.png";
+import { getContent } from "@/i18n/content";
+import { JsonLd } from "@/components/JsonLd";
+import { software } from "@/seo/schema";
+import panel from "../../public/capturas/panel-resumen.png";
 
-export async function generateMetadata({ params }: PageProps<"/[lang]/producto">): Promise<Metadata> {
-  const { lang } = await params;
-  if (!isLocale(lang)) return {};
-  const dict = getDictionary(lang);
-  return { title: `${dict.product.title} · Atias`, description: dict.product.lead };
-}
-
-export default async function Product({ params }: PageProps<"/[lang]/producto">) {
-  const { lang } = await params;
-  if (!isLocale(lang)) notFound();
+export function Product({ lang }: { lang: Locale }) {
   const { product, cta, home } = getDictionary(lang);
+  const content = getContent(lang);
 
   return (
     <>
+      <JsonLd data={software(lang, "Atias", content.seo.product.description)} />
       <section className="plate border-b-[3px] border-ink">
         <div className="mx-auto max-w-[1320px] px-4 pb-16 pt-12 sm:px-8 lg:pb-24 lg:pt-20">
           <h1 className="display text-[clamp(3.25rem,7vw,6rem)]">{product.title}</h1>
@@ -70,13 +64,29 @@ export default async function Product({ params }: PageProps<"/[lang]/producto">)
           <div>
             <h2 className="display text-[clamp(2rem,3.6vw,3rem)]">{product.cropsTitle}</h2>
             <ul className="mt-6 border-t-[3px] border-ink">
-              {product.crops.map((crop) => (
-                <li key={crop} className="display border-b-[3px] border-ink py-4 text-[2rem]">
-                  {crop}
+              {CROPS.map((crop) => (
+                <li key={crop} className="border-b-[3px] border-ink">
+                  <Link
+                    href={pathFor(lang, "cultivos", crop)}
+                    className="display flex items-center justify-between gap-4 py-4 text-[2rem] no-underline hover:underline"
+                  >
+                    {content.crops[crop].name}
+                    <ArrowRight size={24} aria-hidden />
+                  </Link>
                 </li>
               ))}
             </ul>
             <p className="prose-measure mt-4 text-ink-soft">{product.cropsNote}</p>
+            <div className="mt-6 flex flex-wrap gap-x-8 gap-y-2">
+              <Link href={pathFor(lang, "aforo-de-cosecha")} className="btn-secondary">
+                {content.links.guide}
+                <ArrowRight size={18} aria-hidden />
+              </Link>
+              <Link href={pathFor(lang, "preguntas-frecuentes")} className="btn-secondary">
+                {content.links.faq}
+                <ArrowRight size={18} aria-hidden />
+              </Link>
+            </div>
           </div>
           <div>
             <h2 className="display text-[clamp(2rem,3.6vw,3rem)]">{product.dataTitle}</h2>

@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { isLocale, LOCALES } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
+import { BRAND, HAS_DOMAIN, SITE_NAME, SITE_URL } from "@/seo/site";
 import "../globals.css";
 
 // Archivo variable: la anchura condensada da la voz de las placas impresas; la normal, el texto.
@@ -16,18 +17,25 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
+export const viewport: Viewport = { themeColor: BRAND.ink };
+
+/**
+ * Valores comunes a todas las páginas. Cada página pone después su título, descripción, URL
+ * canónica e idiomas (src/seo/metadata.ts). Sin dominio, nada se indexa.
+ */
 export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Promise<Metadata> {
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const dict = getDictionary(lang);
   return {
+    ...(HAS_DOMAIN ? { metadataBase: new URL(SITE_URL) } : {}),
+    applicationName: SITE_NAME,
     title: dict.meta.title,
     description: dict.meta.description,
-    alternates: {
-      languages: Object.fromEntries(LOCALES.map((code) => [code, `/${code}/`])),
-    },
-    openGraph: { title: dict.meta.title, description: dict.meta.description, locale: lang, type: "website" },
-    icons: { icon: "/marca.svg" },
+    robots: HAS_DOMAIN ? { index: true, follow: true } : { index: false, follow: true },
+    icons: { icon: "/marca.svg", apple: "/apple-touch-icon.png" },
+    manifest: "/manifest.webmanifest",
+    formatDetection: { telephone: false },
   };
 }
 

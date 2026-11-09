@@ -10,7 +10,9 @@ export default function Root() {
     <main className="plate flex min-h-dvh flex-col items-start justify-center gap-8 px-6 py-16 sm:px-12">
       <LanguageRedirect />
       <NaveMark size={80} className="-ml-1" />
-      <Wordmark />
+      <h1>
+        <Wordmark />
+      </h1>
       <ul className="label w-full max-w-md">
         {LOCALES.map((code, index) => (
           <li key={code} className={index > 0 ? "border-t-2 border-ink" : ""}>
