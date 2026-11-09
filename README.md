@@ -50,6 +50,7 @@ uv run atias registros cosechas.xlsx --salida informe.md
 - [PRODUCT.md](PRODUCT.md): para quién es y qué debe permitir decidir.
 - [docs/DISENO.md](docs/DISENO.md): requisitos, arquitectura, fases y riesgos.
 - [docs/VALIDACION.md](docs/VALIDACION.md): cómo se calcula y se comprueba el error del 10 %.
+- [docs/GUIA_GRABACION.md](docs/GUIA_GRABACION.md): cómo grabar un invernadero y contar a mano para medir la precisión, con hoja de campo.
 - [docs/CAPTURA.md](docs/CAPTURA.md): raíles, cámaras fijas y otras alternativas.
 - [docs/DOCKER.md](docs/DOCKER.md): cómo arrancarlo y qué falta para la nube.
 - [DESIGN.md](DESIGN.md): sistema visual.
