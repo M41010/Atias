@@ -9,6 +9,7 @@ Estimación semanal de los kilos de fruta en invernaderos a partir de vídeo, pa
 Requiere Docker Desktop.
 
 ```powershell
+copy .env.example .env   # solo la primera vez: activa los enlaces de prueba en este equipo
 docker compose up -d --build
 docker compose exec api node dist/usuarios.js crear tu@correo.com "Tu nombre"
 ```

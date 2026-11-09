@@ -46,8 +46,10 @@ function uploadErrorMessage(error: Error | DetailedError): string {
   const status = "originalResponse" in error ? error.originalResponse?.getStatus() : undefined;
   if (status === 403) return "Este enlace ya no es válido. Pide uno nuevo a la cooperativa.";
   if (status === 413) return "El vídeo supera los 8 GB. Graba la hilera con menos calidad.";
-  if (status === 415) return "Ese archivo no es un vídeo. Elige otro.";
+  if (status === 415) return "Ese archivo no es un vídeo, o su formato no se admite. Usa MP4, MOV o WebM.";
   if (status === 400) return "La hilera ya no existe. Revisa el número de hileras.";
+  if (status === 429) return "Has subido demasiadas versiones esta semana. Avisa a la cooperativa.";
+  if (status === 507) return "La cooperativa no tiene espacio para más vídeos ahora. Avísales.";
   return "No se ha podido subir. Comprueba la conexión y vuelve a intentarlo.";
 }
 
@@ -96,7 +98,8 @@ export function useUploadSession(token: string, link: LinkInfo) {
       // Se reintenta solo ante fallos de red o del servidor; un 4xx no se arregla reintentando.
       onShouldRetry: (error) => {
         const status = error.originalResponse?.getStatus() ?? 0;
-        const retriable = status === 0 || status >= 500 || status === 409 || status === 423;
+        // Sin espacio (507) no se arregla solo: reintentar solo llenaría el registro.
+        const retriable = status === 0 || (status >= 500 && status !== 507) || status === 409 || status === 423;
         if (retriable) setUploads((value) => markReconnecting(value, key));
         return retriable;
       },

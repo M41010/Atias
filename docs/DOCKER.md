@@ -13,7 +13,7 @@ Los vídeos se guardan en el volumen `videos` y la base de datos en `postgres`. 
 
 La subida, los enlaces, la cosecha real y «Vídeos recibidos» usan datos reales. Los kilos y temporeros siguen simulados, porque aún no hay detector que cuente frutos.
 
-Enlaces de prueba: `/subir/demo-invernadero-1`, `-2` y `-3`. Son públicos: desactívalos con `ATIAS_DATOS_DEMO=0` fuera del entorno local.
+Enlaces de prueba: `/subir/demo-invernadero-1`, `-2` y `-3`. Son públicos, así que están apagados por defecto. En este equipo se activan con `ATIAS_DATOS_DEMO=1` en el archivo `.env` (copia `.env.example`). Al arrancar sin ellos, la API los retira de la base de datos.
 
 ## Cuentas de la cooperativa
 
@@ -60,13 +60,28 @@ Para ver el estado: `docker compose ps`, `http://localhost:4000/salud` y `http:/
 
 Mientras esté activo, cualquier equipo de esa red puede llegar a la web y usar los enlaces de prueba. La cooperativa está protegida con contraseña, pero sin HTTPS viaja sin cifrar. Usa `docker compose down` al terminar y no lo hagas en una red pública.
 
+## Seguridad
+
+Lo que ya está protegido, con pruebas automáticas en `api/src/app.test.ts`:
+
+- **Vídeos:** solo se aceptan MP4, MOV, WebM, 3GP y MKV, y se sirven con su tipo exacto y con una política que impide ejecutar código. Así un archivo disfrazado de vídeo no puede actuar con la sesión de la cooperativa.
+- **Espacio:** como máximo 8 GB por vídeo (unos 10 minutos en 4K) y 4 versiones guardadas por lado de hilera, de media, en cada invernadero y recolección. Además, no se acepta un vídeo que deje el disco con menos de `ATIAS_ESPACIO_LIBRE_GB` libres (10 por defecto).
+- **Acceso:** sin proxy de confianza, 5 fallos bloquean la cuenta 15 minutos. Con `ATIAS_PROXY_DE_CONFIANZA=1` el bloqueo va por equipo: 5 fallos por cuenta y equipo, 20 por equipo y 50 por cuenta desde todos.
+- **Otras webs:** las peticiones que cambian algo se rechazan si llegan desde otra página, además de la protección de la cookie.
+- **Cabeceras:** la web no se puede mostrar dentro de otra, no carga nada de fuera y no envía la dirección `/subir/…`, que contiene el enlace privado, a otras webs.
+- **Contenedores:** sin privilegios ni capacidades especiales. El análisis, que abre vídeos que no son de confianza, tiene además límite de memoria (3 GB), de CPU (2) y de procesos, y no puede escribir fuera de `/tmp`.
+
+Lo que no cubre: todas las cuentas de la cooperativa pueden hacer lo mismo, y no queda registro de quién cambió cada cosa salvo en la cosecha real y los enlaces.
+
 ## Antes de pasar a la nube
 
 Las imágenes de `compose.yaml` no llevan secretos ni datos, y no se ejecutan como root. Faltan estas piezas, que dependen de elegir proveedor:
 
 - Registro de imágenes y publicación automática.
-- HTTPS y dominio, con `ATIAS_COOKIE_SEGURA=1`.
-- Almacenamiento de objetos para los vídeos (tus tiene adaptador para S3), base de datos gestionada y copias de seguridad. Cambiar `POSTGRES_PASSWORD` y poner `ATIAS_DATOS_DEMO=0`.
-- Con varias copias de la API: bloqueo de subidas compartido, porque el actual es en memoria.
-- Límites de peticiones y de disco. El bloqueo por intentos de acceso también es en memoria.
+- HTTPS y dominio, con `ATIAS_COOKIE_SEGURA=1`. Añadir en `web/next.config.ts` `Strict-Transport-Security` y `upgrade-insecure-requests`.
+- Un proxy delante de la web que **sustituya** `X-Forwarded-For` por la dirección real del cliente, y entonces `ATIAS_PROXY_DE_CONFIANZA=1`. Si el proxy no la sustituye, un atacante podría inventarse la dirección.
+- Almacenamiento de objetos para los vídeos (tus tiene adaptador para S3), base de datos gestionada y copias de seguridad. Cambiar `POSTGRES_PASSWORD` por una contraseña larga y aleatoria, y no poner `ATIAS_DATOS_DEMO`.
+- No publicar el puerto 4000 de la API: solo la web debe llegar a ella.
+- Con varias copias de la API: bloqueo de subidas y de intentos de acceso compartido, porque los actuales son en memoria.
+- Repetir la auditoría de seguridad contra el entorno en la nube.
 - Una GPU o cola de trabajos si el análisis real lo requiere, a medir con el detector entrenado.
