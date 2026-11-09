@@ -1,0 +1,257 @@
+@import "tailwindcss";
+
+/*
+ * La placa cromática: amarillo de trampa a sangre, cuadrícula impresa en tinta negra (fina cada
+ * 24 px, mayor cada 5 celdas), etiquetas blancas para el texto largo. El rojo es solo del fruto;
+ * el verde (observado) y el ámbar (previsión) solo viven dentro de las etiquetas.
+ */
+@theme {
+  --font-sans: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --color-trap: #f7da1b;
+  --color-trap-deep: #e9c90a;
+  --color-ink: #141412;
+  --color-ink-soft: #3b3608;
+  --color-paper: #ffffff;
+  --color-paper-muted: #55524a;
+  --color-fruit: #c8231b;
+  --color-fruit-unripe: #6f9a2c;
+  --color-leaf: #2f5a2a;
+  --color-leaf-light: #4d7a3a;
+  --color-leaf-dark: #1f3a1d;
+  --color-observed: #17803d;
+  --color-observed-ink: #11632f;
+  --color-forecast: #c98a0c;
+  --color-forecast-ink: #77500a;
+  --color-forecast-soft: #fdf3d7;
+}
+
+:root {
+  color-scheme: light;
+  --cell: 24px;
+  --rule: 3px;
+}
+
+html {
+  background: var(--color-trap);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "tnum" 0;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scrollbar-color: var(--color-ink) var(--color-trap-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  min-height: 100dvh;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-ink);
+  color: var(--color-trap);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+.on-ink :focus-visible {
+  outline-color: var(--color-trap);
+}
+
+a {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* La placa: cuadrícula impresa sobre el amarillo. */
+.plate {
+  background-color: var(--color-trap);
+  background-image:
+    linear-gradient(to right, rgb(20 20 18 / 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(20 20 18 / 0.3) 1px, transparent 1px),
+    linear-gradient(to right, rgb(20 20 18 / 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(20 20 18 / 0.1) 1px, transparent 1px);
+  background-size:
+    calc(var(--cell) * 5) calc(var(--cell) * 5),
+    calc(var(--cell) * 5) calc(var(--cell) * 5),
+    var(--cell) var(--cell),
+    var(--cell) var(--cell);
+  background-position: -1px -1px;
+}
+
+/* Titulares: la voz condensada de las placas impresas. */
+.display {
+  font-stretch: 72%;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.numeral {
+  font-stretch: 78%;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Etiqueta blanca: donde va el texto largo y los datos. */
+.label {
+  background: var(--color-paper);
+  border: var(--rule) solid var(--color-ink);
+}
+
+.lead {
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+.prose-measure {
+  max-width: 68ch;
+  text-wrap: pretty;
+}
+
+/* Botón principal: tinta sobre la placa, con el amarillo dentro. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  background: var(--color-ink);
+  color: var(--color-trap);
+  border: var(--rule) solid var(--color-ink);
+  font-weight: 750;
+  font-size: 1.0625rem;
+  text-decoration: none;
+  transition:
+    background-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  background: var(--color-trap);
+  color: var(--color-ink);
+}
+
+.on-ink .btn-primary {
+  background: var(--color-trap);
+  color: var(--color-ink);
+  border-color: var(--color-trap);
+}
+
+.on-ink .btn-primary:hover {
+  background: var(--color-ink);
+  color: var(--color-trap);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 4px;
+  font-weight: 700;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.btn-secondary:hover {
+  text-decoration-thickness: 4px;
+}
+
+/* El agujero por el que se cuelga la placa. */
+.hang-hole {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--color-paper);
+  border: var(--rule) solid var(--color-ink);
+}
+
+/* Rango deslizante del contador, en la gramática de la placa. */
+.track {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: grab;
+}
+
+.track:active {
+  cursor: grabbing;
+}
+
+.track::-webkit-slider-runnable-track {
+  height: 6px;
+  background: var(--color-ink);
+}
+
+.track::-moz-range-track {
+  height: 6px;
+  background: var(--color-ink);
+}
+
+.track::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
+  background: var(--color-trap);
+  border: var(--rule) solid var(--color-ink);
+  border-radius: 0;
+}
+
+.track::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--color-trap);
+  border: var(--rule) solid var(--color-ink);
+  border-radius: 0;
+}
+
+.field {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+  color: var(--color-ink);
+  font: inherit;
+  border-radius: 0;
+}
+
+.field::placeholder {
+  color: var(--color-paper-muted);
+}
+
+.field[aria-invalid="true"] {
+  border-color: var(--color-fruit);
+  box-shadow: inset 0 0 0 1px var(--color-fruit);
+}
+
+textarea.field {
+  min-height: 140px;
+  resize: vertical;
+}
+
+input[type="checkbox"].check {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-ink);
+  flex-shrink: 0;
+  margin-top: 2px;
+}

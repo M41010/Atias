@@ -27,6 +27,7 @@ Más opciones, como desarrollo o pruebas desde el móvil, en [docs/DOCKER.md](do
 |---|---|
 | `web/` | Aplicación Next.js: cooperativa y subida del agricultor |
 | `api/` | API con Express: acceso, enlaces, subidas reanudables y datos |
+| `sitio/` | Web pública: presentación del producto en seis idiomas (estática) |
 | `src/atias/` | Python: análisis de vídeo, estimación, validación y revisión de registros |
 | `docs/` | Diseño, protocolo de validación, captura automática y Docker |
 
