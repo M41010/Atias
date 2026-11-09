@@ -6,6 +6,7 @@ import type { Pool } from "./db.js";
 import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
 import { type Link, LINK_HEADER, resolveLink } from "./links.js";
 import { createUploadServer, type UploadLimits, UPLOADS_PATH } from "./uploads.js";
+import { createWeatherService, type WeatherConfig } from "./weather.js";
 
 const ANALYSIS_TIMEOUT_MS = 2000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -30,6 +31,7 @@ export function createApp({
   store,
   secureCookies = false,
   limiter = new LoginLimiter(),
+  weather,
   uploadLimits,
   trustedProxy = false,
 }: {
@@ -38,6 +40,8 @@ export function createApp({
   store: FileStore;
   secureCookies?: boolean;
   limiter?: LoginLimiter;
+  /** Dónde pedir la meteorología. Las pruebas usan un Open-Meteo falso. */
+  weather?: WeatherConfig;
   uploadLimits?: UploadLimits;
   /**
    * La web reenvía X-Forwarded-For tal como llega, así que el cliente podría inventarse su
@@ -210,7 +214,7 @@ export function createApp({
   app.use("/api/enlace", linkRoutes);
 
   app.use("/api/auth", createAuthRouter(pool, limiter, secureCookies, trustedProxy));
-  app.use("/api/cooperativa", createCooperativeRouter(pool, store.directory));
+  app.use("/api/cooperativa", createCooperativeRouter(pool, store.directory, createWeatherService(pool, weather)));
 
   app.use((_req, res) => {
     res.status(404).json({ error: "Ruta no encontrada" });

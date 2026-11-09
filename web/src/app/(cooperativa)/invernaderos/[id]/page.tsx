@@ -148,7 +148,7 @@ function DailyPanel({ g }: { g: GreenhouseRow }) {
 /** Curva de las 24 horas del día, sobre una escala común para comparar días. */
 function HourlyCurve({ temps, min, max }: { temps: number[]; min: number; max: number }) {
   const span = max - min || 1;
-  const points = temps.map((t, h) => `${(h / 23) * 72},${20 - ((t - min) / span) * 18 - 1}`).join(" ");
+  const points = temps.map((t, h) => `${(h / Math.max(1, temps.length - 1)) * 72},${20 - ((t - min) / span) * 18 - 1}`).join(" ");
   return (
     <svg viewBox="0 0 72 20" width="72" height="20" aria-hidden className="inline-block text-warn-ink">
       <polyline points={points} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
@@ -165,7 +165,13 @@ function WeatherPanel({ g }: { g: GreenhouseRow }) {
     <Panel
       title={`Meteorología en ${g.info.location.municipality}`}
       description="Temperatura exterior hora a hora, de sábado (día de la grabación) a viernes. Cuando haya un sensor dentro del invernadero, se usará su temperatura."
-      actions={<Pill tone="warn">Simulada</Pill>}
+      actions={
+        g.weather.source === "simulada"
+          ? <Pill tone="warn">Simulada</Pill>
+          : g.weather.stale
+            ? <Pill tone="warn">Sin actualizar</Pill>
+            : <Pill tone="ok">Open-Meteo</Pill>
+      }
     >
       <div className="overflow-x-auto">
         <table className="data-table compact">
@@ -186,6 +192,7 @@ function WeatherPanel({ g }: { g: GreenhouseRow }) {
                 <th scope="row" className="whitespace-nowrap font-normal!">
                   {fmtDay(d.date)}
                   {d.kind === "prevision" && <span className="ml-1.5 text-xs text-muted">previsto</span>}
+                  {d.kind === "normal" && <span className="ml-1.5 text-xs text-muted">sin previsión: lo normal</span>}
                 </th>
                 <td className="hidden sm:table-cell"><HourlyCurve temps={d.hourlyTempC} min={low} max={high} /></td>
                 <td className="num">{fmtDecimal(d.tempMinC)} °C</td>
@@ -204,7 +211,9 @@ function WeatherPanel({ g }: { g: GreenhouseRow }) {
         {change === 0
           ? "la fruta madura a ritmo normal."
           : `la fruta madura un ${Math.abs(change)} % más ${change > 0 ? "deprisa" : "despacio"}.`}{" "}
-        La temperatura y lo normal saldrán de Open-Meteo con la localización del invernadero.
+        {g.weather.source === "simulada"
+          ? "Open-Meteo no ha respondido: estos datos son simulados."
+          : `Datos de Open-Meteo.com (CC BY 4.0) en la localización del invernadero; lo normal es la media de ${g.weather.normalsYears} años.${g.weather.stale ? " Open-Meteo no responde ahora: son los últimos datos guardados." : ""}`}
       </p>
     </Panel>
   );

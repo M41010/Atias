@@ -229,7 +229,8 @@ export type DayWeather = {
   normalHourlyTempC: number[];
   precipitationMm: number;
   place: ReadingPlace;
-  kind: "prevision" | "observado";
+  /** normal: aún no hay previsión para ese día y se usa lo normal. */
+  kind: "prevision" | "observado" | "normal";
 };
 
 const DAY_MS = 86_400_000;
