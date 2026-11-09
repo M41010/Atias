@@ -1,19 +1,8 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { PendingNote } from "@/components/Pending";
-import { isLocale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 
-export async function generateMetadata({ params }: PageProps<"/[lang]/empresa">): Promise<Metadata> {
-  const { lang } = await params;
-  if (!isLocale(lang)) return {};
-  const dict = getDictionary(lang);
-  return { title: `${dict.company.title} · Atias`, description: dict.company.lead };
-}
-
-export default async function Company({ params }: PageProps<"/[lang]/empresa">) {
-  const { lang } = await params;
-  if (!isLocale(lang)) notFound();
+export function Company({ lang }: { lang: Locale }) {
   const { company } = getDictionary(lang);
 
   return (

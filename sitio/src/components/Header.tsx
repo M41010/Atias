@@ -4,7 +4,7 @@ import { Globe, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LOCALE_NAMES, LOCALES, type Locale, type Page, pathFor } from "@/i18n/config";
+import { LOCALE_NAMES, LOCALES, type Locale, type Page, pathFor, swapLocale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/es";
 import { Wordmark } from "./Mark";
 
@@ -17,15 +17,7 @@ const LINKS: { page: Page; key: "home" | "company" | "product" | "contact" }[] =
   { page: "contacto", key: "contact" },
 ];
 
-/** La misma página en otro idioma: se cambia solo el primer tramo de la ruta. */
-function swapLocale(pathname: string, locale: Locale): string {
-  const parts = pathname.split("/");
-  parts[1] = locale;
-  const path = parts.join("/");
-  return path.endsWith("/") ? path : `${path}/`;
-}
-
-/** Cabecera de la placa: el agujero de colgar, la marca, el menú, el estado del piloto y el idioma. */
+/** Cabecera: el logotipo, el menú, el estado del piloto y el idioma. */
 export function Header({ locale, nav }: Props) {
   const pathname = usePathname() ?? `/${locale}/`;
   const [open, setOpen] = useState(false);

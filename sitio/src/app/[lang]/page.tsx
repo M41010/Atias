@@ -1,24 +1,43 @@
 import { ArrowRight, Check, FlaskConical } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Counter } from "@/components/Counter";
 import { NaveMark } from "@/components/Mark";
+import { JsonLd } from "@/components/JsonLd";
 import { isLocale, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
+import { getContent } from "@/i18n/content";
+import { pageMetadata } from "@/seo/metadata";
+import { organization, website } from "@/seo/schema";
+
+export async function generateMetadata({ params }: PageProps<"/[lang]">): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLocale(lang)) return {};
+  const { title, description } = getContent(lang).seo.home;
+  return pageMetadata({ locale: lang, page: "", title, description });
+}
 
 export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const dict = getDictionary(lang);
   const { home, cta } = dict;
+  const content = getContent(lang);
 
   return (
     <>
+      <JsonLd data={[organization(content.seo.home.description), website(lang, content.seo.home.description)]} />
       {/* La placa: titular, acción y el contador funcionando. */}
       <section className="plate border-b-[3px] border-ink">
         <div className="mx-auto grid max-w-[1320px] gap-10 px-4 pb-16 pt-10 sm:px-8 lg:grid-cols-[1fr_minmax(0,560px)] lg:gap-14 lg:pb-24 lg:pt-16">
           <div className="flex flex-col lg:pt-6">
-            <h1 className="display text-[clamp(3.25rem,6.6vw,5.5rem)]">{home.heroTitle}</h1>
+            <h1 className="display text-[clamp(3.25rem,6.6vw,5.5rem)]">
+              <span className="mb-5 block font-sans text-base font-bold uppercase tracking-[0.08em] text-ink-soft [font-stretch:100%]">
+                {content.links.heroEyebrow}
+              </span>
+              {home.heroTitle}
+            </h1>
             <p className="lead mt-7 text-[1.2rem] font-medium leading-relaxed text-ink-soft">{home.heroLead}</p>
             <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3">
               <Link href={pathFor(lang, "contacto")} className="btn-primary">
@@ -44,6 +63,10 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 {paragraph}
               </p>
             ))}
+            <Link href={pathFor(lang, "aforo-de-cosecha")} className="btn-secondary mt-2">
+              {content.links.guideTeaser}
+              <ArrowRight size={18} aria-hidden />
+            </Link>
           </div>
         </div>
       </section>
