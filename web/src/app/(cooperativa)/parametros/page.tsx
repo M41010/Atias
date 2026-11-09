@@ -160,7 +160,7 @@ export default function ParametrosPage() {
                       <tr key={h.id}>
                         <th scope="row" className="whitespace-nowrap">{h.label.replace("Recolección ", "")}</th>
                         <td className="num">{fmtKg(h.realKg)}</td>
-                        <td className="num">{fmtKg(h.technicianKg)}</td>
+                        <td className="num">{h.technicianKg === null ? "—" : fmtKg(h.technicianKg)}</td>
                         <td className="num">{h.technicianErrorPct === null ? "—" : fmtPct(h.technicianErrorPct)}</td>
                         <td className="num">{fmtKg(h.forecastKg)}</td>
                         <td className="num">{h.errorPct === null ? "—" : fmtPct(h.errorPct)}</td>

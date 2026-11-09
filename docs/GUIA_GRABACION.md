@@ -43,6 +43,8 @@ Elegir **4 tramos de 5 metros** en hileras distintas: uno en la cabecera, uno en
 
 En cada tramo, pegar un trozo de cinta al principio y otro al final, a la altura de la fruta y **bien visibles desde el pasillo**. Escribir en la cinta el número del tramo (T1, T2, T3, T4). La cámara tiene que verlas al pasar.
 
+Con una cinta métrica, **medir a cuántos metros de la cabecera está cada cinta** y apuntarlo en la hoja («Desde» y «Hasta»). La cabecera es el extremo por el que se empieza a grabar la hilera. Con esos metros, Atias cuenta exactamente los frutos que vio entre las dos cintas y los compara con el conteo a mano.
+
 ## 4. Grabar
 
 Un vídeo por cada **hilera y lado**. En cada vídeo:
@@ -78,8 +80,10 @@ Si no se puede recoger tanto, basta con **pesar 50 frutos maduros** de plantas d
 
 ## 7. Lo que necesitamos después
 
-- **Antes del lunes 16:** la previsión del agricultor en kg para la semana, mejor día a día de lunes a viernes. Tiene que darla sin conocer la cifra de Atias.
+- **Antes del lunes 16:** la previsión del agricultor en kg para la semana, mejor día a día de lunes a viernes. Tiene que darla sin conocer la cifra de Atias. Si el técnico hace la suya, también, por separado.
 - **Cada día de lunes 16 a viernes 20:** los kg recogidos ese día, del ERP o de los albaranes.
+
+Todo esto, y lo de la hoja de campo, se apunta en la app de la cooperativa, en **Datos de campo**. El resultado se ve en **Precisión**.
 
 ## 8. Subir los vídeos
 
@@ -99,12 +103,14 @@ Con el enlace que dará la cooperativa (lo creamos el miércoles 11, cuando cono
 
 **Maduración esperada esta semana (según el agricultor):** ______ % de lo verde
 
-| Tramo | Hilera y lado | Dónde (cabecera, centro…) | Maduros visibles | Maduros en total | Recogidos | Peso (g) |
-|---|---|---|---|---|---|---|
-| T1 | | | | | | |
-| T2 | | | | | | |
-| T3 | | | | | | |
-| T4 | | | | | | |
+| Tramo | Hilera y lado | Desde (m) | Hasta (m) | Maduros visibles | Maduros en total | Recogidos | Peso (g) |
+|---|---|---|---|---|---|---|---|
+| T1 | | | | | | | |
+| T2 | | | | | | | |
+| T3 | | | | | | | |
+| T4 | | | | | | | |
+
+*Desde y Hasta: metros desde la cabecera hasta cada cinta.*
 
 **Peso de 50 frutos maduros (si no se cosechan los tramos):** ________ g
 

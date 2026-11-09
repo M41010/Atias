@@ -14,15 +14,15 @@ import {
   type GreenhouseRow,
   type HarvestReport,
   listReports,
-  TECHNICIANS,
 } from "@/lib/api";
 import { errorPct } from "@/lib/calc";
 import { fmtDate, fmtDay, fmtKg, fmtPct } from "@/lib/format";
-import { useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
+import { queryKeys, useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
+import { useDataMode } from "@/lib/mode";
 
-type Totals = { real: (number | null)[]; technician: number[]; atias: number[] };
+type Totals = { real: (number | null)[]; technician: (number | null)[]; atias: number[] };
 
-/** Suma por día. El real solo se suma si todos los invernaderos lo tienen. */
+/** Suma por día. El real y el del técnico solo se suman si todos los invernaderos lo tienen. */
 function totals(rows: GreenhouseRow[]): Totals {
   return {
     real: [0, 1, 2, 3, 4].map((i) =>
@@ -30,7 +30,11 @@ function totals(rows: GreenhouseRow[]): Totals {
         ? rows.reduce((sum, g) => sum + (g.daily[i].real as number), 0)
         : null,
     ),
-    technician: [0, 1, 2, 3, 4].map((i) => rows.reduce((sum, g) => sum + g.daily[i].technician, 0)),
+    technician: [0, 1, 2, 3, 4].map((i) =>
+      rows.length > 0 && rows.every((g) => g.daily[i].technician !== null)
+        ? rows.reduce((sum, g) => sum + (g.daily[i].technician as number), 0)
+        : null,
+    ),
     atias: [0, 1, 2, 3, 4].map((i) => rows.reduce((sum, g) => sum + g.daily[i].atias, 0)),
   };
 }
@@ -107,12 +111,12 @@ function DayCells({ t, strong = false }: { t: Totals; strong?: boolean }) {
       {[0, 1, 2, 3, 4].map((i) => (
         <Fragment key={i}>
           <td className={`num border-l border-line ${weight}`}>{kg(t.real[i])}</td>
-          <td className={`num ${weight}`}>{fmtKg(t.technician[i])}</td>
+          <td className={`num ${weight}`}>{kg(t.technician[i])}</td>
           <td className={`num ${weight}`}>{fmtKg(t.atias[i])}</td>
         </Fragment>
       ))}
       <td className="num border-l border-line font-semibold">{kg(addReal(t.real))}</td>
-      <td className="num font-semibold">{fmtKg(add(t.technician))}</td>
+      <td className="num font-semibold">{kg(addReal(t.technician))}</td>
       <td className="num font-semibold">{fmtKg(add(t.atias))}</td>
     </>
   );
@@ -210,7 +214,9 @@ function History({ reports, keep }: { reports: HarvestReport[]; keep: (g: Greenh
       ? rows.reduce((sum, g) => sum + (g.realKg as number), 0)
       : null;
     if (real === null) return [];
-    const technician = rows.reduce((sum, g) => sum + g.technicianKg, 0);
+    const technician = rows.every((g) => g.technicianKg !== null)
+      ? rows.reduce((sum, g) => sum + (g.technicianKg as number), 0)
+      : null;
     const atias = rows.reduce((sum, g) => sum + g.forecast.kg, 0);
     return [{ id: r.id, week: r.isoWeek, label: r.label, real, technician, atias }];
   });
@@ -233,7 +239,7 @@ function History({ reports, keep }: { reports: HarvestReport[]; keep: (g: Greenh
         </thead>
         <tbody>
           {weeks.map((w) => {
-            const tech = errorPct(w.technician, w.real) as number;
+            const tech = w.technician === null ? null : (errorPct(w.technician, w.real) as number);
             const atias = errorPct(w.atias, w.real) as number;
             return (
               <tr key={w.id}>
@@ -242,12 +248,14 @@ function History({ reports, keep }: { reports: HarvestReport[]; keep: (g: Greenh
                   <span className="block text-xs font-normal text-muted">{w.label.replace("Recolección ", "")}</span>
                 </th>
                 <td className="num">{fmtKg(w.real)}</td>
-                <td className="num">{fmtKg(w.technician)}</td>
-                <td className="num">{fmtPct(tech)}</td>
+                <td className="num">{w.technician === null ? "—" : fmtKg(w.technician)}</td>
+                <td className="num">{tech === null ? "—" : fmtPct(tech)}</td>
                 <td className="num">{fmtKg(w.atias)}</td>
                 <td className="num">{fmtPct(atias)}</td>
                 <td>
-                  {Math.abs(tech - atias) < 0.05
+                  {tech === null
+                    ? <span className="text-muted">—</span>
+                    : Math.abs(tech - atias) < 0.05
                     ? <Pill tone="neutral">Igual</Pill>
                     : atias < tech ? <Pill tone="brand">Atias</Pill> : <Pill tone="neutral">Técnico</Pill>}
                 </td>
@@ -264,7 +272,8 @@ export default function PrevisionPage() {
   useDocumentTitle("Previsión diaria");
   const harvestId = useSelectedHarvest();
   const report = useReport(harvestId);
-  const history = useQuery({ queryKey: ["informe", "todas"], queryFn: listReports });
+  const mode = useDataMode();
+  const history = useQuery({ queryKey: queryKeys.reports(mode), queryFn: listReports });
   const [families, setFamilies] = useListParam("familia");
   const [technicians, setTechnicians] = useListParam("tecnico");
 
@@ -273,7 +282,7 @@ export default function PrevisionPage() {
     <PageHeader
       title="Previsión diaria"
       description={data
-        ? <>Semana {data.isoWeek} de {data.year}. Kilos reales frente a la previsión del técnico y la de Atias. Última actualización: {fmtDate(data.updatedAt)}.</>
+        ? <>Semana {data.isoWeek} de {data.year}. Kilos reales frente a la previsión del técnico y la de Atias. La del agricultor se compara en Precisión. Última actualización: {fmtDate(data.updatedAt)}.</>
         : undefined}
       actions={<HarvestPicker selected={harvestId} />}
     />
@@ -305,7 +314,9 @@ export default function PrevisionPage() {
             <Chips
               label="Técnico"
               allLabel="Todos"
-              options={TECHNICIANS.map((t) => ({ id: t.id, name: t.name }))}
+              options={[...new Map(
+                data.greenhouses.filter((g) => g.technicianId).map((g) => [g.technicianId, { id: g.technicianId, name: g.technicianName }]),
+              ).values()]}
               selected={technicians}
               onChange={setTechnicians}
             />

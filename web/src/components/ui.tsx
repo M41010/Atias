@@ -8,7 +8,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import type { AppWarning, HarvestReport } from "@/lib/api";
 import type { KgRange } from "@/lib/calc";
 import { fmtBetween, fmtCaptureSpan, fmtInt } from "@/lib/format";
-import { useHarvests } from "@/lib/hooks";
+import { useHarvests, useReport } from "@/lib/hooks";
 
 export function PageHeader({
   title,
@@ -34,11 +34,14 @@ export function HarvestPicker({ selected }: { selected: string }) {
   const router = useRouter();
   const search = useSearchParams();
   const { data, isError } = useHarvests();
+  // «La última» se resuelve en el informe: el selector enseña la semana que de verdad se ve.
+  const { data: report } = useReport(selected);
+  const value = report?.id ?? selected;
   return (
     <label className="flex items-center gap-2 text-sm text-muted">
       <span className="sr-only md:not-sr-only">Recolección</span>
       <select
-        value={selected}
+        value={value}
         onChange={(event) => {
           const next = new URLSearchParams(search);
           next.set("recoleccion", event.target.value);
@@ -46,7 +49,7 @@ export function HarvestPicker({ selected }: { selected: string }) {
         }}
         className="min-h-10 rounded-md border border-control bg-surface px-3 text-sm font-medium text-ink transition-colors duration-150 hover:border-ink"
       >
-        {(data ?? [{ id: selected, label: isError ? "Recolección actual" : "Cargando…", hasData: true }]).map((h) => (
+        {(data ?? [{ id: value, label: isError ? "Recolección actual" : "Cargando…", hasData: true }]).map((h) => (
           <option key={h.id} value={h.id}>
             {h.label.replace("Recolección ", "")}
             {h.hasData ? "" : " (sin capturas)"}
@@ -163,10 +166,13 @@ export function WarningList({ warnings, harvestId }: { warnings: AppWarning[]; h
           </div>
           {harvestId && (
             <Link
-              href={`/invernaderos/${w.greenhouseId}?recoleccion=${encodeURIComponent(harvestId)}#hilera-${w.hilera}`}
+              // Los avisos de la ficha (sin hilera) se corrigen en Datos de campo.
+              href={w.hilera > 0
+                ? `/invernaderos/${w.greenhouseId}?recoleccion=${encodeURIComponent(harvestId)}#hilera-${w.hilera}`
+                : "/campo"}
               className="flex shrink-0 items-center gap-0.5 self-center whitespace-nowrap text-sm font-medium text-brand-ink underline-offset-3 hover:underline"
             >
-              Ver hilera
+              {w.hilera > 0 ? "Ver hilera" : "Completar"}
               <ChevronRight size={15} aria-hidden />
             </Link>
           )}

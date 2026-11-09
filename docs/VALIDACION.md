@@ -79,6 +79,14 @@ la variación entre semanas y del tamaño del error; conviene abarcar un cambio 
 
 ## Estado actual
 
-El cálculo y el veredicto están en `src/atias/validation.py`, con sus pruebas, pero aún no se usan desde la
-app. El detalle de invernadero muestra el error de la previsión frente a una cosecha simulada. Falta poder
-registrar cosecha real.
+- La app calcula los kilos con el conteo real del detector y el peso por fruto medido (muestra pesada o lo
+  recogido en los tramos de control); si aún no se ha pesado, usa el de partida de la familia y lo avisa.
+- **Datos de campo** guarda las previsiones del agricultor y del técnico por separado, los kilos recogidos
+  cada día, los tramos de control (con los metros desde la cabecera de cada cinta) y la muestra de peso.
+- **Precisión** muestra el veredicto y las métricas de esta página (`web/src/lib/validation.ts`, misma
+  lógica que `src/atias/validation.py`), cada semana frente al agricultor y al técnico, y los eslabones:
+  detección en los tramos de control, fruta tapada (`k`), peso por fruto y lo observado frente a la
+  cosecha de control.
+- La semana en que se pesa la muestra calibra el peso: cuenta en el error orientativo, no en el veredicto.
+- Una previsión con hileras sin contar no se compara con la cosecha entera.
+- Los dos lados de una hilera se combinan con `max(A, B)` por tramo hasta medir cuánta fruta comparten.

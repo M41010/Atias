@@ -2,7 +2,7 @@
 
 Estimación semanal de los kilos de fruta en invernaderos a partir de vídeo, para que una cooperativa decida cuántos kilos vender y cuántos temporeros contratar. Cultivos iniciales: tomate cherry, pimiento y pepino.
 
-> **Estado: prototipo.** La subida de vídeos y los datos de la semana son reales. Los kilos y temporeros que muestra la app siguen **simulados**, porque aún no hay un detector entrenado ni se analizan los vídeos. **No hay ninguna medida de precisión real**, y el objetivo de error ≤ 10 % sigue sin validar.
+> **Estado: prototipo.** La app calcula los kilos con los vídeos contados por el detector y los datos de campo reales; los datos simulados solo se ven en el **modo demostración**, con una franja visible. **Aún no hay ninguna medida de precisión real**: el objetivo de error ≤ 10 % se mide en la pantalla Precisión cuando haya cosechas pesadas.
 
 ## Arrancarlo
 
@@ -53,7 +53,7 @@ uv run atias registros cosechas.xlsx --salida informe.md
 - [docs/DISENO.md](docs/DISENO.md): requisitos, arquitectura, fases y riesgos.
 - [docs/VALIDACION.md](docs/VALIDACION.md): cómo se calcula y se comprueba el error del 10 %.
 - [docs/DETECTOR.md](docs/DETECTOR.md): cómo cuenta los frutos y cómo entrenar e instalar el modelo.
-- [docs/GUIA_GRABACION.md](docs/GUIA_GRABACION.md): cómo grabar un invernadero y contar a mano para medir la precisión, con hoja de campo.
+- [docs/GUIA_GRABACION.md](docs/GUIA_GRABACION.md): cómo grabar un invernadero y contar a mano para medir la precisión, con hoja de campo. El PDF se regenera con `docs/guia_pdf.py`.
 - [docs/CAPTURA.md](docs/CAPTURA.md): raíles, cámaras fijas y otras alternativas.
 - [docs/DOCKER.md](docs/DOCKER.md): cómo arrancarlo y qué falta para la nube.
 - [DESIGN.md](DESIGN.md): sistema visual.

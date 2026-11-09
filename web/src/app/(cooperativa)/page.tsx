@@ -62,7 +62,14 @@ export default function ResumenPage() {
         )}
 
         {report.realKg !== null && (
-          <Panel title="Previsión frente a cosecha real" description="Cosecha simulada: el error comprueba el cálculo, no la precisión real.">
+          <Panel
+            title="Previsión frente a cosecha real"
+            description={report.simulated
+              ? "Cosecha simulada: el error comprueba el cálculo, no la precisión real."
+              : report.partial
+                ? "Faltan hileras por contar: la previsión se queda corta y el error no se calcula."
+                : "Una sola semana no basta para saber cuánto acierta Atias: el conjunto está en Precisión."}
+          >
             <dl className="grid grid-cols-3 divide-x divide-line">
               <div className="p-5">
                 <dt className="flex flex-wrap items-center gap-1.5 text-sm text-muted">Previsión <Pill tone="warn">Experimental</Pill></dt>
@@ -74,7 +81,7 @@ export default function ResumenPage() {
               </div>
               <div className="p-5">
                 <dt className="text-sm text-muted">Error</dt>
-                <dd className="mt-1 text-xl font-semibold tabular-nums">{report.errorPct === null ? "—" : fmtPct(report.errorPct)}</dd>
+                <dd className="mt-1 text-xl font-semibold tabular-nums">{report.errorPct === null || report.partial ? "—" : fmtPct(report.errorPct)}</dd>
               </div>
             </dl>
           </Panel>

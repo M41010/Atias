@@ -140,3 +140,80 @@ export const saveHarvestRecord = async (
     { method: "PUT", body: JSON.stringify({ kg }) },
   );
 };
+
+// ---- Datos de campo: lo necesario para calcular con datos reales y medir el acierto ----
+export type FieldFamily = { id: string; nombre: string; cultivo: CropId };
+export type DayValues = (number | null)[];
+export type ControlCount = {
+  etiqueta: string;
+  hilera: number;
+  lado: "A" | "B";
+  /** Metros desde la cabecera donde empieza y acaba la cinta. */
+  inicioM: number;
+  finM: number;
+  /** Maduros visibles desde el pasillo, sin tocar las hojas. */
+  visibles: number;
+  /** Todos los maduros, apartando las hojas. */
+  total: number | null;
+  recogidos: number | null;
+  pesoG: number | null;
+  nota: string;
+};
+export type ControlWithAtias = ControlCount & {
+  /** Maduros que contó Atias entre las dos cintas, o el motivo por el que aún no se puede saber. */
+  atias: { frutos: number | null; motivo: "sin_video" | "sin_contar" | "sin_longitud" | "sin_posiciones" | "fuera_de_hilera" | null };
+};
+export type FieldGreenhouse = {
+  id: string;
+  nombre: string;
+  cultivo: CropId;
+  familia: { id: string; nombre: string } | null;
+  agricultor: string | null;
+  tecnico: string | null;
+  ubicacion: { municipio: string; latitud: number; longitud: number } | null;
+  hileras: number;
+  tramos: number;
+  longitudHileraM: number | null;
+  variedad: string;
+  muestra: { frutos: number; gramos: number } | null;
+  videos: ServerVideo[];
+  previsiones: { agricultor: DayValues; tecnico: DayValues };
+  real: DayValues;
+  cosecha: { lunesViernes: number | null; inmediata: number | null };
+  controles: ControlWithAtias[];
+};
+export type FieldData = { id: string; etiqueta: string; dias: string[]; invernaderos: FieldGreenhouse[] };
+export type FieldSheet = {
+  familia: string | null;
+  municipio: string | null;
+  latitud: number | null;
+  longitud: number | null;
+  hileras: number;
+  longitudHileraM: number | null;
+  muestra: { frutos: number; gramos: number } | null;
+};
+
+const fieldPath = (harvestId: string, greenhouseId: string, rest: string) =>
+  `/api/cooperativa/recolecciones/${encodeURIComponent(harvestId)}/campo/${encodeURIComponent(greenhouseId)}/${rest}`;
+
+export const fetchFamilies = async (): Promise<FieldFamily[]> =>
+  ((await (await request("/api/cooperativa/familias")).json()) as { familias: FieldFamily[] }).familias;
+
+export const fetchFieldData = async (harvestId: string): Promise<FieldData> =>
+  (await request(`/api/cooperativa/recolecciones/${encodeURIComponent(harvestId)}/campo`)).json();
+
+export const saveForecast = async (harvestId: string, greenhouseId: string, source: "agricultor" | "tecnico", days: DayValues) => {
+  await request(fieldPath(harvestId, greenhouseId, `previsiones/${source}`), { method: "PUT", body: JSON.stringify({ dias: days }) });
+};
+
+export const saveDailyHarvest = async (harvestId: string, greenhouseId: string, days: DayValues) => {
+  await request(fieldPath(harvestId, greenhouseId, "real"), { method: "PUT", body: JSON.stringify({ dias: days }) });
+};
+
+export const saveControls = async (harvestId: string, greenhouseId: string, controls: ControlCount[]) => {
+  await request(fieldPath(harvestId, greenhouseId, "controles"), { method: "PUT", body: JSON.stringify({ controles: controls }) });
+};
+
+export const saveFieldSheet = async (harvestId: string, greenhouseId: string, sheet: FieldSheet) => {
+  await request(fieldPath(harvestId, greenhouseId, "ficha"), { method: "PUT", body: JSON.stringify(sheet) });
+};
