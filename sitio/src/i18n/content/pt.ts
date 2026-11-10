@@ -460,4 +460,32 @@ export const contentPt: Content = {
     },
     closeTitle: "Medimos nas suas estufas?",
   },
+  pilotOffer: {
+    badge: "Piloto grátis de 4 semanas",
+    eyebrow: "Piloto grátis",
+    title: "Experimente 4 semanas nas suas estufas, sem custos",
+    lead: "Todas as semanas, compare a nossa previsão com o que marca a sua balança. Se não lhe servir, não perdeu nada.",
+    steps: [
+      {
+        name: "Grave uma vez por semana",
+        body: "Um vídeo por linha e por lado com o telemóvel, antes da semana de colheita.",
+      },
+      {
+        name: "Registe os quilos colhidos",
+        body: "Os quilos de cada dia, como já os pesam hoje. Também a sua própria previsão, se a quiser comparar.",
+      },
+      {
+        name: "Compare com a sua balança",
+        body: "Todas as semanas vê a nossa previsão face ao que foi colhido, com o seu erro medido.",
+      },
+    ],
+    note: "Aberto a cooperativas e agricultores de qualquer país.",
+    cta: "Quero um piloto",
+    interestLabel: "O que lhe interessa?",
+    interests: {
+      piloto: "Piloto grátis de 4 semanas",
+      demo: "Uma demonstração",
+      otro: "Outra coisa",
+    },
+  },
 };

@@ -463,6 +463,34 @@ export const contentEs = {
     },
     closeTitle: "¿Lo medimos en tus invernaderos?",
   },
+  pilotOffer: {
+    badge: "Piloto gratis de 4 semanas",
+    eyebrow: "Piloto gratis",
+    title: "Pruébalo 4 semanas en tus invernaderos, sin coste",
+    lead: "Compara cada semana nuestra previsión con lo que marca tu báscula. Si no te sirve, no has perdido nada.",
+    steps: [
+      {
+        name: "Graba una vez por semana",
+        body: "Un vídeo por hilera y lado con el móvil, antes de la semana de recogida.",
+      },
+      {
+        name: "Apunta los kilos recogidos",
+        body: "Los kilos de cada día, como ya los pesáis hoy. También tu propia previsión, si quieres compararla.",
+      },
+      {
+        name: "Compara con tu báscula",
+        body: "Cada semana ves nuestra previsión frente a lo recogido, con su error medido.",
+      },
+    ],
+    note: "Abierto a cooperativas y agricultores de cualquier país.",
+    cta: "Quiero un piloto",
+    interestLabel: "¿Qué te interesa?",
+    interests: {
+      piloto: "Piloto gratis de 4 semanas",
+      demo: "Una demostración",
+      otro: "Otra cosa",
+    },
+  },
 };
 
 export type Content = typeof contentEs;

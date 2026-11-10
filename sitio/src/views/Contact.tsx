@@ -3,6 +3,7 @@ import { ContactForm } from "@/components/ContactForm";
 import { PendingValue } from "@/components/Pending";
 import type { Locale } from "@/i18n/config";
 import { getDictionary, LEGAL_DATA } from "@/i18n";
+import { getContent } from "@/i18n/content";
 
 export function Contact({ lang }: { lang: Locale }) {
   const { contact } = getDictionary(lang);
@@ -27,7 +28,7 @@ export function Contact({ lang }: { lang: Locale }) {
             </p>
           </div>
         </div>
-        <ContactForm locale={lang} t={contact} />
+        <ContactForm locale={lang} t={contact} offer={getContent(lang).pilotOffer} />
       </div>
     </section>
   );

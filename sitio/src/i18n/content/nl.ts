@@ -460,4 +460,32 @@ export const contentNl: Content = {
     },
     closeTitle: "Zullen we het in uw kassen meten?",
   },
+  pilotOffer: {
+    badge: "Gratis pilot van 4 weken",
+    eyebrow: "Gratis pilot",
+    title: "Probeer het 4 weken in uw kassen, kosteloos",
+    lead: "Vergelijk elke week onze prognose met wat uw weegschaal aangeeft. Helpt het niet, dan bent u niets kwijt.",
+    steps: [
+      {
+        name: "Film één keer per week",
+        body: "Eén video per rij en per kant met de telefoon, vóór de oogstweek.",
+      },
+      {
+        name: "Noteer de geoogste kilo’s",
+        body: "De kilo’s van elke dag, zoals u ze nu al weegt. Ook uw eigen prognose, als u die wilt vergelijken.",
+      },
+      {
+        name: "Vergelijk met uw weegschaal",
+        body: "Elke week ziet u onze prognose naast de oogst, met de gemeten fout.",
+      },
+    ],
+    note: "Open voor coöperaties en telers in elk land.",
+    cta: "Ik wil een pilot",
+    interestLabel: "Waar bent u in geïnteresseerd?",
+    interests: {
+      piloto: "Gratis pilot van 4 weken",
+      demo: "Een demonstratie",
+      otro: "Iets anders",
+    },
+  },
 };

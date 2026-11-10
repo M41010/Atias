@@ -460,4 +460,32 @@ export const contentFr: Content = {
     },
     closeTitle: "On la mesure dans vos serres ?",
   },
+  pilotOffer: {
+    badge: "Pilote gratuit de 4 semaines",
+    eyebrow: "Pilote gratuit",
+    title: "Essayez-le 4 semaines dans vos serres, gratuitement",
+    lead: "Chaque semaine, comparez notre prévision avec ce qu’indique votre balance. Si cela ne vous sert pas, vous n’avez rien perdu.",
+    steps: [
+      {
+        name: "Filmez une fois par semaine",
+        body: "Une vidéo par rang et par côté avec le téléphone, avant la semaine de récolte.",
+      },
+      {
+        name: "Notez les kilos récoltés",
+        body: "Les kilos de chaque jour, comme vous les pesez déjà. Votre propre prévision aussi, si vous voulez la comparer.",
+      },
+      {
+        name: "Comparez avec votre balance",
+        body: "Chaque semaine, vous voyez notre prévision face à la récolte, avec son erreur mesurée.",
+      },
+    ],
+    note: "Ouvert aux coopératives et aux producteurs de tous les pays.",
+    cta: "Je veux un pilote",
+    interestLabel: "Qu’est-ce qui vous intéresse ?",
+    interests: {
+      piloto: "Pilote gratuit de 4 semaines",
+      demo: "Une démonstration",
+      otro: "Autre chose",
+    },
+  },
 };
