@@ -372,4 +372,32 @@ export const contentFr: Content = {
     "principleBody": "Atias ne remplace personne : il donne des yeux sur chaque rang à ceux qui connaissent la culture. Les décisions de vente, de traitement et de conduite restent humaines.",
     "closeTitle": "Envie de voir le pilote ?"
   },
+  pilotOffer: {
+    badge: "Pilote gratuit de 4 semaines",
+    eyebrow: "Pilote gratuit",
+    title: "Essayez-le 4 semaines dans vos serres, gratuitement",
+    lead: "Chaque semaine, comparez notre prévision avec ce qu’indique votre balance. Si cela ne vous sert pas, vous n’avez rien perdu.",
+    steps: [
+      {
+        name: "Filmez une fois par semaine",
+        body: "Une vidéo par rang et par côté avec le téléphone, avant la semaine de récolte.",
+      },
+      {
+        name: "Notez les kilos récoltés",
+        body: "Les kilos de chaque jour, comme vous les pesez déjà. Votre propre prévision aussi, si vous voulez la comparer.",
+      },
+      {
+        name: "Comparez avec votre balance",
+        body: "Chaque semaine, vous voyez notre prévision face à la récolte, avec son erreur mesurée.",
+      },
+    ],
+    note: "Ouvert aux coopératives et aux producteurs de tous les pays.",
+    cta: "Je veux un pilote",
+    interestLabel: "Qu’est-ce qui vous intéresse ?",
+    interests: {
+      piloto: "Pilote gratuit de 4 semaines",
+      demo: "Une démonstration",
+      otro: "Autre chose",
+    },
+  },
 };

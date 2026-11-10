@@ -372,4 +372,32 @@ export const contentEn: Content = {
     "principleBody": "Atias replaces nobody: it gives the people who know the crop eyes on every row. Decisions on sales, treatments and crop management stay with people.",
     "closeTitle": "Want to see the pilot?"
   },
+  pilotOffer: {
+    badge: "Free 4-week pilot",
+    eyebrow: "Free pilot",
+    title: "Try it for 4 weeks in your greenhouses, free of charge",
+    lead: "Every week, compare our forecast with what your scales say. If it does not help, you have lost nothing.",
+    steps: [
+      {
+        name: "Film once a week",
+        body: "One video per row and side with your phone, before the harvest week.",
+      },
+      {
+        name: "Record the kilos harvested",
+        body: "Each day's kilos, the way you already weigh them. Your own forecast too, if you want to compare it.",
+      },
+      {
+        name: "Compare with your scales",
+        body: "Every week you see our forecast against the harvest, with its error measured.",
+      },
+    ],
+    note: "Open to cooperatives and growers in any country.",
+    cta: "I want a pilot",
+    interestLabel: "What are you interested in?",
+    interests: {
+      piloto: "Free 4-week pilot",
+      demo: "A demo",
+      otro: "Something else",
+    },
+  },
 };
