@@ -32,7 +32,8 @@ export function Header({ locale, nav }: Props) {
     <header className="relative z-30 border-b-[3px] border-ink bg-trap">
       <div className="mx-auto flex h-[72px] max-w-[1320px] items-center gap-6 px-4 sm:px-8">
         <Link href={pathFor(locale)} className="no-underline" aria-label="Atias">
-          <Wordmark />
+          {/* Al entrar, la nave se dibuja y aparece el resto del nombre (solo CSS, no retrasa nada). */}
+          <Wordmark className="wordmark-draw" />
         </Link>
 
         <nav aria-label={nav.menu} className="ml-6 hidden items-center gap-1 md:flex">

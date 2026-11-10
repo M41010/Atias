@@ -271,6 +271,7 @@ export const contentPt: Content = {
     "title": "Desça e percorra a linha com a Atias",
     "hint": "Desloque para avançar pela estufa",
     "tag": "Recriação animada",
+    "loading": "A preparar a estufa…",
     "counted": "frutos maduros contados",
     "steps": [
       {

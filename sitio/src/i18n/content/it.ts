@@ -271,6 +271,7 @@ export const contentIt: Content = {
     "title": "Scorri e percorri la fila con Atias",
     "hint": "Scorri per avanzare nella serra",
     "tag": "Ricostruzione animata",
+    "loading": "Preparazione della serra…",
     "counted": "frutti maturi contati",
     "steps": [
       {
