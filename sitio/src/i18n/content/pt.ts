@@ -42,6 +42,10 @@ export const contentPt: Content = {
       "title": "Visão: de contar fruta a cuidar da estufa | Atias",
       "description": "Para onde vai a Atias: da previsão de colheita à sanidade vegetal e ao estado da planta, versão a versão. A Atias recomenda, o técnico decide."
     },
+    journal: {
+      title: "Diário do piloto: como avança a Atias | Atias",
+      description: "Novidades datadas do piloto da Atias: do primeiro protótipo à primeira gravação numa estufa real. Só factos, sem números por medir.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal do site da Atias." },
     privacy: { title: "Política de privacidade | Atias", description: "Política de privacidade do site da Atias." },
   },
@@ -54,6 +58,7 @@ export const contentPt: Content = {
     faqTeaser: "Respostas às dúvidas mais comuns",
     cropTeaser: "Ver a página da cultura",
     vision: "Visão",
+    journal: "Diário do piloto",
     breadcrumb: "Percurso de navegação",
   },
   guide: {

@@ -42,6 +42,10 @@ export const contentIt: Content = {
       "title": "Visione: dal contare i frutti al curare la serra | Atias",
       "description": "Dove va Atias: dalla previsione del raccolto alla difesa delle piante e allo stato della coltura, versione dopo versione. Atias consiglia, il tecnico decide."
     },
+    journal: {
+      title: "Diario del pilota: come procede Atias | Atias",
+      description: "Le novità datate del pilota di Atias: dal primo prototipo alla prima ripresa in una serra vera. Solo fatti, senza cifre non misurate.",
+    },
     notice: { title: "Note legali | Atias", description: "Note legali del sito di Atias." },
     privacy: { title: "Informativa sulla privacy | Atias", description: "Informativa sulla privacy del sito di Atias." },
   },
@@ -54,6 +58,7 @@ export const contentIt: Content = {
     faqTeaser: "Le risposte alle domande più comuni",
     cropTeaser: "Vedi la pagina della coltura",
     vision: "Visione",
+    journal: "Diario del pilota",
     breadcrumb: "Percorso di navigazione",
   },
   guide: {

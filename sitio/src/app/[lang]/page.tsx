@@ -7,6 +7,7 @@ import { NaveMark } from "@/components/Mark";
 import { PilotResults } from "@/components/PilotResults";
 import { PresentationVideo } from "@/components/PresentationVideo";
 import { RowTour } from "@/components/RowTour";
+import { JournalTeaser } from "@/components/JournalTeaser";
 import { JsonLd } from "@/components/JsonLd";
 import { isLocale, NUMBER_LOCALE, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -178,8 +179,11 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
+      {/* Diario del piloto: lo último que ha pasado, con fecha. */}
+      <JournalTeaser lang={lang} />
+
       {/* Cierre. */}
-      <section className="plate">
+      <section className="plate border-t-[3px] border-ink">
         <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-12 px-4 py-24 sm:px-8 lg:py-32">
           <div className="flex flex-col items-start gap-8">
             <h2 className="display max-w-[16ch] text-[clamp(2.75rem,6vw,5.25rem)]">{home.closeTitle}</h2>

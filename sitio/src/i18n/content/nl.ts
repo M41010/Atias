@@ -42,6 +42,10 @@ export const contentNl: Content = {
       "title": "Visie: van vruchten tellen naar de hele kas verzorgen | Atias",
       "description": "Waar Atias naartoe gaat: van oogstprognose naar gewasbescherming en gewasconditie, versie na versie. Atias adviseert, de teeltadviseur beslist."
     },
+    journal: {
+      title: "Pilotlogboek: hoe Atias vordert | Atias",
+      description: "Gedateerd nieuws uit de Atias-pilot: van het eerste prototype tot de eerste opname in een echte kas. Alleen feiten, geen ongemeten cijfers.",
+    },
     notice: { title: "Juridische informatie | Atias", description: "Juridische informatie over de website van Atias." },
     privacy: { title: "Privacybeleid | Atias", description: "Privacybeleid van de website van Atias." },
   },
@@ -54,6 +58,7 @@ export const contentNl: Content = {
     faqTeaser: "Antwoorden op de meest gestelde vragen",
     cropTeaser: "Bekijk de gewaspagina",
     vision: "Visie",
+    journal: "Pilotlogboek",
     breadcrumb: "Kruimelpad",
   },
   guide: {

@@ -45,6 +45,10 @@ export const contentEs = {
       "title": "Visión: de contar fruta a cuidar el invernadero | Atias",
       "description": "Hacia dónde va Atias: de la previsión de cosecha a la sanidad vegetal y el estado de la planta, versión a versión. Atias recomienda y el técnico decide."
     },
+    journal: {
+      title: "Diario del piloto: cómo avanza Atias | Atias",
+      description: "Novedades fechadas del piloto de Atias: del primer prototipo a la primera grabación en un invernadero real. Solo hechos, sin cifras sin medir.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal de la web de Atias." },
     privacy: { title: "Política de privacidad | Atias", description: "Política de privacidad de la web de Atias." },
   },
@@ -57,6 +61,7 @@ export const contentEs = {
     faqTeaser: "Resolvemos las dudas más habituales",
     cropTeaser: "Ver la página del cultivo",
     vision: "Visión",
+    journal: "Diario del piloto",
     breadcrumb: "Ruta de navegación",
   },
   guide: {
