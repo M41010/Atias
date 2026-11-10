@@ -5,6 +5,7 @@ import { NaveMark, Wordmark } from "@/components/Mark";
 import { Reveal } from "@/components/Reveal";
 import { type Locale, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
+import { getContent } from "@/i18n/content";
 
 /**
  * Quiénes somos: el origen, la misión, los hitos reales, el nombre y el logo, cómo trabajamos y a
@@ -203,8 +204,9 @@ export function Company({ lang }: { lang: Locale }) {
               <Reveal key={item.name} delay={index * 120} className="label flex flex-col gap-4 p-6 sm:p-8">
                 <h3 className="display text-[clamp(1.75rem,2.6vw,2.25rem)]">{item.name}</h3>
                 <p className="flex-1 text-ink-soft">{item.body}</p>
-                <Link href={pathFor(lang, "contacto")} className="btn-secondary self-start">
-                  {company.joinCta}
+                {/* El bloque de inversores lleva a su página; los demás, a contacto. */}
+                <Link href={pathFor(lang, index === 1 ? "inversores" : "contacto")} className="btn-secondary self-start">
+                  {index === 1 ? getContent(lang).links.investors : company.joinCta}
                   <ArrowRight size={18} aria-hidden />
                 </Link>
               </Reveal>

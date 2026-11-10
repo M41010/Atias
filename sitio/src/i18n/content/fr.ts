@@ -42,6 +42,18 @@ export const contentFr: Content = {
       "title": "Vision : de compter les fruits à soigner la serre | Atias",
       "description": "Où va Atias : de la prévision de récolte à la santé des plantes et à l'état des cultures, version après version. Atias recommande, le technicien décide."
     },
+    measure: {
+      title: "Comment nous mesurons la précision des prévisions | Atias",
+      description: "Nous comparons chaque prévision aux kilos pesés sur la balance, avec celle du producteur et celle du technicien. Méthode, critère des 10 % et ce qui est encore en test.",
+    },
+    investors: {
+      title: "Investisseurs et partenaires : investir dans Atias | Atias",
+      description: "Atias compte les fruits de chaque rang pour prévoir la récolte en serre. Nous cherchons des investisseurs et des partenaires pour l’amener à sa première saison.",
+    },
+    journal: {
+      title: "Journal du pilote : comment avance Atias | Atias",
+      description: "Les nouvelles datées du pilote d’Atias : du premier prototype au premier tournage dans une vraie serre. Uniquement des faits, sans chiffres non mesurés.",
+    },
     notice: { title: "Mentions légales | Atias", description: "Mentions légales du site d'Atias." },
     privacy: { title: "Politique de confidentialité | Atias", description: "Politique de confidentialité du site d'Atias." },
   },
@@ -54,6 +66,9 @@ export const contentFr: Content = {
     faqTeaser: "Réponses aux questions les plus courantes",
     cropTeaser: "Voir la page de la culture",
     vision: "Vision",
+    measure: "Comment nous mesurons",
+    investors: "Investisseurs",
+    journal: "Journal du pilote",
     breadcrumb: "Fil d'Ariane",
   },
   guide: {
@@ -371,5 +386,182 @@ export const contentFr: Content = {
     "principleTitle": "Atias recommande, le technicien décide",
     "principleBody": "Atias ne remplace personne : il donne des yeux sur chaque rang à ceux qui connaissent la culture. Les décisions de vente, de traitement et de conduite restent humaines.",
     "closeTitle": "Envie de voir le pilote ?"
+  },
+  measure: {
+    eyebrow: "Comment nous mesurons",
+    title: "La précision se mesure sur la balance, elle ne se promet pas",
+    lead: "Presque personne dans le secteur ne publie de combien sa prévision se trompe. Nous publions la méthode avant le résultat, pour que chacun puisse la vérifier.",
+    compareTitle: "Ce que nous comparons",
+    compare: [
+      {
+        name: "Atias prévoit",
+        body: "Les kilos récoltés chaque jour du lundi au vendredi, à partir de la vidéo du samedi.",
+      },
+      {
+        name: "Le producteur et le technicien aussi",
+        body: "Nous notons leur prévision avant la récolte, jour par jour et séparément.",
+      },
+      {
+        name: "La balance tranche",
+        body: "Les kilos réellement récoltés sont pesés chaque jour.",
+      },
+      {
+        name: "Nous comparons les trois",
+        body: "Chaque semaine, on voit qui s’est le plus approché de la récolte, et de combien.",
+      },
+    ],
+    metricsTitle: "Comment nous calculons l’erreur",
+    formula: "erreur = |kilos prévus − kilos récoltés| ÷ kilos récoltés",
+    metrics: [
+      {
+        name: "Erreur de la semaine",
+        body: "On additionne l’écart de chaque serre et on divise par tout ce qui a été récolté : une petite récolte ne gonfle pas le pourcentage.",
+      },
+      {
+        name: "Biais",
+        body: "Si la prévision a tendance à rester en dessous ou à dépasser. Un biais stable peut se corriger.",
+      },
+      {
+        name: "Marge de confiance",
+        body: "Avec peu de semaines, l’erreur réelle peut dépasser l’erreur mesurée. Nous calculons sa fourchette avec 90 % de confiance.",
+      },
+      {
+        name: "Semaines dans l’objectif",
+        body: "Combien de semaines l’erreur est restée à 10 % ou moins.",
+      },
+    ],
+    criteriaTitle: "Quand nous disons que les 10 % sont atteints",
+    criteriaLead: "Seulement si les quatre conditions sont réunies :",
+    criteria: [
+      "Toutes les données sont réelles : rien de simulé dans les vidéos, les paramètres ou la récolte.",
+      "Les semaines évaluées n’ont pas servi à calibrer le système.",
+      "Au moins 8 semaines et serres ont été mesurées.",
+      "Même le haut de la marge de confiance reste à 10 % ou moins.",
+    ],
+    criteriaNote: "Même alors, le résultat vaut pour cette serre, cette culture et cette façon de filmer. Avant de l’affirmer ailleurs, on mesure de nouveau.",
+    linksTitle: "Où se perd la précision",
+    linksLead: "L’erreur totale ne dit pas ce qui échoue. Nous mesurons chaque maillon séparément :",
+    links: [
+      {
+        name: "Le comptage de la caméra",
+        body: "Dans des tronçons de contrôle marqués au ruban, les fruits sont comptés à la main et comparés à ce qu’Atias a compté au même endroit.",
+      },
+      {
+        name: "Les fruits cachés",
+        body: "Dans ces tronçons, on compte aussi ceux qu’on ne voit qu’en écartant les feuilles : ceux qu’aucune caméra ne voit depuis l’allée.",
+      },
+      {
+        name: "Le poids par fruit",
+        body: "On pèse un échantillon de fruits pour passer des fruits comptés aux kilos.",
+      },
+      {
+        name: "La maturation",
+        body: "Ce qui mûrit après le tournage est réparti selon la chaleur de chaque jour et confronté à la récolte.",
+      },
+    ],
+    statusTitle: "Ce qui est prouvé et ce qui ne l’est pas",
+    proven: {
+      name: "Prouvé",
+      body: "Le système fonctionne de bout en bout : envoi de la vidéo, comptage par tronçon, kilos par jour et comparaison automatique avec la balance.",
+    },
+    testing: {
+      name: "En test",
+      body: "La précision réelle. En novembre 2026, nous avons commencé à la mesurer dans une vraie serre. Nous publierons le résultat avec cette méthode, bon ou mauvais.",
+    },
+    closeTitle: "On la mesure dans vos serres ?",
+  },
+  pilotOffer: {
+    badge: "Pilote gratuit de 4 semaines",
+    eyebrow: "Pilote gratuit",
+    title: "Essayez-le 4 semaines dans vos serres, gratuitement",
+    lead: "Chaque semaine, comparez notre prévision avec ce qu’indique votre balance. Si cela ne vous sert pas, vous n’avez rien perdu.",
+    steps: [
+      {
+        name: "Filmez une fois par semaine",
+        body: "Une vidéo par rang et par côté avec le téléphone, avant la semaine de récolte.",
+      },
+      {
+        name: "Notez les kilos récoltés",
+        body: "Les kilos de chaque jour, comme vous les pesez déjà. Votre propre prévision aussi, si vous voulez la comparer.",
+      },
+      {
+        name: "Comparez avec votre balance",
+        body: "Chaque semaine, vous voyez notre prévision face à la récolte, avec son erreur mesurée.",
+      },
+    ],
+    note: "Ouvert aux coopératives et aux producteurs de tous les pays.",
+    cta: "Je veux un pilote",
+    interestLabel: "Qu’est-ce qui vous intéresse ?",
+    interests: {
+      piloto: "Pilote gratuit de 4 semaines",
+      demo: "Une démonstration",
+      otro: "Autre chose",
+    },
+  },
+  appTour: {
+    "eyebrow": "L’application de l’intérieur",
+    "title": "Ce que voit la coopérative chaque lundi",
+    "lead": "De vrais écrans de l’application, avec des données d’exemple. Chacun répond à une décision de la semaine.",
+    "sample": "Données d’exemple",
+    "blurred": "Les noms des variétés sont floutés.",
+    "uiLanguage": "L’application est présentée en espagnol.",
+    "tabsLabel": "Écrans de l’application",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Résumé",
+        "decision": "Combien de kilos vendre cette semaine, et avec quelle marge.",
+        "alt": "Résumé hebdomadaire : prévision de vente, saisonniers nécessaires et fruits mûrs observés, avec alertes par rang."
+      },
+      {
+        "id": "prevision",
+        "name": "Prévision quotidienne",
+        "decision": "Ce qui se récolte chaque jour, à côté de la prévision du technicien.",
+        "alt": "Kilos par jour du lundi au vendredi : réel, prévision du technicien et prévision d’Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Serre",
+        "decision": "Où sont les fruits : chaque serre, rang et tronçon.",
+        "alt": "Détail d’une serre : fruits mûrs observés, prévision et kilos par jour de récolte."
+      },
+      {
+        "id": "temporeros",
+        "name": "Saisonniers",
+        "decision": "Combien de personnes appeler pour récolter du lundi au vendredi.",
+        "alt": "Saisonniers nécessaires pour la semaine, avec la fourchette selon la prévision et les kilos par journée."
+      },
+      {
+        "id": "precision",
+        "name": "Précision",
+        "decision": "À quel point Atias tombe juste face à la balance, à côté du producteur et du technicien.",
+        "alt": "Écran de précision : erreur d’Atias, du producteur et du technicien face à la récolte."
+      }
+    ]
+  },
+  dataTrust: {
+    "eyebrow": "Vos données",
+    "title": "Ce que deviennent vos vidéos, sans petits caractères",
+    "lead": "Voici comment cela fonctionne aujourd’hui, tel que c’est programmé.",
+    "points": [
+      {
+        "name": "Un lien par serre et par semaine",
+        "body": "Le producteur n’a pas besoin de compte. Son lien n’ouvre que sa serre et sa semaine, expire au début de la récolte et la coopérative peut l’annuler."
+      },
+      {
+        "name": "La coopérative, avec mot de passe",
+        "body": "Ses écrans demandent un identifiant et un mot de passe. Les mots de passe ne sont pas stockés en clair et les échecs répétés sont bloqués."
+      },
+      {
+        "name": "Les vidéos restent chez Atias",
+        "body": "Elles sont comptées par notre propre détecteur. Seule la localisation de la serre sert à consulter la météo."
+      },
+      {
+        "name": "Ce qui est retiré est effacé",
+        "body": "Si le producteur remplace ou retire une vidéo, l’ancienne est effacée définitivement au bout de sept jours."
+      }
+    ],
+    "pending": "La durée de conservation des vidéos en cours n’est pas encore fixée.",
+    "more": "En savoir plus sur la sécurité et les données"
   },
 };

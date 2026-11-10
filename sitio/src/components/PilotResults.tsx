@@ -1,5 +1,6 @@
 import { type PilotResults as Data, RESULTADOS } from "@/content/resultados";
-import { type Locale, NUMBER_LOCALE } from "@/i18n/config";
+import Link from "next/link";
+import { type Locale, NUMBER_LOCALE, pathFor } from "@/i18n/config";
 import { getContent } from "@/i18n/content";
 import { fill, formatPct, hasResults, MIN_WEEKS, plural } from "./resultsModel";
 
@@ -53,7 +54,12 @@ export function PilotResults({ lang, data = RESULTADOS }: { lang: Locale; data?:
 
         <div className="prose-measure mt-6 flex flex-col gap-2 text-ink-soft">
           {data.controlDiffPct !== undefined && <p>{fill(t.control, { value: formatPct(data.controlDiffPct, numbers) })}</p>}
-          <p>{t.method}</p>
+          <p>
+            {t.method}{" "}
+            <Link href={pathFor(lang, "como-medimos")} className="font-semibold text-ink underline underline-offset-4">
+              {getContent(lang).links.measure}
+            </Link>
+          </p>
           {data.weeks < MIN_WEEKS && <p className="font-semibold text-ink">{t.caution}</p>}
           <p className="text-sm">{fill(t.asOf, { date })}</p>
         </div>

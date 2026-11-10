@@ -42,6 +42,18 @@ export const contentEn: Content = {
       "title": "Vision: from counting fruit to caring for the greenhouse | Atias",
       "description": "Where Atias is heading: from harvest forecasting to plant health and crop condition, one version at a time. Atias recommends, the agronomist decides."
     },
+    measure: {
+      title: "How we measure harvest forecast accuracy | Atias",
+      description: "We compare every forecast with the kilos weighed on the scales, alongside the grower's and the agronomist's. Method, the 10 % criterion and what is still being tested.",
+    },
+    investors: {
+      title: "Investors and partners: invest in Atias | Atias",
+      description: "Atias counts the fruit in every row to forecast greenhouse harvests. We are looking for investors and partners to help take it to its first season.",
+    },
+    journal: {
+      title: "Pilot journal: how Atias is progressing | Atias",
+      description: "Dated news from the Atias pilot: from the first prototype to the first recording in a real greenhouse. Facts only, no unmeasured figures.",
+    },
     notice: { title: "Legal notice | Atias", description: "Legal notice for the Atias website." },
     privacy: { title: "Privacy policy | Atias", description: "Privacy policy for the Atias website." },
   },
@@ -54,6 +66,9 @@ export const contentEn: Content = {
     faqTeaser: "Answers to the most common questions",
     cropTeaser: "See the crop page",
     vision: "Vision",
+    measure: "How we measure",
+    investors: "Investors",
+    journal: "Pilot journal",
     breadcrumb: "Breadcrumb",
   },
   guide: {
@@ -371,5 +386,182 @@ export const contentEn: Content = {
     "principleTitle": "Atias recommends, the agronomist decides",
     "principleBody": "Atias replaces nobody: it gives the people who know the crop eyes on every row. Decisions on sales, treatments and crop management stay with people.",
     "closeTitle": "Want to see the pilot?"
+  },
+  measure: {
+    eyebrow: "How we measure",
+    title: "Accuracy is measured on the scales, not promised",
+    lead: "Almost no one in the sector publishes how wrong their forecast is. We publish the method before the result, so anyone can check it.",
+    compareTitle: "What we compare",
+    compare: [
+      {
+        name: "Atias forecasts",
+        body: "The kilos to be harvested each day from Monday to Friday, from Saturday's video.",
+      },
+      {
+        name: "So do the grower and the agronomist",
+        body: "We record their forecast before the harvest, day by day and separately.",
+      },
+      {
+        name: "The scales decide",
+        body: "The kilos actually harvested are weighed every day.",
+      },
+      {
+        name: "We compare all three",
+        body: "Each week shows who came closest to the harvest, and by how much.",
+      },
+    ],
+    metricsTitle: "How we calculate the error",
+    formula: "error = |forecast kilos − harvested kilos| ÷ harvested kilos",
+    metrics: [
+      {
+        name: "Weekly error",
+        body: "We add up how far off each greenhouse is and divide by everything harvested, so a small harvest does not inflate the percentage.",
+      },
+      {
+        name: "Bias",
+        body: "Whether the forecast tends to fall short or overshoot. A steady bias can be corrected.",
+      },
+      {
+        name: "Confidence range",
+        body: "With few weeks, the true error may be larger than the one measured. We calculate its range with 90 % confidence.",
+      },
+      {
+        name: "Weeks on target",
+        body: "How many weeks the error stayed at 10 % or less.",
+      },
+    ],
+    criteriaTitle: "When we say the 10 % target is met",
+    criteriaLead: "Only when all four conditions hold at once:",
+    criteria: [
+      "All data are real: nothing simulated in the videos, the parameters or the harvest.",
+      "The weeks evaluated were not used to calibrate the system.",
+      "At least 8 weeks and greenhouses have been measured.",
+      "Even the high end of the confidence range stays at 10 % or less.",
+    ],
+    criteriaNote: "Even then, the result holds for that greenhouse, that crop and that way of filming. Before claiming it elsewhere, it is measured again.",
+    linksTitle: "Where accuracy is lost",
+    linksLead: "The total error does not say what fails. We measure each link separately:",
+    links: [
+      {
+        name: "The camera count",
+        body: "In control sections marked with tape, fruit is counted by hand and compared with what Atias counted on the same stretch of row.",
+      },
+      {
+        name: "Hidden fruit",
+        body: "In those sections we also count the fruit you only see by moving leaves: the fruit no camera sees from the aisle.",
+      },
+      {
+        name: "Weight per fruit",
+        body: "A sample of fruit is weighed to turn counted fruit into kilos.",
+      },
+      {
+        name: "Ripening",
+        body: "What ripens after filming is spread by each day's heat and checked against the harvest.",
+      },
+    ],
+    statusTitle: "What is proven and what is not",
+    proven: {
+      name: "Proven",
+      body: "The system works end to end: video upload, count per section, kilos per day and automatic comparison with the scales.",
+    },
+    testing: {
+      name: "Being tested",
+      body: "Real accuracy. In November 2026 we started measuring it in a real greenhouse. We will publish the result with this method, good or bad.",
+    },
+    closeTitle: "Shall we measure it in your greenhouses?",
+  },
+  pilotOffer: {
+    badge: "Free 4-week pilot",
+    eyebrow: "Free pilot",
+    title: "Try it for 4 weeks in your greenhouses, free of charge",
+    lead: "Every week, compare our forecast with what your scales say. If it does not help, you have lost nothing.",
+    steps: [
+      {
+        name: "Film once a week",
+        body: "One video per row and side with your phone, before the harvest week.",
+      },
+      {
+        name: "Record the kilos harvested",
+        body: "Each day's kilos, the way you already weigh them. Your own forecast too, if you want to compare it.",
+      },
+      {
+        name: "Compare with your scales",
+        body: "Every week you see our forecast against the harvest, with its error measured.",
+      },
+    ],
+    note: "Open to cooperatives and growers in any country.",
+    cta: "I want a pilot",
+    interestLabel: "What are you interested in?",
+    interests: {
+      piloto: "Free 4-week pilot",
+      demo: "A demo",
+      otro: "Something else",
+    },
+  },
+  appTour: {
+    "eyebrow": "Inside the app",
+    "title": "What the cooperative sees every Monday",
+    "lead": "Real screens from the app, with sample data. Each one answers a decision for the week.",
+    "sample": "Sample data",
+    "blurred": "Variety names are blurred.",
+    "uiLanguage": "The app is shown in Spanish.",
+    "tabsLabel": "App screens",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Summary",
+        "decision": "How many kilos to sell this week, and with what margin.",
+        "alt": "Weekly summary: sales forecast, pickers needed and ripe fruit observed, with warnings per row."
+      },
+      {
+        "id": "prevision",
+        "name": "Daily forecast",
+        "decision": "How much is picked each day, next to the agronomist's forecast.",
+        "alt": "Kilos per day from Monday to Friday: actual, agronomist's forecast and Atias forecast."
+      },
+      {
+        "id": "invernadero",
+        "name": "Greenhouse",
+        "decision": "Where the fruit is: each greenhouse, row and section.",
+        "alt": "Greenhouse detail: ripe fruit observed, forecast and kilos per harvest day."
+      },
+      {
+        "id": "temporeros",
+        "name": "Pickers",
+        "decision": "How many people to call in to pick it from Monday to Friday.",
+        "alt": "Pickers needed for the week, with the range from the forecast and kilos per working day."
+      },
+      {
+        "id": "precision",
+        "name": "Accuracy",
+        "decision": "How close Atias gets to the scales, next to the grower and the agronomist.",
+        "alt": "Accuracy screen: error of Atias, the grower and the agronomist against the harvest."
+      }
+    ]
+  },
+  dataTrust: {
+    "eyebrow": "Your data",
+    "title": "What happens to your videos, no small print",
+    "lead": "This is how it works today, exactly as it is built.",
+    "points": [
+      {
+        "name": "One link per greenhouse and week",
+        "body": "Growers need no account. Their link only opens their greenhouse and week, expires when the harvest starts and the cooperative can revoke it."
+      },
+      {
+        "name": "The cooperative signs in",
+        "body": "Its screens ask for a username and password. Passwords are not stored in plain text and repeated failed attempts are blocked."
+      },
+      {
+        "name": "Videos stay within Atias",
+        "body": "They are counted by our own detector. Only the greenhouse location is used to look up the weather."
+      },
+      {
+        "name": "What is removed is deleted",
+        "body": "If a grower replaces or removes a video, the old one is deleted for good after seven days."
+      }
+    ],
+    "pending": "The retention period for current videos has not been set yet.",
+    "more": "More on security and data"
   },
 };

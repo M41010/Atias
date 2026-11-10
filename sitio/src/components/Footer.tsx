@@ -18,6 +18,8 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <Link href={pathFor(locale, "empresa")}>{dict.nav.company}</Link>
           <Link href={pathFor(locale, "producto")}>{dict.nav.product}</Link>
           <Link href={pathFor(locale, "vision")}>{links.vision}</Link>
+          <Link href={pathFor(locale, "como-medimos")}>{links.measure}</Link>
+          <Link href={pathFor(locale, "inversores")}>{links.investors}</Link>
           <Link href={pathFor(locale, "cultivos")}>{links.crops}</Link>
           <Link href={pathFor(locale, "aforo-de-cosecha")}>{links.guide}</Link>
           <Link href={pathFor(locale, "preguntas-frecuentes")}>{links.faq}</Link>

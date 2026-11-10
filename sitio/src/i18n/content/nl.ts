@@ -42,6 +42,18 @@ export const contentNl: Content = {
       "title": "Visie: van vruchten tellen naar de hele kas verzorgen | Atias",
       "description": "Waar Atias naartoe gaat: van oogstprognose naar gewasbescherming en gewasconditie, versie na versie. Atias adviseert, de teeltadviseur beslist."
     },
+    measure: {
+      title: "Hoe we de nauwkeurigheid van de oogstprognose meten | Atias",
+      description: "We vergelijken elke prognose met de kilo’s op de weegschaal, naast die van de teler en de teeltadviseur. Methode, het 10 %-criterium en wat nog getest wordt.",
+    },
+    investors: {
+      title: "Investeerders en partners: investeren in Atias | Atias",
+      description: "Atias telt het fruit in elke rij om de oogst in de kas te voorspellen. We zoeken investeerders en partners om het naar het eerste seizoen te brengen.",
+    },
+    journal: {
+      title: "Pilotlogboek: hoe Atias vordert | Atias",
+      description: "Gedateerd nieuws uit de Atias-pilot: van het eerste prototype tot de eerste opname in een echte kas. Alleen feiten, geen ongemeten cijfers.",
+    },
     notice: { title: "Juridische informatie | Atias", description: "Juridische informatie over de website van Atias." },
     privacy: { title: "Privacybeleid | Atias", description: "Privacybeleid van de website van Atias." },
   },
@@ -54,6 +66,9 @@ export const contentNl: Content = {
     faqTeaser: "Antwoorden op de meest gestelde vragen",
     cropTeaser: "Bekijk de gewaspagina",
     vision: "Visie",
+    measure: "Hoe we meten",
+    investors: "Investeerders",
+    journal: "Pilotlogboek",
     breadcrumb: "Kruimelpad",
   },
   guide: {
@@ -371,5 +386,182 @@ export const contentNl: Content = {
     "principleTitle": "Atias adviseert, de teeltadviseur beslist",
     "principleBody": "Atias vervangt niemand: het geeft wie het gewas kent ogen in elke rij. Beslissingen over verkoop, behandeling en teelt blijven bij mensen.",
     "closeTitle": "Wil je de pilot zien?"
+  },
+  measure: {
+    eyebrow: "Hoe we meten",
+    title: "Nauwkeurigheid meet je op de weegschaal, je belooft haar niet",
+    lead: "Bijna niemand in de sector publiceert hoeveel zijn prognose ernaast zit. Wij publiceren de methode vóór het resultaat, zodat iedereen het kan controleren.",
+    compareTitle: "Wat we vergelijken",
+    compare: [
+      {
+        name: "Atias voorspelt",
+        body: "De kilo’s die elke dag van maandag tot vrijdag geoogst worden, op basis van de video van zaterdag.",
+      },
+      {
+        name: "De teler en de adviseur ook",
+        body: "We noteren hun prognose vóór de oogst, per dag en apart.",
+      },
+      {
+        name: "De weegschaal beslist",
+        body: "De werkelijk geoogste kilo’s worden elke dag gewogen.",
+      },
+      {
+        name: "We vergelijken alle drie",
+        body: "Elke week zie je wie het dichtst bij de oogst zat, en hoeveel.",
+      },
+    ],
+    metricsTitle: "Hoe we de fout berekenen",
+    formula: "fout = |voorspelde kilo’s − geoogste kilo’s| ÷ geoogste kilo’s",
+    metrics: [
+      {
+        name: "Weekfout",
+        body: "We tellen op hoeveel elke kas ernaast zit en delen door alles wat geoogst is. Zo blaast een kleine oogst het percentage niet op.",
+      },
+      {
+        name: "Bias",
+        body: "Of de prognose de neiging heeft te laag of te hoog uit te komen. Een stabiele bias kun je corrigeren.",
+      },
+      {
+        name: "Betrouwbaarheidsmarge",
+        body: "Met weinig weken kan de echte fout groter zijn dan de gemeten fout. We berekenen de marge met 90 % betrouwbaarheid.",
+      },
+      {
+        name: "Weken binnen het doel",
+        body: "Hoeveel weken de fout op 10 % of minder bleef.",
+      },
+    ],
+    criteriaTitle: "Wanneer we zeggen dat de 10 % gehaald is",
+    criteriaLead: "Alleen als aan alle vier de voorwaarden tegelijk is voldaan:",
+    criteria: [
+      "Alle gegevens zijn echt: niets gesimuleerd in de video’s, de parameters of de oogst.",
+      "De beoordeelde weken zijn niet gebruikt om het systeem te kalibreren.",
+      "Er zijn minstens 8 weken en kassen gemeten.",
+      "Zelfs de bovenkant van de betrouwbaarheidsmarge blijft op 10 % of minder.",
+    ],
+    criteriaNote: "Ook dan geldt het resultaat voor die kas, dat gewas en die manier van filmen. Voordat we het elders beweren, meten we opnieuw.",
+    linksTitle: "Waar nauwkeurigheid verloren gaat",
+    linksLead: "De totale fout zegt niet wat er misgaat. We meten elke schakel apart:",
+    links: [
+      {
+        name: "De telling van de camera",
+        body: "In controlestukken gemarkeerd met tape wordt het fruit met de hand geteld en vergeleken met wat Atias op hetzelfde stuk rij telde.",
+      },
+      {
+        name: "Verborgen fruit",
+        body: "In die stukken tellen we ook het fruit dat je alleen ziet door bladeren opzij te doen: wat geen camera vanuit het pad ziet.",
+      },
+      {
+        name: "Gewicht per vrucht",
+        body: "Er wordt een monster vruchten gewogen om getelde vruchten om te rekenen naar kilo’s.",
+      },
+      {
+        name: "Rijping",
+        body: "Wat na het filmen rijpt, wordt verdeeld naar de warmte van elke dag en vergeleken met de oogst.",
+      },
+    ],
+    statusTitle: "Wat bewezen is en wat niet",
+    proven: {
+      name: "Bewezen",
+      body: "Het systeem werkt van begin tot eind: video uploaden, telling per stuk rij, kilo’s per dag en automatische vergelijking met de weegschaal.",
+    },
+    testing: {
+      name: "In test",
+      body: "De echte nauwkeurigheid. In november 2026 zijn we begonnen haar te meten in een echte kas. We publiceren het resultaat met deze methode, goed of slecht.",
+    },
+    closeTitle: "Zullen we het in uw kassen meten?",
+  },
+  pilotOffer: {
+    badge: "Gratis pilot van 4 weken",
+    eyebrow: "Gratis pilot",
+    title: "Probeer het 4 weken in uw kassen, kosteloos",
+    lead: "Vergelijk elke week onze prognose met wat uw weegschaal aangeeft. Helpt het niet, dan bent u niets kwijt.",
+    steps: [
+      {
+        name: "Film één keer per week",
+        body: "Eén video per rij en per kant met de telefoon, vóór de oogstweek.",
+      },
+      {
+        name: "Noteer de geoogste kilo’s",
+        body: "De kilo’s van elke dag, zoals u ze nu al weegt. Ook uw eigen prognose, als u die wilt vergelijken.",
+      },
+      {
+        name: "Vergelijk met uw weegschaal",
+        body: "Elke week ziet u onze prognose naast de oogst, met de gemeten fout.",
+      },
+    ],
+    note: "Open voor coöperaties en telers in elk land.",
+    cta: "Ik wil een pilot",
+    interestLabel: "Waar bent u in geïnteresseerd?",
+    interests: {
+      piloto: "Gratis pilot van 4 weken",
+      demo: "Een demonstratie",
+      otro: "Iets anders",
+    },
+  },
+  appTour: {
+    "eyebrow": "De app van binnen",
+    "title": "Wat de coöperatie elke maandag ziet",
+    "lead": "Echte schermen van de app, met voorbeeldgegevens. Elk scherm beantwoordt een beslissing voor de week.",
+    "sample": "Voorbeeldgegevens",
+    "blurred": "Rasnamen zijn vervaagd.",
+    "uiLanguage": "De app wordt in het Spaans getoond.",
+    "tabsLabel": "Schermen van de app",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Overzicht",
+        "decision": "Hoeveel kilo deze week te verkopen, en met welke marge.",
+        "alt": "Weekoverzicht: verkoopprognose, benodigde plukkers en waargenomen rijp fruit, met waarschuwingen per rij."
+      },
+      {
+        "id": "prevision",
+        "name": "Dagprognose",
+        "decision": "Hoeveel er elke dag wordt geoogst, naast de prognose van de teeltadviseur.",
+        "alt": "Kilo’s per dag van maandag tot vrijdag: werkelijk, prognose van de adviseur en prognose van Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Kas",
+        "decision": "Waar het fruit hangt: elke kas, rij en rijdeel.",
+        "alt": "Detail van een kas: waargenomen rijp fruit, prognose en kilo’s per oogstdag."
+      },
+      {
+        "id": "temporeros",
+        "name": "Plukkers",
+        "decision": "Hoeveel mensen op te roepen om van maandag tot vrijdag te oogsten.",
+        "alt": "Benodigde plukkers voor de week, met de bandbreedte uit de prognose en kilo’s per werkdag."
+      },
+      {
+        "id": "precision",
+        "name": "Nauwkeurigheid",
+        "decision": "Hoe dicht Atias bij de weegschaal komt, naast de teler en de adviseur.",
+        "alt": "Scherm nauwkeurigheid: fout van Atias, de teler en de adviseur tegen de oogst."
+      }
+    ]
+  },
+  dataTrust: {
+    "eyebrow": "Uw gegevens",
+    "title": "Wat er met uw video’s gebeurt, zonder kleine lettertjes",
+    "lead": "Zo werkt het vandaag, precies zoals het is gebouwd.",
+    "points": [
+      {
+        "name": "Eén link per kas en week",
+        "body": "De teler heeft geen account nodig. Zijn link opent alleen zijn kas en week, verloopt bij het begin van de oogst en de coöperatie kan hem intrekken."
+      },
+      {
+        "name": "De coöperatie, met wachtwoord",
+        "body": "De schermen vragen om gebruikersnaam en wachtwoord. Wachtwoorden worden niet leesbaar opgeslagen en herhaalde mislukte pogingen worden geblokkeerd."
+      },
+      {
+        "name": "Video’s blijven bij Atias",
+        "body": "Ze worden geteld door onze eigen detector. Alleen de locatie van de kas wordt gebruikt voor het weer."
+      },
+      {
+        "name": "Wat verwijderd wordt, wordt gewist",
+        "body": "Als de teler een video vervangt of verwijdert, wordt de oude na zeven dagen definitief gewist."
+      }
+    ],
+    "pending": "De bewaartermijn van actuele video’s ligt nog niet vast.",
+    "more": "Meer over beveiliging en gegevens"
   },
 };

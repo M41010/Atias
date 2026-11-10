@@ -42,6 +42,18 @@ export const contentPt: Content = {
       "title": "Visão: de contar fruta a cuidar da estufa | Atias",
       "description": "Para onde vai a Atias: da previsão de colheita à sanidade vegetal e ao estado da planta, versão a versão. A Atias recomenda, o técnico decide."
     },
+    measure: {
+      title: "Como medimos a precisão da previsão de colheita | Atias",
+      description: "Comparamos cada previsão com os quilos pesados na balança, junto com a do agricultor e a do técnico. Método, critério dos 10 % e o que ainda está em teste.",
+    },
+    investors: {
+      title: "Investidores e parceiros: investir na Atias | Atias",
+      description: "A Atias conta a fruta de cada linha para prever a colheita em estufa. Procuramos investidores e parceiros que nos ajudem a levá-la à primeira campanha.",
+    },
+    journal: {
+      title: "Diário do piloto: como avança a Atias | Atias",
+      description: "Novidades datadas do piloto da Atias: do primeiro protótipo à primeira gravação numa estufa real. Só factos, sem números por medir.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal do site da Atias." },
     privacy: { title: "Política de privacidade | Atias", description: "Política de privacidade do site da Atias." },
   },
@@ -54,6 +66,9 @@ export const contentPt: Content = {
     faqTeaser: "Respostas às dúvidas mais comuns",
     cropTeaser: "Ver a página da cultura",
     vision: "Visão",
+    measure: "Como medimos",
+    investors: "Investidores",
+    journal: "Diário do piloto",
     breadcrumb: "Percurso de navegação",
   },
   guide: {
@@ -371,5 +386,182 @@ export const contentPt: Content = {
     "principleTitle": "A Atias recomenda, o técnico decide",
     "principleBody": "A Atias não substitui ninguém: dá olhos em cada linha a quem conhece a cultura. As decisões de venda, tratamento e condução continuam a ser das pessoas.",
     "closeTitle": "Quer ver o piloto?"
+  },
+  measure: {
+    eyebrow: "Como medimos",
+    title: "A precisão mede-se na balança, não se promete",
+    lead: "Quase ninguém no setor publica quanto a sua previsão falha. Nós publicamos o método antes do resultado, para que qualquer pessoa o possa verificar.",
+    compareTitle: "O que comparamos",
+    compare: [
+      {
+        name: "A Atias prevê",
+        body: "Os quilos que se vão colher cada dia de segunda a sexta, a partir do vídeo de sábado.",
+      },
+      {
+        name: "O agricultor e o técnico também",
+        body: "Registamos a previsão deles antes da colheita, dia a dia e em separado.",
+      },
+      {
+        name: "A balança decide",
+        body: "Os quilos realmente colhidos são pesados todos os dias.",
+      },
+      {
+        name: "Comparamos as três",
+        body: "Todas as semanas vê-se quem esteve mais perto da colheita, e por quanto.",
+      },
+    ],
+    metricsTitle: "Como calculamos o erro",
+    formula: "erro = |quilos previstos − quilos colhidos| ÷ quilos colhidos",
+    metrics: [
+      {
+        name: "Erro da semana",
+        body: "Soma-se quanto falha cada estufa e divide-se por tudo o que foi colhido. Assim, uma colheita pequena não dispara a percentagem.",
+      },
+      {
+        name: "Enviesamento",
+        body: "Se a previsão tende a ficar abaixo ou a passar. Um enviesamento estável pode ser corrigido.",
+      },
+      {
+        name: "Margem de confiança",
+        body: "Com poucas semanas, o erro real pode ser maior do que o medido. Calculamos entre que valores está, com 90 % de confiança.",
+      },
+      {
+        name: "Semanas dentro do objetivo",
+        body: "Quantas semanas o erro ficou em 10 % ou menos.",
+      },
+    ],
+    criteriaTitle: "Quando dizemos que os 10 % se cumprem",
+    criteriaLead: "Só se as quatro condições se verificarem ao mesmo tempo:",
+    criteria: [
+      "Todos os dados são reais: nada simulado nos vídeos, nos parâmetros ou na colheita.",
+      "As semanas avaliadas não foram usadas para calibrar o sistema.",
+      "Há pelo menos 8 semanas e estufas medidas.",
+      "Até o extremo alto da margem de confiança fica em 10 % ou menos.",
+    ],
+    criteriaNote: "Mesmo assim, o resultado vale para essa estufa, essa cultura e essa forma de gravar. Antes de o afirmar noutro sítio, mede-se de novo.",
+    linksTitle: "Onde se perde a precisão",
+    linksLead: "O erro total não diz o que falha. Medimos cada elo em separado:",
+    links: [
+      {
+        name: "A contagem da câmara",
+        body: "Em troços de controlo marcados com fita, a fruta é contada à mão e comparada com o que a Atias contou no mesmo troço de linha.",
+      },
+      {
+        name: "A fruta escondida",
+        body: "Nesses troços conta-se também a que só se vê afastando as folhas: a que nenhuma câmara vê a partir do corredor.",
+      },
+      {
+        name: "O peso por fruto",
+        body: "Pesa-se uma amostra de frutos para passar de frutos contados a quilos.",
+      },
+      {
+        name: "A maturação",
+        body: "O que amadurece depois de gravar reparte-se segundo o calor de cada dia e confronta-se com a colheita.",
+      },
+    ],
+    statusTitle: "O que está provado e o que não está",
+    proven: {
+      name: "Provado",
+      body: "O sistema funciona de ponta a ponta: envio do vídeo, contagem por troço, quilos por dia e comparação automática com a balança.",
+    },
+    testing: {
+      name: "Em teste",
+      body: "A precisão real. Em novembro de 2026 começámos a medi-la numa estufa real. Vamos publicar o resultado com este método, seja bom ou mau.",
+    },
+    closeTitle: "Medimos nas suas estufas?",
+  },
+  pilotOffer: {
+    badge: "Piloto grátis de 4 semanas",
+    eyebrow: "Piloto grátis",
+    title: "Experimente 4 semanas nas suas estufas, sem custos",
+    lead: "Todas as semanas, compare a nossa previsão com o que marca a sua balança. Se não lhe servir, não perdeu nada.",
+    steps: [
+      {
+        name: "Grave uma vez por semana",
+        body: "Um vídeo por linha e por lado com o telemóvel, antes da semana de colheita.",
+      },
+      {
+        name: "Registe os quilos colhidos",
+        body: "Os quilos de cada dia, como já os pesam hoje. Também a sua própria previsão, se a quiser comparar.",
+      },
+      {
+        name: "Compare com a sua balança",
+        body: "Todas as semanas vê a nossa previsão face ao que foi colhido, com o seu erro medido.",
+      },
+    ],
+    note: "Aberto a cooperativas e agricultores de qualquer país.",
+    cta: "Quero um piloto",
+    interestLabel: "O que lhe interessa?",
+    interests: {
+      piloto: "Piloto grátis de 4 semanas",
+      demo: "Uma demonstração",
+      otro: "Outra coisa",
+    },
+  },
+  appTour: {
+    "eyebrow": "A aplicação por dentro",
+    "title": "O que a cooperativa vê todas as segundas-feiras",
+    "lead": "Ecrãs reais da aplicação, com dados de exemplo. Cada um responde a uma decisão da semana.",
+    "sample": "Dados de exemplo",
+    "blurred": "Os nomes das variedades aparecem desfocados.",
+    "uiLanguage": "A aplicação é mostrada em espanhol.",
+    "tabsLabel": "Ecrãs da aplicação",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Resumo",
+        "decision": "Quantos quilos vender esta semana, e com que margem.",
+        "alt": "Resumo semanal: previsão de venda, trabalhadores necessários e fruta madura observada, com avisos por linha."
+      },
+      {
+        "id": "prevision",
+        "name": "Previsão diária",
+        "decision": "Quanto se colhe cada dia, ao lado da previsão do técnico.",
+        "alt": "Quilos por dia de segunda a sexta: real, previsão do técnico e previsão da Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Estufa",
+        "decision": "Onde está a fruta: cada estufa, linha e troço.",
+        "alt": "Detalhe de uma estufa: fruta madura observada, previsão e quilos por dia de colheita."
+      },
+      {
+        "id": "temporeros",
+        "name": "Trabalhadores",
+        "decision": "Quantas pessoas chamar para colher de segunda a sexta.",
+        "alt": "Trabalhadores necessários para a semana, com o intervalo segundo a previsão e os quilos por jornada."
+      },
+      {
+        "id": "precision",
+        "name": "Precisão",
+        "decision": "Quanto acerta a Atias face à balança, ao lado do agricultor e do técnico.",
+        "alt": "Ecrã de precisão: erro da Atias, do agricultor e do técnico face ao que se colhe."
+      }
+    ]
+  },
+  dataTrust: {
+    "eyebrow": "Os seus dados",
+    "title": "O que acontece aos seus vídeos, sem letra miudinha",
+    "lead": "É assim que funciona hoje, tal como está programado.",
+    "points": [
+      {
+        "name": "Uma ligação por estufa e semana",
+        "body": "O agricultor não precisa de conta. A sua ligação só abre a sua estufa e a sua semana, expira ao começar a colheita e a cooperativa pode anulá-la."
+      },
+      {
+        "name": "A cooperativa, com palavra-passe",
+        "body": "Os seus ecrãs pedem utilizador e palavra-passe. As palavras-passe não são guardadas em claro e as tentativas falhadas repetidas são bloqueadas."
+      },
+      {
+        "name": "Os vídeos não saem da Atias",
+        "body": "São contados pelo nosso próprio detetor. Para a meteorologia só se usa a localização da estufa."
+      },
+      {
+        "name": "O que se retira, apaga-se",
+        "body": "Se o agricultor substituir ou retirar um vídeo, o anterior é apagado de vez ao fim de sete dias."
+      }
+    ],
+    "pending": "O prazo para apagar os vídeos em uso ainda não está fixado.",
+    "more": "Mais sobre segurança e dados"
   },
 };

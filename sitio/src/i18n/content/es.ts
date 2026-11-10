@@ -45,6 +45,18 @@ export const contentEs = {
       "title": "Visión: de contar fruta a cuidar el invernadero | Atias",
       "description": "Hacia dónde va Atias: de la previsión de cosecha a la sanidad vegetal y el estado de la planta, versión a versión. Atias recomienda y el técnico decide."
     },
+    measure: {
+      title: "Cómo medimos la precisión de la previsión de cosecha | Atias",
+      description: "Comparamos cada previsión con los kilos pesados en la báscula, junto a la del agricultor y la del técnico. Método, criterio del 10 % y lo que aún está en pruebas.",
+    },
+    investors: {
+      title: "Inversores y socios: invertir en Atias | Atias",
+      description: "Atias cuenta la fruta de cada hilera para prever la cosecha en invernadero. Buscamos inversores y socios que nos ayuden a llevarlo a su primera temporada.",
+    },
+    journal: {
+      title: "Diario del piloto: cómo avanza Atias | Atias",
+      description: "Novedades fechadas del piloto de Atias: del primer prototipo a la primera grabación en un invernadero real. Solo hechos, sin cifras sin medir.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal de la web de Atias." },
     privacy: { title: "Política de privacidad | Atias", description: "Política de privacidad de la web de Atias." },
   },
@@ -57,6 +69,9 @@ export const contentEs = {
     faqTeaser: "Resolvemos las dudas más habituales",
     cropTeaser: "Ver la página del cultivo",
     vision: "Visión",
+    measure: "Cómo medimos",
+    investors: "Inversores",
+    journal: "Diario del piloto",
     breadcrumb: "Ruta de navegación",
   },
   guide: {
@@ -374,6 +389,183 @@ export const contentEs = {
     "principleTitle": "Atias recomienda, el técnico decide",
     "principleBody": "Atias no sustituye a nadie: da ojos en cada hilera a quien conoce el cultivo. Las decisiones de venta, de tratamiento y de manejo siguen siendo de las personas.",
     "closeTitle": "¿Quieres ver el piloto?"
+  },
+  measure: {
+    eyebrow: "Cómo medimos",
+    title: "La precisión se mide en la báscula, no se promete",
+    lead: "Casi nadie en el sector publica cuánto se equivoca su previsión. Nosotros publicamos el método antes que el resultado, para que cualquiera pueda comprobarlo.",
+    compareTitle: "Qué comparamos",
+    compare: [
+      {
+        name: "Atias prevé",
+        body: "Los kilos que se recogerán cada día de lunes a viernes, a partir del vídeo del sábado.",
+      },
+      {
+        name: "El agricultor y el técnico también",
+        body: "Apuntamos su previsión antes de recoger, día a día y por separado.",
+      },
+      {
+        name: "La báscula decide",
+        body: "Se pesan los kilos recogidos de verdad cada día.",
+      },
+      {
+        name: "Comparamos las tres",
+        body: "Cada semana se ve quién se acercó más a lo recogido y por cuánto.",
+      },
+    ],
+    metricsTitle: "Cómo calculamos el error",
+    formula: "error = |kilos previstos − kilos recogidos| ÷ kilos recogidos",
+    metrics: [
+      {
+        name: "Error de la semana",
+        body: "Se suma lo que se equivoca cada invernadero y se divide entre todo lo recogido. Así una cosecha pequeña no dispara el porcentaje.",
+      },
+      {
+        name: "Sesgo",
+        body: "Si la previsión tiende a quedarse corta o a pasarse. Un sesgo estable se puede corregir.",
+      },
+      {
+        name: "Margen de confianza",
+        body: "Con pocas semanas, el error real puede ser mayor que el medido. Calculamos entre qué valores está con un 90 % de confianza.",
+      },
+      {
+        name: "Semanas dentro del objetivo",
+        body: "Cuántas semanas quedó el error en el 10 % o menos.",
+      },
+    ],
+    criteriaTitle: "Cuándo decimos que se cumple el 10 %",
+    criteriaLead: "Solo si se dan las cuatro condiciones a la vez:",
+    criteria: [
+      "Todos los datos son reales: nada simulado en los vídeos, los parámetros ni la cosecha.",
+      "Las semanas evaluadas no se usaron para calibrar el sistema.",
+      "Hay al menos 8 semanas e invernaderos medidos.",
+      "Incluso el extremo alto del margen de confianza queda en el 10 % o menos.",
+    ],
+    criteriaNote: "Aun así, el resultado vale para ese invernadero, ese cultivo y esa forma de grabar. Antes de afirmarlo en otro sitio, se vuelve a medir.",
+    linksTitle: "Dónde se pierde la precisión",
+    linksLead: "El error total no dice qué falla. Medimos cada eslabón por separado:",
+    links: [
+      {
+        name: "El conteo de la cámara",
+        body: "En tramos de control marcados con cinta se cuenta la fruta a mano y se compara con lo que contó Atias en el mismo trozo de hilera.",
+      },
+      {
+        name: "La fruta tapada",
+        body: "En esos tramos también se cuenta la que solo se ve apartando hojas: es la que ninguna cámara ve desde el pasillo.",
+      },
+      {
+        name: "El peso por fruto",
+        body: "Se pesa una muestra de frutos para pasar de frutos contados a kilos.",
+      },
+      {
+        name: "La maduración",
+        body: "Lo que madura después de grabar se reparte según el calor de cada día y se contrasta con lo recogido.",
+      },
+    ],
+    statusTitle: "Lo que está probado y lo que no",
+    proven: {
+      name: "Probado",
+      body: "El sistema funciona de punta a punta: subida del vídeo, conteo por tramos, kilos por día y comparación automática con la báscula.",
+    },
+    testing: {
+      name: "En pruebas",
+      body: "La precisión real. En noviembre de 2026 empezamos a medirla en un invernadero real. Publicaremos el resultado con este método, sea bueno o malo.",
+    },
+    closeTitle: "¿Lo medimos en tus invernaderos?",
+  },
+  pilotOffer: {
+    badge: "Piloto gratis de 4 semanas",
+    eyebrow: "Piloto gratis",
+    title: "Pruébalo 4 semanas en tus invernaderos, sin coste",
+    lead: "Compara cada semana nuestra previsión con lo que marca tu báscula. Si no te sirve, no has perdido nada.",
+    steps: [
+      {
+        name: "Graba una vez por semana",
+        body: "Un vídeo por hilera y lado con el móvil, antes de la semana de recogida.",
+      },
+      {
+        name: "Apunta los kilos recogidos",
+        body: "Los kilos de cada día, como ya los pesáis hoy. También tu propia previsión, si quieres compararla.",
+      },
+      {
+        name: "Compara con tu báscula",
+        body: "Cada semana ves nuestra previsión frente a lo recogido, con su error medido.",
+      },
+    ],
+    note: "Abierto a cooperativas y agricultores de cualquier país.",
+    cta: "Quiero un piloto",
+    interestLabel: "¿Qué te interesa?",
+    interests: {
+      piloto: "Piloto gratis de 4 semanas",
+      demo: "Una demostración",
+      otro: "Otra cosa",
+    },
+  },
+  appTour: {
+    "eyebrow": "La app por dentro",
+    "title": "Así lo ve la cooperativa cada lunes",
+    "lead": "Pantallas reales de la aplicación, con datos de ejemplo. Cada una responde a una decisión de la semana.",
+    "sample": "Datos de ejemplo",
+    "blurred": "Los nombres de las variedades aparecen difuminados.",
+    "uiLanguage": "",
+    "tabsLabel": "Pantallas de la aplicación",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Resumen",
+        "decision": "Cuántos kilos vender esta semana y con qué margen.",
+        "alt": "Resumen semanal: previsión para la venta, temporeros necesarios y fruta madura observada, con avisos por hilera."
+      },
+      {
+        "id": "prevision",
+        "name": "Previsión diaria",
+        "decision": "Cuánto se recoge cada día, al lado de la previsión del técnico.",
+        "alt": "Tabla de kilos por día de lunes a viernes: real, previsión del técnico y previsión de Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Invernadero",
+        "decision": "Dónde está la fruta: cada invernadero, hilera y tramo.",
+        "alt": "Detalle de un invernadero: fruta madura observada, previsión y kilos por día de recolección."
+      },
+      {
+        "id": "temporeros",
+        "name": "Temporeros",
+        "decision": "Cuántas personas llamar para recogerlo de lunes a viernes.",
+        "alt": "Temporeros necesarios para la semana, con el rango según la previsión y los kilos por jornal."
+      },
+      {
+        "id": "precision",
+        "name": "Precisión",
+        "decision": "Cuánto acierta Atias frente a la báscula, junto al agricultor y el técnico.",
+        "alt": "Pantalla de precisión: error de Atias, del agricultor y del técnico frente a lo recogido."
+      }
+    ]
+  },
+  dataTrust: {
+    "eyebrow": "Tus datos",
+    "title": "Lo que pasa con tus vídeos, sin letra pequeña",
+    "lead": "Así funciona hoy, tal como está programado.",
+    "points": [
+      {
+        "name": "Un enlace por invernadero y semana",
+        "body": "El agricultor no necesita cuenta. Su enlace solo abre su invernadero y su semana, caduca al empezar la recolección y la cooperativa puede anularlo."
+      },
+      {
+        "name": "La cooperativa, con contraseña",
+        "body": "Sus pantallas piden usuario y contraseña. Las contraseñas no se guardan en claro y los intentos fallidos repetidos se bloquean."
+      },
+      {
+        "name": "Los vídeos no salen de Atias",
+        "body": "Los cuenta nuestro propio detector. Para la meteorología solo se usa la ubicación del invernadero."
+      },
+      {
+        "name": "Lo que se quita, se borra",
+        "body": "Si el agricultor cambia o quita un vídeo, el anterior se borra del todo a los siete días."
+      }
+    ],
+    "pending": "El plazo para borrar los vídeos vigentes aún no está fijado.",
+    "more": "Más sobre seguridad y datos"
   },
 };
 

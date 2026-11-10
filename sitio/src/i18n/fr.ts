@@ -202,7 +202,7 @@ export const fr: Dictionary = {
       },
       {
         name: "Les données de chacun restent les siennes",
-        body: "Chaque producteur ne voit que les siennes, et les vidéos sont effacées dès qu'elles ne servent plus.",
+        body: "Chaque producteur ne voit que les siennes, et les vidéos qu'il remplace ou retire sont effacées au bout de sept jours.",
       },
     ],
     joinTitle: "Rejoignez-nous",
@@ -261,6 +261,8 @@ export const fr: Dictionary = {
       "Chaque lien n'ouvre que sa serre et sa semaine, expire seul et peut être révoqué.",
       "La coopérative se connecte avec son compte. Les mots de passe sont stockés chiffrés.",
       "Les vidéos remplacées ou retirées sont effacées au bout de sept jours.",
+      "Les vidéos sont comptées par notre propre détecteur et ne sont pas envoyées à d'autres services. Seule la localisation de la serre sert à consulter la météo.",
+      "La durée de conservation des vidéos en cours n'est pas encore fixée.",
     ],
   },
   contact: {

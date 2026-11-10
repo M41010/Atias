@@ -202,7 +202,7 @@ export const pt: Dictionary = {
       },
       {
         name: "Os dados de cada um são de cada um",
-        body: "Cada agricultor só vê os seus, e os vídeos apagam-se quando já não são precisos.",
+        body: "Cada agricultor só vê os seus, e os vídeos que substitui ou retira apagam-se ao fim de sete dias.",
       },
     ],
     joinTitle: "Junte-se a nós",
@@ -261,6 +261,8 @@ export const pt: Dictionary = {
       "Cada ligação só dá acesso à sua estufa e à sua semana, expira sozinha e pode ser anulada.",
       "A cooperativa entra com a sua conta. As palavras-passe são guardadas cifradas.",
       "Os vídeos substituídos ou retirados apagam-se ao fim de sete dias.",
+      "Os vídeos são contados pelo nosso próprio detetor e não são enviados a outros serviços. Para a meteorologia só se usa a localização da estufa.",
+      "O prazo para apagar os vídeos em uso ainda não está fixado.",
     ],
   },
   contact: {

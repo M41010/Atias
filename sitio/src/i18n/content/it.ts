@@ -42,6 +42,18 @@ export const contentIt: Content = {
       "title": "Visione: dal contare i frutti al curare la serra | Atias",
       "description": "Dove va Atias: dalla previsione del raccolto alla difesa delle piante e allo stato della coltura, versione dopo versione. Atias consiglia, il tecnico decide."
     },
+    measure: {
+      title: "Come misuriamo la precisione delle previsioni | Atias",
+      description: "Confrontiamo ogni previsione con i chili pesati sulla bilancia, insieme a quella dell’agricoltore e del tecnico. Metodo, criterio del 10 % e cosa è ancora in prova.",
+    },
+    investors: {
+      title: "Investitori e partner: investire in Atias | Atias",
+      description: "Atias conta i frutti di ogni fila per prevedere il raccolto in serra. Cerchiamo investitori e partner che ci aiutino a portarlo alla prima stagione.",
+    },
+    journal: {
+      title: "Diario del pilota: come procede Atias | Atias",
+      description: "Le novità datate del pilota di Atias: dal primo prototipo alla prima ripresa in una serra vera. Solo fatti, senza cifre non misurate.",
+    },
     notice: { title: "Note legali | Atias", description: "Note legali del sito di Atias." },
     privacy: { title: "Informativa sulla privacy | Atias", description: "Informativa sulla privacy del sito di Atias." },
   },
@@ -54,6 +66,9 @@ export const contentIt: Content = {
     faqTeaser: "Le risposte alle domande più comuni",
     cropTeaser: "Vedi la pagina della coltura",
     vision: "Visione",
+    measure: "Come misuriamo",
+    investors: "Investitori",
+    journal: "Diario del pilota",
     breadcrumb: "Percorso di navigazione",
   },
   guide: {
@@ -371,5 +386,182 @@ export const contentIt: Content = {
     "principleTitle": "Atias consiglia, il tecnico decide",
     "principleBody": "Atias non sostituisce nessuno: dà occhi su ogni fila a chi conosce la coltura. Le decisioni di vendita, trattamento e gestione restano alle persone.",
     "closeTitle": "Vuoi vedere il pilota?"
+  },
+  measure: {
+    eyebrow: "Come misuriamo",
+    title: "La precisione si misura sulla bilancia, non si promette",
+    lead: "Quasi nessuno nel settore pubblica di quanto sbaglia la propria previsione. Noi pubblichiamo il metodo prima del risultato, perché chiunque possa verificarlo.",
+    compareTitle: "Cosa confrontiamo",
+    compare: [
+      {
+        name: "Atias prevede",
+        body: "I chili che si raccoglieranno ogni giorno dal lunedì al venerdì, a partire dal video del sabato.",
+      },
+      {
+        name: "Anche l’agricoltore e il tecnico",
+        body: "Annotiamo la loro previsione prima della raccolta, giorno per giorno e separatamente.",
+      },
+      {
+        name: "Decide la bilancia",
+        body: "Ogni giorno si pesano i chili raccolti davvero.",
+      },
+      {
+        name: "Confrontiamo le tre",
+        body: "Ogni settimana si vede chi si è avvicinato di più al raccolto, e di quanto.",
+      },
+    ],
+    metricsTitle: "Come calcoliamo l’errore",
+    formula: "errore = |chili previsti − chili raccolti| ÷ chili raccolti",
+    metrics: [
+      {
+        name: "Errore della settimana",
+        body: "Si somma lo scarto di ogni serra e si divide per tutto il raccolto: così un raccolto piccolo non gonfia la percentuale.",
+      },
+      {
+        name: "Distorsione",
+        body: "Se la previsione tende a restare sotto o a superare. Una distorsione stabile si può correggere.",
+      },
+      {
+        name: "Margine di confidenza",
+        body: "Con poche settimane, l’errore reale può essere maggiore di quello misurato. Ne calcoliamo l’intervallo con il 90 % di confidenza.",
+      },
+      {
+        name: "Settimane nell’obiettivo",
+        body: "Quante settimane l’errore è rimasto al 10 % o meno.",
+      },
+    ],
+    criteriaTitle: "Quando diciamo che il 10 % è raggiunto",
+    criteriaLead: "Solo se si verificano tutte e quattro le condizioni:",
+    criteria: [
+      "Tutti i dati sono reali: niente di simulato nei video, nei parametri o nel raccolto.",
+      "Le settimane valutate non sono servite a calibrare il sistema.",
+      "Sono state misurate almeno 8 settimane e serre.",
+      "Anche l’estremo alto del margine di confidenza resta al 10 % o meno.",
+    ],
+    criteriaNote: "Anche così, il risultato vale per quella serra, quella coltura e quel modo di riprendere. Prima di affermarlo altrove, si misura di nuovo.",
+    linksTitle: "Dove si perde la precisione",
+    linksLead: "L’errore totale non dice cosa non funziona. Misuriamo ogni anello separatamente:",
+    links: [
+      {
+        name: "Il conteggio della telecamera",
+        body: "In tratti di controllo segnati con nastro, la frutta si conta a mano e si confronta con ciò che ha contato Atias nello stesso tratto di fila.",
+      },
+      {
+        name: "La frutta nascosta",
+        body: "In quei tratti si conta anche quella che si vede solo spostando le foglie: quella che nessuna telecamera vede dal corridoio.",
+      },
+      {
+        name: "Il peso per frutto",
+        body: "Si pesa un campione di frutti per passare dai frutti contati ai chili.",
+      },
+      {
+        name: "La maturazione",
+        body: "Ciò che matura dopo le riprese si distribuisce secondo il caldo di ogni giorno e si confronta con il raccolto.",
+      },
+    ],
+    statusTitle: "Cosa è provato e cosa no",
+    proven: {
+      name: "Provato",
+      body: "Il sistema funziona dall’inizio alla fine: caricamento del video, conteggio per tratto, chili al giorno e confronto automatico con la bilancia.",
+    },
+    testing: {
+      name: "In prova",
+      body: "La precisione reale. A novembre 2026 abbiamo iniziato a misurarla in una serra vera. Pubblicheremo il risultato con questo metodo, buono o cattivo che sia.",
+    },
+    closeTitle: "La misuriamo nelle tue serre?",
+  },
+  pilotOffer: {
+    badge: "Pilota gratuito di 4 settimane",
+    eyebrow: "Pilota gratuito",
+    title: "Provalo 4 settimane nelle tue serre, senza costi",
+    lead: "Ogni settimana confronta la nostra previsione con ciò che segna la tua bilancia. Se non ti serve, non hai perso nulla.",
+    steps: [
+      {
+        name: "Riprendi una volta a settimana",
+        body: "Un video per fila e per lato con il telefono, prima della settimana di raccolta.",
+      },
+      {
+        name: "Annota i chili raccolti",
+        body: "I chili di ogni giorno, come già li pesate. Anche la tua previsione, se vuoi confrontarla.",
+      },
+      {
+        name: "Confronta con la tua bilancia",
+        body: "Ogni settimana vedi la nostra previsione rispetto al raccolto, con il suo errore misurato.",
+      },
+    ],
+    note: "Aperto a cooperative e agricoltori di qualsiasi paese.",
+    cta: "Voglio un pilota",
+    interestLabel: "Cosa ti interessa?",
+    interests: {
+      piloto: "Pilota gratuito di 4 settimane",
+      demo: "Una dimostrazione",
+      otro: "Altro",
+    },
+  },
+  appTour: {
+    "eyebrow": "L’app dall’interno",
+    "title": "Cosa vede la cooperativa ogni lunedì",
+    "lead": "Schermate reali dell’app, con dati di esempio. Ognuna risponde a una decisione della settimana.",
+    "sample": "Dati di esempio",
+    "blurred": "I nomi delle varietà sono sfocati.",
+    "uiLanguage": "L’app è mostrata in spagnolo.",
+    "tabsLabel": "Schermate dell’app",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Riepilogo",
+        "decision": "Quanti chili vendere questa settimana, e con quale margine.",
+        "alt": "Riepilogo settimanale: previsione di vendita, braccianti necessari e frutta matura osservata, con avvisi per fila."
+      },
+      {
+        "id": "prevision",
+        "name": "Previsione giornaliera",
+        "decision": "Quanto si raccoglie ogni giorno, accanto alla previsione del tecnico.",
+        "alt": "Chili al giorno dal lunedì al venerdì: reale, previsione del tecnico e previsione di Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Serra",
+        "decision": "Dov’è la frutta: ogni serra, fila e tratto.",
+        "alt": "Dettaglio di una serra: frutta matura osservata, previsione e chili per giorno di raccolta."
+      },
+      {
+        "id": "temporeros",
+        "name": "Braccianti",
+        "decision": "Quante persone chiamare per raccogliere dal lunedì al venerdì.",
+        "alt": "Braccianti necessari per la settimana, con l’intervallo secondo la previsione e i chili per giornata."
+      },
+      {
+        "id": "precision",
+        "name": "Precisione",
+        "decision": "Quanto ci prende Atias rispetto alla bilancia, accanto all’agricoltore e al tecnico.",
+        "alt": "Schermata di precisione: errore di Atias, dell’agricoltore e del tecnico rispetto al raccolto."
+      }
+    ]
+  },
+  dataTrust: {
+    "eyebrow": "I tuoi dati",
+    "title": "Cosa succede ai tuoi video, senza clausole nascoste",
+    "lead": "Funziona così oggi, esattamente come è programmato.",
+    "points": [
+      {
+        "name": "Un link per serra e settimana",
+        "body": "L’agricoltore non ha bisogno di un account. Il suo link apre solo la sua serra e la sua settimana, scade all’inizio della raccolta e la cooperativa può revocarlo."
+      },
+      {
+        "name": "La cooperativa, con password",
+        "body": "Le sue schermate chiedono utente e password. Le password non sono salvate in chiaro e i tentativi falliti ripetuti vengono bloccati."
+      },
+      {
+        "name": "I video restano in Atias",
+        "body": "Li conta il nostro rilevatore. Per il meteo si usa solo la posizione della serra."
+      },
+      {
+        "name": "Ciò che si toglie si cancella",
+        "body": "Se l’agricoltore sostituisce o rimuove un video, quello precedente viene cancellato definitivamente dopo sette giorni."
+      }
+    ],
+    "pending": "Il periodo di conservazione dei video in uso non è ancora stabilito.",
+    "more": "Di più su sicurezza e dati"
   },
 };

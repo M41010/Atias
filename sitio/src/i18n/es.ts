@@ -207,7 +207,7 @@ export const es = {
       },
       {
         name: "Los datos de cada uno, de cada uno",
-        body: "Cada agricultor solo ve lo suyo, y los vídeos se borran cuando ya no hacen falta.",
+        body: "Cada agricultor solo ve lo suyo, y los vídeos que sustituye o quita se borran a los siete días.",
       },
     ],
     joinTitle: "Súmate",
@@ -266,6 +266,8 @@ export const es = {
       "Cada enlace solo da acceso a su invernadero y a su semana, caduca solo y se puede anular.",
       "La cooperativa entra con su cuenta. Las contraseñas se guardan cifradas.",
       "Los vídeos sustituidos o quitados se borran a los siete días.",
+      "Los vídeos los cuenta nuestro propio detector: no se envían a otros servicios. Para la meteorología solo se usa la ubicación del invernadero.",
+      "El plazo para borrar los vídeos vigentes aún no está fijado.",
     ],
   },
   contact: {

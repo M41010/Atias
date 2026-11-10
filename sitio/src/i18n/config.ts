@@ -49,6 +49,9 @@ export const PAGES = [
   "preguntas-frecuentes",
   "cultivos",
   "vision",
+  "como-medimos",
+  "inversores",
+  "diario",
 ] as const;
 export type Page = (typeof PAGES)[number];
 export type SubPage = Exclude<Page, "">;
@@ -71,6 +74,9 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "preguntas-frecuentes": "preguntas-frecuentes",
     cultivos: "cultivos",
     vision: "vision",
+    "como-medimos": "como-medimos",
+    inversores: "inversores",
+    diario: "diario",
   },
   en: {
     empresa: "about",
@@ -82,6 +88,9 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "preguntas-frecuentes": "faq",
     cultivos: "crops",
     vision: "vision",
+    "como-medimos": "how-we-measure",
+    inversores: "investors",
+    diario: "journal",
   },
   fr: {
     empresa: "a-propos",
@@ -93,6 +102,9 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "preguntas-frecuentes": "questions-frequentes",
     cultivos: "cultures",
     vision: "vision",
+    "como-medimos": "comment-nous-mesurons",
+    inversores: "investisseurs",
+    diario: "journal",
   },
   nl: {
     empresa: "over-ons",
@@ -104,6 +116,9 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "preguntas-frecuentes": "veelgestelde-vragen",
     cultivos: "gewassen",
     vision: "visie",
+    "como-medimos": "hoe-we-meten",
+    inversores: "investeerders",
+    diario: "logboek",
   },
   it: {
     empresa: "chi-siamo",
@@ -115,6 +130,9 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "preguntas-frecuentes": "domande-frequenti",
     cultivos: "colture",
     vision: "visione",
+    "como-medimos": "come-misuriamo",
+    inversores: "investitori",
+    diario: "diario",
   },
   pt: {
     empresa: "quem-somos",
@@ -126,6 +144,9 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "preguntas-frecuentes": "perguntas-frequentes",
     cultivos: "culturas",
     vision: "visao",
+    "como-medimos": "como-medimos",
+    inversores: "investidores",
+    diario: "diario",
   },
 };
 

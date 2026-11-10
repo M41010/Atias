@@ -86,10 +86,14 @@ export function Product({ lang }: { lang: Locale }) {
                 {content.links.faq}
                 <ArrowRight size={18} aria-hidden />
               </Link>
+              <Link href={pathFor(lang, "como-medimos")} className="btn-secondary">
+                {content.links.measure}
+                <ArrowRight size={18} aria-hidden />
+              </Link>
             </div>
           </div>
           <div>
-            <h2 className="display text-[clamp(2rem,3.6vw,3rem)]">{product.dataTitle}</h2>
+            <h2 id="seguridad-y-datos" className="display scroll-mt-24 text-[clamp(2rem,3.6vw,3rem)]">{product.dataTitle}</h2>
             <ul className="label mt-6">
               {product.data.map((item, index) => (
                 <li key={item} className={`flex gap-3 px-5 py-4 ${index > 0 ? "border-t-2 border-ink" : ""}`}>

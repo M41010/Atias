@@ -202,7 +202,7 @@ export const en: Dictionary = {
       },
       {
         name: "Everyone's data stays theirs",
-        body: "Each grower only sees their own, and videos are deleted once they are no longer needed.",
+        body: "Each grower only sees their own, and videos they replace or remove are deleted after seven days.",
       },
     ],
     joinTitle: "Join us",
@@ -261,6 +261,8 @@ export const en: Dictionary = {
       "Each link only opens its own greenhouse and week, expires on its own and can be revoked.",
       "The cooperative signs in with its account. Passwords are stored encrypted.",
       "Replaced or removed videos are deleted after seven days.",
+      "Videos are counted by our own detector and are not sent to other services. Only the greenhouse location is used to look up the weather.",
+      "The retention period for current videos has not been set yet.",
     ],
   },
   contact: {

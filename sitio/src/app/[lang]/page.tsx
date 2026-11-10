@@ -3,10 +3,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Counter } from "@/components/Counter";
+import { DataTrust } from "@/components/DataTrust";
 import { NaveMark } from "@/components/Mark";
+import { PilotOffer, pilotHref } from "@/components/PilotOffer";
+import { AppTour } from "@/components/AppTour";
 import { PilotResults } from "@/components/PilotResults";
 import { PresentationVideo } from "@/components/PresentationVideo";
 import { RowTour } from "@/components/RowTour";
+import { JournalTeaser } from "@/components/JournalTeaser";
 import { JsonLd } from "@/components/JsonLd";
 import { isLocale, NUMBER_LOCALE, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -51,6 +55,15 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 {cta.how}
               </Link>
             </div>
+            {/* La oferta de piloto, a la vista desde el primer momento. */}
+            <Link
+              href={pilotHref(lang)}
+              className="mt-7 inline-flex items-center gap-2.5 self-start border-2 border-ink bg-paper px-3.5 py-2 font-bold no-underline transition-colors hover:bg-ink hover:text-trap"
+            >
+              <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-sprout" />
+              {content.pilotOffer.badge}
+              <ArrowRight size={16} aria-hidden />
+            </Link>
           </div>
           <Counter locale={lang} t={dict.counter} />
         </div>
@@ -113,6 +126,23 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
+      {/* La app por dentro: justo después de los tres pasos, las pantallas donde acaban. */}
+      <section className="plate border-t-[3px] border-ink" aria-labelledby="app-por-dentro">
+        <div className="mx-auto max-w-[1320px] px-4 py-20 sm:px-8 lg:py-28">
+          <p className="font-bold uppercase tracking-[0.08em] text-ink-soft">{content.appTour.eyebrow}</p>
+          <h2 id="app-por-dentro" className="display mt-4 max-w-[20ch] text-[clamp(2.25rem,4.4vw,3.75rem)]">
+            {content.appTour.title}
+          </h2>
+          <p className="lead mt-5 text-[1.125rem] text-ink-soft">{content.appTour.lead}</p>
+          <div className="mt-12">
+            <AppTour tour={content.appTour} />
+          </div>
+        </div>
+      </section>
+
+      {/* Piloto gratis de 4 semanas: después de ver cómo funciona, la invitación a probarlo. */}
+      <PilotOffer lang={lang} />
+
       {/* Para quién: una tabla en etiqueta, no tarjetas sueltas. */}
       <section className="plate border-y-[3px] border-ink" aria-labelledby="para-quien">
         <div className="mx-auto max-w-[1320px] px-4 py-20 sm:px-8 lg:py-28">
@@ -134,6 +164,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </dl>
         </div>
       </section>
+
+      {/* Tus datos: lo que pasa con los vídeos, justo antes de hablar del piloto. */}
+      <DataTrust lang={lang} trust={content.dataTrust} />
 
       {/* Resultados medidos del piloto: no aparece hasta que haya cifras reales en content/resultados.ts. */}
       <PilotResults lang={lang} />
@@ -178,16 +211,24 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
+      {/* Diario del piloto: lo último que ha pasado, con fecha. */}
+      <JournalTeaser lang={lang} />
+
       {/* Cierre. */}
-      <section className="plate">
+      <section className="plate border-t-[3px] border-ink">
         <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-12 px-4 py-24 sm:px-8 lg:py-32">
           <div className="flex flex-col items-start gap-8">
             <h2 className="display max-w-[16ch] text-[clamp(2.75rem,6vw,5.25rem)]">{home.closeTitle}</h2>
             <p className="lead text-[1.2rem] font-medium text-ink-soft">{home.closeBody}</p>
-            <Link href={pathFor(lang, "contacto")} className="btn-primary">
-              {cta.demo}
-              <ArrowRight size={18} aria-hidden />
-            </Link>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link href={pathFor(lang, "contacto")} className="btn-primary">
+                {cta.demo}
+                <ArrowRight size={18} aria-hidden />
+              </Link>
+              <Link href={pilotHref(lang)} className="btn-secondary">
+                {content.pilotOffer.badge}
+              </Link>
+            </div>
           </div>
           <NaveMark size={320} className="hidden shrink-0 md:block" />
         </div>

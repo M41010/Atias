@@ -202,7 +202,7 @@ export const it: Dictionary = {
       },
       {
         name: "I dati di ciascuno restano suoi",
-        body: "Ogni produttore vede solo i propri, e i video vengono cancellati quando non servono più.",
+        body: "Ogni produttore vede solo i propri, e i video che sostituisce o rimuove vengono cancellati dopo sette giorni.",
       },
     ],
     joinTitle: "Unisciti a noi",
@@ -261,6 +261,8 @@ export const it: Dictionary = {
       "Ogni link apre solo la sua serra e la sua settimana, scade da solo e si può revocare.",
       "La cooperativa accede con il proprio account. Le password sono salvate cifrate.",
       "I video sostituiti o rimossi vengono cancellati dopo sette giorni.",
+      "I video li conta il nostro rilevatore e non vengono inviati ad altri servizi. Per il meteo si usa solo la posizione della serra.",
+      "Il periodo di conservazione dei video in uso non è ancora stabilito.",
     ],
   },
   contact: {

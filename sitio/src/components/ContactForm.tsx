@@ -2,7 +2,7 @@
 
 import { AlertTriangle, ArrowRight, CheckCircle2, Info, LoaderCircle } from "lucide-react";
 import Link from "next/link";
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useId, useState, useSyncExternalStore } from "react";
 import { type Locale, pathFor } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/es";
 import { type ContactValues, validateContact } from "./contactValidation";
@@ -15,8 +15,24 @@ const ENDPOINT = process.env.NEXT_PUBLIC_FORMULARIO_URL ?? "";
 
 type Status = "idle" | "sending" | "sent" | "error" | "inactive";
 
-export function ContactForm({ locale, t }: { locale: Locale; t: Dictionary["contact"] }) {
+/** Qué busca quien escribe: el piloto gratis, una demostración u otra cosa. */
+export type Interest = "piloto" | "demo" | "otro";
+const INTERESTS: Interest[] = ["piloto", "demo", "otro"];
+type InterestTexts = { interestLabel: string; interests: Record<Interest, string> };
+
+const noSubscription = () => () => {};
+function readAskedInterest(): Interest | null {
+  const asked = new URLSearchParams(window.location.search).get("interes");
+  return asked && (INTERESTS as string[]).includes(asked) ? (asked as Interest) : null;
+}
+
+export function ContactForm({ locale, t, offer }: { locale: Locale; t: Dictionary["contact"]; offer: InterestTexts }) {
   const id = useId();
+  // Quien llega desde «Quiero un piloto» (?interes=piloto) lo encuentra ya elegido. Se lee de la
+  // dirección sin efecto: en la compilación estática no hay dirección y vale «demo».
+  const asked = useSyncExternalStore(noSubscription, readAskedInterest, () => null);
+  const [chosen, setInterest] = useState<Interest | null>(null);
+  const interest: Interest = chosen ?? asked ?? "demo";
   const [values, setValues] = useState<ContactValues>({
     name: "",
     organization: "",
@@ -65,6 +81,7 @@ export function ContactForm({ locale, t }: { locale: Locale; t: Dictionary["cont
           correo: values.email,
           telefono: values.phone,
           mensaje: values.message,
+          interes: interest,
           idioma: locale,
         }),
       });
@@ -105,6 +122,28 @@ export function ContactForm({ locale, t }: { locale: Locale; t: Dictionary["cont
           {t.inactive}
         </p>
       )}
+
+      <fieldset>
+        <legend className="mb-2 font-semibold">{offer.interestLabel}</legend>
+        <div className="flex flex-wrap gap-2">
+          {INTERESTS.map((option) => (
+            <label
+              key={option}
+              className="flex min-h-11 cursor-pointer items-center gap-2 border-2 border-ink px-3.5 font-semibold has-[:checked]:bg-ink has-[:checked]:text-trap has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink"
+            >
+              <input
+                type="radio"
+                name="interest"
+                value={option}
+                checked={interest === option}
+                onChange={() => setInterest(option)}
+                className="sr-only"
+              />
+              {offer.interests[option]}
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
