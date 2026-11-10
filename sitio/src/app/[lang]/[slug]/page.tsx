@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { isLocale, type Locale, pageFromSlug, SLUGS, type SubPage } from "@/i18n/config";
 import { getContent } from "@/i18n/content";
 import { pageMetadata } from "@/seo/metadata";
+import { ArticleAccuracy, ArticleMistakes, ArticlePickers, ArticlesIndex } from "@/views/Articles";
 import { Company } from "@/views/Company";
 import { Contact } from "@/views/Contact";
 import { CropsHub } from "@/views/Crops";
@@ -38,6 +39,10 @@ const SEO_KEY: Record<SubPage, keyof ReturnType<typeof getContent>["seo"]> = {
   "como-medimos": "measure",
   inversores: "investors",
   diario: "journal",
+  "articulos": "articles",
+  "planificar-temporeros": "articlePickers",
+  "errores-al-prever": "articleMistakes",
+  "precision-de-la-prevision": "articleAccuracy",
 };
 
 const VIEWS: Record<SubPage, (props: { lang: Locale }) => ReactNode> = {
@@ -53,6 +58,10 @@ const VIEWS: Record<SubPage, (props: { lang: Locale }) => ReactNode> = {
   "como-medimos": Measure,
   inversores: Investors,
   diario: Journal,
+  "articulos": ArticlesIndex,
+  "planificar-temporeros": ArticlePickers,
+  "errores-al-prever": ArticleMistakes,
+  "precision-de-la-prevision": ArticleAccuracy,
 };
 
 async function resolve(params: PageProps<"/[lang]/[slug]">["params"]) {

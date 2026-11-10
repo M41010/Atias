@@ -54,6 +54,22 @@ export const contentIt: Content = {
       title: "Diario del pilota: come procede Atias | Atias",
       description: "Le novità datate del pilota di Atias: dal primo prototipo alla prima ripresa in una serra vera. Solo fatti, senza cifre non misurate.",
     },
+    articles: {
+      title: "Articoli sulla previsione del raccolto in serra | Atias",
+      description: "Guide pratiche su stima del raccolto, pianificazione dei braccianti e precisione delle previsioni in serra.",
+    },
+    articlePickers: {
+      title: "Pianificare i braccianti con la previsione del raccolto | Atias",
+      description: "Dai chili previsti alle persone, giorno per giorno: il calcolo di base, i chili per giornata e come usare il margine della previsione.",
+    },
+    articleMistakes: {
+      title: "Sette errori nella previsione del raccolto in serra | Atias",
+      description: "Poche piante, frutti nascosti, peso medio non aggiornato, il meteo e non misurare il proprio errore: le trappole più comuni.",
+    },
+    articleAccuracy: {
+      title: "Che precisione aspettarsi dalla previsione del raccolto | Atias",
+      description: "Come misurare la precisione di una previsione del raccolto: rispetto alla bilancia, errore pesato sui chili, distorsione e perché una settimana non basta.",
+    },
     notice: { title: "Note legali | Atias", description: "Note legali del sito di Atias." },
     privacy: { title: "Informativa sulla privacy | Atias", description: "Informativa sulla privacy del sito di Atias." },
   },
@@ -69,6 +85,7 @@ export const contentIt: Content = {
     measure: "Come misuriamo",
     investors: "Investitori",
     journal: "Diario del pilota",
+    articles: "Articoli",
     breadcrumb: "Percorso di navigazione",
   },
   guide: {
@@ -563,5 +580,136 @@ export const contentIt: Content = {
     ],
     "pending": "Il periodo di conservazione dei video in uso non è ancora stabilito.",
     "more": "Di più su sicurezza e dati"
+  },
+  articles: {
+    "index": {
+      "eyebrow": "Articoli",
+      "title": "Articoli sulla previsione del raccolto",
+      "lead": "Quello che impariamo su stima del raccolto, braccianti e precisione, scritto per chi lavora in serra.",
+      "read": "Leggi"
+    },
+    "date": "2026-11-11",
+    "updated": "Pubblicato a novembre 2026",
+    "pickers": {
+      "eyebrow": "Articolo",
+      "title": "Pianificare i braccianti della settimana con la previsione del raccolto",
+      "lead": "Assumere troppo costa giornate; troppo poco lascia frutta sulla pianta. Un modo semplice per passare dai chili previsti alle persone, giorno per giorno.",
+      "sections": [
+        {
+          "heading": "Il calcolo di base",
+          "paragraphs": [
+            "Le persone che servono in un giorno sono, in sostanza, i chili da raccogliere quel giorno divisi per i chili che una persona raccoglie in una giornata.",
+            "Un esempio con cifre inventate: se martedì bisogna raccogliere 2.400 kg e una persona raccoglie circa 300 kg al giorno in quella coltura, servono 8 persone."
+          ]
+        },
+        {
+          "heading": "I chili per giornata cambiano",
+          "paragraphs": [
+            "Raccogliere pomodoro ciliegino non è come raccogliere peperone o cetriolo, né l’inizio della campagna è come il picco. Conviene tenere il dato per coltura e aggiornarlo con ciò che si raccoglie davvero ogni settimana.",
+            "Un dato stimato male sposta tutto il calcolo: usare 300 quando la squadra ne raccoglie 250 significa una persona in meno ogni sei."
+          ]
+        },
+        {
+          "heading": "Pianificare con il margine, non solo con la cifra",
+          "paragraphs": [
+            "Una previsione utile dà una cifra e un margine. Per assumere, la scelta prudente è guardare l’estremo alto del margine nei giorni di punta e il valore centrale negli altri.",
+            "Così si evita di restare scoperti il giorno che conta di più, senza riempire la settimana di giornate inutili."
+          ]
+        },
+        {
+          "heading": "Distribuire la settimana giorno per giorno",
+          "paragraphs": [
+            "La frutta non matura in modo uniforme: il caldo anticipa, il freddo ritarda. Una previsione per ogni giorno, dal lunedì al venerdì, è più utile di una cifra settimanale divisa in parti uguali.",
+            "Atias calcola i braccianti di ogni giorno dalla sua previsione giornaliera e dai chili per giornata indicati dalla cooperativa, e mostra anche l’estremo alto."
+          ]
+        }
+      ]
+    },
+    "mistakes": {
+      "eyebrow": "Articolo",
+      "title": "Sette errori frequenti nella previsione del raccolto in serra",
+      "lead": "La maggior parte non nasce da conti sbagliati, ma da ciò che nessuno guarda.",
+      "sections": [
+        {
+          "heading": "1. Guardare poche piante",
+          "paragraphs": [
+            "Qualche pianta vista di passaggio non rappresenta un’intera serra: le file di bordo, le zone più ombreggiate o con irrigazione diversa si comportano in altro modo."
+          ]
+        },
+        {
+          "heading": "2. Confondere il maturo con ciò che si raccoglierà",
+          "paragraphs": [
+            "La frutta matura di oggi non è quella che si raccoglierà tutta la settimana: altra maturerà nei prossimi giorni, più in fretta se fa caldo."
+          ]
+        },
+        {
+          "heading": "3. Dimenticare i frutti nascosti",
+          "paragraphs": [
+            "Ciò che non si vede dal corridoio conta comunque. Se non si misura mai quanta parte resta nascosta tra le foglie, la previsione resta sempre bassa."
+          ]
+        },
+        {
+          "heading": "4. Un peso medio non aggiornato",
+          "paragraphs": [
+            "Il peso dei frutti cambia nel corso della campagna. Un errore sul peso passa intero ai chili: non si compensa sommando."
+          ]
+        },
+        {
+          "heading": "5. Ignorare il meteo",
+          "paragraphs": [
+            "Una settimana calda anticipa la maturazione, una fredda la ritarda. Prevedere senza guardare le previsioni meteo è prevedere alla cieca."
+          ]
+        },
+        {
+          "heading": "6. Dare una cifra senza margine",
+          "paragraphs": [
+            "Una previsione senza margine mostra più certezza di quanta ne abbia. Con il margine si decide meglio quanto vendere e quante persone chiamare."
+          ]
+        },
+        {
+          "heading": "7. Non misurare il proprio errore",
+          "paragraphs": [
+            "Se non si confronta ogni settimana la previsione con ciò che è stato pesato, nessuno sa quanto sbaglia né se migliora. È l’errore più caro, perché nasconde tutti gli altri."
+          ]
+        }
+      ]
+    },
+    "accuracy": {
+      "eyebrow": "Articolo",
+      "title": "Quale precisione è ragionevole in una previsione del raccolto?",
+      "lead": "Prima di chiedere quanto è precisa una previsione, bisogna mettersi d’accordo su come misurarla.",
+      "sections": [
+        {
+          "heading": "Misurare rispetto alla bilancia",
+          "paragraphs": [
+            "L’unico riferimento valido è ciò che è stato raccolto e pesato. Confrontare una previsione con un’altra stima non dice nulla sulla sua precisione.",
+            "E bisogna confrontare cose uguali: la previsione dal lunedì al venerdì con i chili dal lunedì al venerdì, non con la frutta visibile il giorno delle riprese."
+          ]
+        },
+        {
+          "heading": "Un errore che non inganna",
+          "paragraphs": [
+            "L’errore di ogni settimana è la differenza tra previsto e raccolto, in percentuale del raccolto. Unendo più settimane conviene pesare per chili, perché una settimana piccola non conti quanto una grande.",
+            "Conta anche la distorsione: se una previsione è sempre troppo alta, o sempre troppo bassa, si può correggere."
+          ]
+        },
+        {
+          "heading": "Una settimana non basta",
+          "paragraphs": [
+            "Una buona settimana può essere fortuna. Per affermare una precisione servono più settimane e serre non usate per mettere a punto il metodo.",
+            "In Atias ne esigiamo almeno 8, e che anche l’estremo alto dell’intervallo di confidenza resti sotto il 10 % di errore."
+          ]
+        },
+        {
+          "heading": "Confrontare con ciò che già si usa",
+          "paragraphs": [
+            "Una cifra di precisione da sola dice poco. È utile confrontarla con la previsione già in uso, quella del tecnico o dell’agricoltore, misurata allo stesso modo nelle stesse settimane.",
+            "Non esiste una cifra standard pubblicata per il settore. Per questo pubblichiamo il metodo prima del risultato."
+          ]
+        }
+      ]
+    },
+    "ctaTitle": "Lo proviamo nelle tue serre?",
+    "ctaBody": "Prova Atias gratis per 4 settimane e confronta la sua previsione con la tua bilancia."
   },
 };

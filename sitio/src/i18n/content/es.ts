@@ -57,6 +57,22 @@ export const contentEs = {
       title: "Diario del piloto: cómo avanza Atias | Atias",
       description: "Novedades fechadas del piloto de Atias: del primer prototipo a la primera grabación en un invernadero real. Solo hechos, sin cifras sin medir.",
     },
+    articles: {
+      title: "Artículos sobre previsión de cosecha en invernadero | Atias",
+      description: "Guías prácticas sobre aforo de cosecha, planificación de temporeros y precisión de la previsión en invernadero.",
+    },
+    articlePickers: {
+      title: "Planificar temporeros con la previsión de cosecha | Atias",
+      description: "De kilos previstos a personas, día a día: la cuenta básica, los kilos por jornal y cómo usar el margen de la previsión para contratar.",
+    },
+    articleMistakes: {
+      title: "Siete errores al prever la cosecha en invernadero | Atias",
+      description: "Pocas plantas, fruta tapada, peso medio desactualizado, el tiempo y no medir el propio error: los fallos más comunes del aforo.",
+    },
+    articleAccuracy: {
+      title: "Qué precisión es razonable en una previsión de cosecha | Atias",
+      description: "Cómo medir la precisión de una previsión de cosecha: contra la báscula, error ponderado por kilos, sesgo y por qué una semana no basta.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal de la web de Atias." },
     privacy: { title: "Política de privacidad | Atias", description: "Política de privacidad de la web de Atias." },
   },
@@ -72,6 +88,7 @@ export const contentEs = {
     measure: "Cómo medimos",
     investors: "Inversores",
     journal: "Diario del piloto",
+    articles: "Artículos",
     breadcrumb: "Ruta de navegación",
   },
   guide: {
@@ -566,6 +583,137 @@ export const contentEs = {
     ],
     "pending": "El plazo para borrar los vídeos vigentes aún no está fijado.",
     "more": "Más sobre seguridad y datos"
+  },
+  articles: {
+    "index": {
+      "eyebrow": "Artículos",
+      "title": "Artículos sobre previsión de cosecha",
+      "lead": "Lo que aprendemos sobre aforo, temporeros y precisión, contado para quien trabaja en el invernadero.",
+      "read": "Leer"
+    },
+    "date": "2026-11-11",
+    "updated": "Publicado en noviembre de 2026",
+    "pickers": {
+      "eyebrow": "Artículo",
+      "title": "Cómo planificar los temporeros de la semana con la previsión de cosecha",
+      "lead": "Contratar de más cuesta jornales; de menos, fruta sin recoger. Una forma sencilla de pasar de kilos previstos a personas, día a día.",
+      "sections": [
+        {
+          "heading": "La cuenta básica",
+          "paragraphs": [
+            "Las personas que hacen falta un día son, en esencia, los kilos que hay que recoger ese día divididos entre los kilos que recoge una persona en una jornada.",
+            "Un ejemplo con cifras inventadas: si el martes hay que recoger 2.400 kg y una persona recoge unos 300 kg por jornada en ese cultivo, hacen falta 8 personas."
+          ]
+        },
+        {
+          "heading": "Los kilos por jornal cambian",
+          "paragraphs": [
+            "No es lo mismo recoger tomate cherry que pimiento o pepino, ni al principio que en plena campaña. Conviene llevar la cuenta por cultivo y actualizarla con lo que se recoge de verdad cada semana.",
+            "Un kilo por jornal mal estimado desplaza todo el cálculo: si se usa 300 cuando la cuadrilla recoge 250, faltará una persona de cada seis."
+          ]
+        },
+        {
+          "heading": "Planificar con el margen, no solo con la cifra",
+          "paragraphs": [
+            "Una previsión útil da una cifra y un margen. Para contratar, lo prudente es mirar el extremo alto del margen en los días fuertes y el valor central en el resto.",
+            "Así se evita quedarse corto el día que más pesa, sin llenar la semana de jornales que sobran."
+          ]
+        },
+        {
+          "heading": "Repartir la semana día a día",
+          "paragraphs": [
+            "La fruta no madura igual cada día: con calor se adelanta y con frío se retrasa. Por eso sirve más una previsión por día, de lunes a viernes, que una cifra semanal repartida a partes iguales.",
+            "Atias calcula los temporeros de cada día a partir de su previsión diaria y de los kilos por jornal que indica la cooperativa, y enseña también el extremo alto."
+          ]
+        }
+      ]
+    },
+    "mistakes": {
+      "eyebrow": "Artículo",
+      "title": "Siete errores frecuentes al prever la cosecha en invernadero",
+      "lead": "La mayoría no vienen de hacer mal las cuentas, sino de lo que no se mira.",
+      "sections": [
+        {
+          "heading": "1. Mirar pocas plantas",
+          "paragraphs": [
+            "Unas cuantas plantas al pasar no representan un invernadero entero: las hileras de los bordes, las zonas con más sombra o con riego distinto se comportan de otra manera."
+          ]
+        },
+        {
+          "heading": "2. Confundir lo maduro con lo que se recogerá",
+          "paragraphs": [
+            "La fruta madura que hay hoy no es la que se recogerá toda la semana: otra parte madurará en los próximos días, más deprisa si hace calor."
+          ]
+        },
+        {
+          "heading": "3. Olvidar la fruta tapada",
+          "paragraphs": [
+            "Lo que no se ve desde el pasillo también cuenta. Si nunca se mide qué parte queda oculta entre las hojas, la previsión se queda corta siempre."
+          ]
+        },
+        {
+          "heading": "4. Un peso medio desactualizado",
+          "paragraphs": [
+            "El peso de cada fruto cambia a lo largo de la campaña. Un error en el peso pasa entero a los kilos: no se compensa al sumar."
+          ]
+        },
+        {
+          "heading": "5. Ignorar el tiempo",
+          "paragraphs": [
+            "Una semana de calor adelanta la maduración y una de frío la retrasa. Prever sin mirar la previsión meteorológica es prever a ciegas."
+          ]
+        },
+        {
+          "heading": "6. Dar una cifra sin margen",
+          "paragraphs": [
+            "Una previsión sin margen da más seguridad de la que tiene. Con el margen se decide mejor cuánto vender y a cuántos llamar."
+          ]
+        },
+        {
+          "heading": "7. No medir el propio error",
+          "paragraphs": [
+            "Si no se compara cada semana la previsión con lo pesado en la báscula, nadie sabe cuánto se equivoca ni si mejora. Es el error más caro, porque esconde a todos los demás."
+          ]
+        }
+      ]
+    },
+    "accuracy": {
+      "eyebrow": "Artículo",
+      "title": "¿Qué precisión es razonable en una previsión de cosecha?",
+      "lead": "Antes de preguntar cuánto acierta una previsión, hay que acordar cómo se mide.",
+      "sections": [
+        {
+          "heading": "Medir contra la báscula",
+          "paragraphs": [
+            "La única referencia que vale es lo recogido y pesado. Comparar una previsión con otra estimación no dice nada de su precisión.",
+            "Y hay que comparar lo mismo: la previsión de lunes a viernes con los kilos de lunes a viernes, no con la fruta que se veía el día de grabar."
+          ]
+        },
+        {
+          "heading": "Un error que no engañe",
+          "paragraphs": [
+            "El error de cada semana es la diferencia entre lo previsto y lo recogido, en porcentaje de lo recogido. Al juntar semanas conviene ponderar por kilos, para que una semana pequeña no pese tanto como una grande.",
+            "También importa el sesgo: si una previsión se pasa siempre, o se queda corta siempre, se puede corregir."
+          ]
+        },
+        {
+          "heading": "Una semana no basta",
+          "paragraphs": [
+            "Una semana buena puede ser suerte. Para afirmar una precisión hacen falta varias semanas e invernaderos que no se hayan usado para ajustar el método.",
+            "En Atias exigimos al menos 8, y que incluso el extremo alto del intervalo de confianza quede por debajo del 10 % de error."
+          ]
+        },
+        {
+          "heading": "Comparar con lo que ya se usa",
+          "paragraphs": [
+            "Una cifra de precisión sola dice poco. Lo útil es compararla con la previsión que ya se usa, la del técnico o la del agricultor, medida igual y en las mismas semanas.",
+            "No hay una cifra estándar publicada para el sector. Por eso publicamos el método antes que el resultado."
+          ]
+        }
+      ]
+    },
+    "ctaTitle": "¿Lo probamos en tus invernaderos?",
+    "ctaBody": "Prueba Atias 4 semanas sin coste y compara su previsión con tu báscula."
   },
 };
 

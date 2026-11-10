@@ -52,6 +52,10 @@ export const PAGES = [
   "como-medimos",
   "inversores",
   "diario",
+  "articulos",
+  "planificar-temporeros",
+  "errores-al-prever",
+  "precision-de-la-prevision",
 ] as const;
 export type Page = (typeof PAGES)[number];
 export type SubPage = Exclude<Page, "">;
@@ -77,6 +81,10 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "como-medimos": "como-medimos",
     inversores: "inversores",
     diario: "diario",
+    "articulos": "articulos",
+    "planificar-temporeros": "planificar-temporeros",
+    "errores-al-prever": "errores-al-prever-la-cosecha",
+    "precision-de-la-prevision": "precision-de-la-prevision",
   },
   en: {
     empresa: "about",
@@ -91,6 +99,10 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "como-medimos": "how-we-measure",
     inversores: "investors",
     diario: "journal",
+    "articulos": "articles",
+    "planificar-temporeros": "planning-pickers",
+    "errores-al-prever": "harvest-forecast-mistakes",
+    "precision-de-la-prevision": "forecast-accuracy",
   },
   fr: {
     empresa: "a-propos",
@@ -105,6 +117,10 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "como-medimos": "comment-nous-mesurons",
     inversores: "investisseurs",
     diario: "journal",
+    "articulos": "articles",
+    "planificar-temporeros": "planifier-saisonniers",
+    "errores-al-prever": "erreurs-prevision-recolte",
+    "precision-de-la-prevision": "precision-prevision",
   },
   nl: {
     empresa: "over-ons",
@@ -119,6 +135,10 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "como-medimos": "hoe-we-meten",
     inversores: "investeerders",
     diario: "logboek",
+    "articulos": "artikelen",
+    "planificar-temporeros": "plukkers-plannen",
+    "errores-al-prever": "fouten-oogstprognose",
+    "precision-de-la-prevision": "nauwkeurigheid-prognose",
   },
   it: {
     empresa: "chi-siamo",
@@ -133,6 +153,10 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "como-medimos": "come-misuriamo",
     inversores: "investitori",
     diario: "diario",
+    "articulos": "articoli",
+    "planificar-temporeros": "pianificare-braccianti",
+    "errores-al-prever": "errori-previsione-raccolto",
+    "precision-de-la-prevision": "precisione-previsione",
   },
   pt: {
     empresa: "quem-somos",
@@ -147,6 +171,10 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "como-medimos": "como-medimos",
     inversores: "investidores",
     diario: "diario",
+    "articulos": "artigos",
+    "planificar-temporeros": "planear-trabalhadores",
+    "errores-al-prever": "erros-previsao-colheita",
+    "precision-de-la-prevision": "precisao-previsao",
   },
 };
 

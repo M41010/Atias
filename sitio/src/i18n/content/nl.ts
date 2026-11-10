@@ -54,6 +54,22 @@ export const contentNl: Content = {
       title: "Pilotlogboek: hoe Atias vordert | Atias",
       description: "Gedateerd nieuws uit de Atias-pilot: van het eerste prototype tot de eerste opname in een echte kas. Alleen feiten, geen ongemeten cijfers.",
     },
+    articles: {
+      title: "Artikelen over oogstprognoses in de kas | Atias",
+      description: "Praktische gidsen over oogstschatting, het plannen van plukkers en de nauwkeurigheid van prognoses in de kas.",
+    },
+    articlePickers: {
+      title: "Plukkers plannen met de oogstprognose | Atias",
+      description: "Van voorspelde kilo’s naar mensen, dag na dag: de basisberekening, kilo’s per werkdag en hoe je de marge van de prognose gebruikt.",
+    },
+    articleMistakes: {
+      title: "Zeven veelgemaakte fouten bij oogstprognoses in de kas | Atias",
+      description: "Te weinig planten, verborgen vruchten, een verouderd gemiddeld gewicht, het weer en je eigen fout niet meten: de meest voorkomende valkuilen.",
+    },
+    articleAccuracy: {
+      title: "Welke nauwkeurigheid is redelijk voor een oogstprognose | Atias",
+      description: "Hoe je de nauwkeurigheid van een oogstprognose meet: tegen de weegschaal, fout gewogen naar kilo’s, afwijking en waarom één week niet genoeg is.",
+    },
     notice: { title: "Juridische informatie | Atias", description: "Juridische informatie over de website van Atias." },
     privacy: { title: "Privacybeleid | Atias", description: "Privacybeleid van de website van Atias." },
   },
@@ -69,6 +85,7 @@ export const contentNl: Content = {
     measure: "Hoe we meten",
     investors: "Investeerders",
     journal: "Pilotlogboek",
+    articles: "Artikelen",
     breadcrumb: "Kruimelpad",
   },
   guide: {
@@ -563,5 +580,136 @@ export const contentNl: Content = {
     ],
     "pending": "De bewaartermijn van actuele video’s ligt nog niet vast.",
     "more": "Meer over beveiliging en gegevens"
+  },
+  articles: {
+    "index": {
+      "eyebrow": "Artikelen",
+      "title": "Artikelen over oogstprognoses",
+      "lead": "Wat we leren over oogstschatting, plukkers en nauwkeurigheid, geschreven voor wie in de kas werkt.",
+      "read": "Lezen"
+    },
+    "date": "2026-11-11",
+    "updated": "Gepubliceerd in november 2026",
+    "pickers": {
+      "eyebrow": "Artikel",
+      "title": "De plukkers van de week plannen met de oogstprognose",
+      "lead": "Te veel inhuren kost loon; te weinig laat fruit hangen. Een eenvoudige manier om van voorspelde kilo’s naar mensen te gaan, dag na dag.",
+      "sections": [
+        {
+          "heading": "De basisberekening",
+          "paragraphs": [
+            "Het aantal mensen dat je op een dag nodig hebt, is in wezen het aantal te plukken kilo’s die dag gedeeld door wat één persoon op een werkdag plukt.",
+            "Een voorbeeld met verzonnen cijfers: moet er dinsdag 2.400 kg geplukt worden en plukt één persoon zo’n 300 kg per dag in dat gewas, dan heb je 8 mensen nodig."
+          ]
+        },
+        {
+          "heading": "Kilo’s per werkdag veranderen",
+          "paragraphs": [
+            "Cherrytomaten plukken is anders dan paprika of komkommer, en het begin van het seizoen is anders dan de piek. Houd het cijfer per gewas bij en werk het bij met wat er elke week echt geplukt wordt.",
+            "Een verkeerd ingeschat cijfer verschuift de hele berekening: 300 gebruiken terwijl de ploeg 250 plukt, betekent één persoon te weinig op elke zes."
+          ]
+        },
+        {
+          "heading": "Plan met de marge, niet alleen met het cijfer",
+          "paragraphs": [
+            "Een bruikbare prognose geeft een cijfer en een marge. Bij het inhuren is het verstandig op drukke dagen naar de bovenkant van de marge te kijken en op andere dagen naar de middenwaarde.",
+            "Zo kom je op de belangrijkste dag niet tekort, zonder de week te vullen met overbodige werkdagen."
+          ]
+        },
+        {
+          "heading": "De week per dag verdelen",
+          "paragraphs": [
+            "Fruit rijpt niet gelijkmatig: warmte versnelt, kou vertraagt. Een prognose per dag, van maandag tot vrijdag, is nuttiger dan een weekcijfer dat gelijk wordt verdeeld.",
+            "Atias berekent de plukkers per dag op basis van zijn dagprognose en de kilo’s per werkdag die de coöperatie opgeeft, en toont ook de bovenkant."
+          ]
+        }
+      ]
+    },
+    "mistakes": {
+      "eyebrow": "Artikel",
+      "title": "Zeven veelgemaakte fouten bij oogstprognoses in de kas",
+      "lead": "De meeste komen niet door slecht rekenen, maar door wat niemand bekijkt.",
+      "sections": [
+        {
+          "heading": "1. Te weinig planten bekijken",
+          "paragraphs": [
+            "Een paar planten in het voorbijgaan zijn niet representatief voor een hele kas: randrijen, schaduwrijke plekken of zones met andere irrigatie gedragen zich anders."
+          ]
+        },
+        {
+          "heading": "2. Rijp verwarren met wat geplukt wordt",
+          "paragraphs": [
+            "Het rijpe fruit van vandaag is niet wat de hele week geplukt wordt: er rijpt meer in de komende dagen, sneller als het warm is."
+          ]
+        },
+        {
+          "heading": "3. Verborgen vruchten vergeten",
+          "paragraphs": [
+            "Wat je vanaf het pad niet ziet, telt ook. Meet je nooit hoeveel er tussen de bladeren verborgen blijft, dan valt de prognose altijd te laag uit."
+          ]
+        },
+        {
+          "heading": "4. Een verouderd gemiddeld gewicht",
+          "paragraphs": [
+            "Het vruchtgewicht verandert in de loop van het seizoen. Een fout in het gewicht gaat volledig door in de kilo’s: die middelt niet uit bij het optellen."
+          ]
+        },
+        {
+          "heading": "5. Het weer negeren",
+          "paragraphs": [
+            "Een warme week versnelt de rijping, een koude week vertraagt die. Voorspellen zonder naar de weersverwachting te kijken is blind voorspellen."
+          ]
+        },
+        {
+          "heading": "6. Een cijfer zonder marge",
+          "paragraphs": [
+            "Een prognose zonder marge doet zekerder voor dan ze is. Met de marge beslis je beter hoeveel je verkoopt en hoeveel mensen je oproept."
+          ]
+        },
+        {
+          "heading": "7. Je eigen fout niet meten",
+          "paragraphs": [
+            "Vergelijk je de prognose niet elke week met wat er gewogen is, dan weet niemand hoeveel ze ernaast zit of dat ze beter wordt. Het is de duurste fout, omdat ze alle andere verbergt."
+          ]
+        }
+      ]
+    },
+    "accuracy": {
+      "eyebrow": "Artikel",
+      "title": "Welke nauwkeurigheid is redelijk voor een oogstprognose?",
+      "lead": "Voordat je vraagt hoe nauwkeurig een prognose is, moet je afspreken hoe je dat meet.",
+      "sections": [
+        {
+          "heading": "Meten tegen de weegschaal",
+          "paragraphs": [
+            "De enige geldige referentie is wat geplukt en gewogen is. Een prognose vergelijken met een andere schatting zegt niets over de nauwkeurigheid.",
+            "En vergelijk gelijke dingen: de prognose van maandag tot vrijdag met de kilo’s van maandag tot vrijdag, niet met het fruit dat zichtbaar was op de filmdag."
+          ]
+        },
+        {
+          "heading": "Een fout die niet misleidt",
+          "paragraphs": [
+            "De fout van elke week is het verschil tussen voorspeld en geoogst, als percentage van de oogst. Weeg weken bij het samenvoegen naar kilo’s, zodat een kleine week niet even zwaar telt als een grote.",
+            "Ook de afwijking telt: zit een prognose altijd te hoog, of altijd te laag, dan valt dat te corrigeren."
+          ]
+        },
+        {
+          "heading": "Eén week is niet genoeg",
+          "paragraphs": [
+            "Eén goede week kan geluk zijn. Om een nauwkeurigheid te claimen heb je meerdere weken en kassen nodig die niet zijn gebruikt om de methode af te stellen.",
+            "Bij Atias eisen we er minstens 8, en dat zelfs de bovenkant van het betrouwbaarheidsinterval onder 10 % fout blijft."
+          ]
+        },
+        {
+          "heading": "Vergelijken met wat er al is",
+          "paragraphs": [
+            "Een nauwkeurigheidscijfer op zich zegt weinig. Nuttig is het te vergelijken met de prognose die al gebruikt wordt, die van de teeltadviseur of de teler, op dezelfde manier gemeten over dezelfde weken.",
+            "Er bestaat geen gepubliceerd standaardcijfer voor de sector. Daarom publiceren we de methode vóór het resultaat."
+          ]
+        }
+      ]
+    },
+    "ctaTitle": "Zullen we het in uw kassen proberen?",
+    "ctaBody": "Probeer Atias 4 weken gratis en vergelijk de prognose met uw weegschaal."
   },
 };

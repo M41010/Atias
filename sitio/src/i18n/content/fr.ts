@@ -54,6 +54,22 @@ export const contentFr: Content = {
       title: "Journal du pilote : comment avance Atias | Atias",
       description: "Les nouvelles datées du pilote d’Atias : du premier prototype au premier tournage dans une vraie serre. Uniquement des faits, sans chiffres non mesurés.",
     },
+    articles: {
+      title: "Articles sur la prévision de récolte en serre | Atias",
+      description: "Guides pratiques sur l’estimation de récolte, la planification des saisonniers et la précision des prévisions en serre.",
+    },
+    articlePickers: {
+      title: "Planifier les saisonniers avec la prévision de récolte | Atias",
+      description: "Des kilos prévus aux personnes, jour après jour : le calcul de base, les kilos par journée et comment utiliser la marge de la prévision pour embaucher.",
+    },
+    articleMistakes: {
+      title: "Sept erreurs de prévision de récolte en serre | Atias",
+      description: "Trop peu de plantes, fruits cachés, poids moyen dépassé, la météo et ne pas mesurer sa propre erreur : les pièges les plus courants.",
+    },
+    articleAccuracy: {
+      title: "Quelle précision attendre d’une prévision de récolte | Atias",
+      description: "Comment mesurer la précision d’une prévision de récolte : face à la balance, erreur pondérée par les kilos, biais et pourquoi une semaine ne suffit pas.",
+    },
     notice: { title: "Mentions légales | Atias", description: "Mentions légales du site d'Atias." },
     privacy: { title: "Politique de confidentialité | Atias", description: "Politique de confidentialité du site d'Atias." },
   },
@@ -69,6 +85,7 @@ export const contentFr: Content = {
     measure: "Comment nous mesurons",
     investors: "Investisseurs",
     journal: "Journal du pilote",
+    articles: "Articles",
     breadcrumb: "Fil d'Ariane",
   },
   guide: {
@@ -563,5 +580,136 @@ export const contentFr: Content = {
     ],
     "pending": "La durée de conservation des vidéos en cours n’est pas encore fixée.",
     "more": "En savoir plus sur la sécurité et les données"
+  },
+  articles: {
+    "index": {
+      "eyebrow": "Articles",
+      "title": "Articles sur la prévision de récolte",
+      "lead": "Ce que nous apprenons sur l’estimation de récolte, les saisonniers et la précision, écrit pour ceux qui travaillent en serre.",
+      "read": "Lire"
+    },
+    "date": "2026-11-11",
+    "updated": "Publié en novembre 2026",
+    "pickers": {
+      "eyebrow": "Article",
+      "title": "Planifier les saisonniers de la semaine avec la prévision de récolte",
+      "lead": "Embaucher trop coûte des salaires ; trop peu laisse des fruits sur la plante. Une méthode simple pour passer des kilos prévus aux personnes, jour après jour.",
+      "sections": [
+        {
+          "heading": "Le calcul de base",
+          "paragraphs": [
+            "Le nombre de personnes nécessaires un jour donné, ce sont les kilos à récolter ce jour-là divisés par les kilos qu’une personne récolte en une journée.",
+            "Un exemple avec des chiffres inventés : s’il faut récolter 2 400 kg mardi et qu’une personne récolte environ 300 kg par jour dans cette culture, il faut 8 personnes."
+          ]
+        },
+        {
+          "heading": "Les kilos par journée varient",
+          "paragraphs": [
+            "Récolter de la tomate cerise n’est pas comme récolter du poivron ou du concombre, ni le début de campagne comme le plein pic. Mieux vaut suivre ce chiffre par culture et le mettre à jour avec ce qui est réellement récolté chaque semaine.",
+            "Un chiffre mal estimé décale tout le calcul : utiliser 300 quand l’équipe récolte 250, c’est une personne de moins sur six."
+          ]
+        },
+        {
+          "heading": "Planifier avec la marge, pas seulement le chiffre",
+          "paragraphs": [
+            "Une prévision utile donne un chiffre et une marge. Pour embaucher, le plus prudent est de regarder le haut de la marge les jours chargés et la valeur centrale les autres jours.",
+            "On évite ainsi de manquer de bras le jour le plus important, sans remplir la semaine de journées inutiles."
+          ]
+        },
+        {
+          "heading": "Répartir la semaine jour par jour",
+          "paragraphs": [
+            "Les fruits ne mûrissent pas de façon régulière : la chaleur avance la maturation, le froid la retarde. Une prévision par jour, du lundi au vendredi, est plus utile qu’un chiffre hebdomadaire réparti à parts égales.",
+            "Atias calcule les saisonniers de chaque jour à partir de sa prévision quotidienne et des kilos par journée indiqués par la coopérative, et montre aussi le haut de la marge."
+          ]
+        }
+      ]
+    },
+    "mistakes": {
+      "eyebrow": "Article",
+      "title": "Sept erreurs fréquentes dans la prévision de récolte en serre",
+      "lead": "La plupart ne viennent pas d’un mauvais calcul, mais de ce que personne ne regarde.",
+      "sections": [
+        {
+          "heading": "1. Regarder trop peu de plantes",
+          "paragraphs": [
+            "Quelques plantes vues en passant ne représentent pas toute une serre : les rangs de bordure, les zones plus ombragées ou irriguées différemment se comportent autrement."
+          ]
+        },
+        {
+          "heading": "2. Confondre le mûr et ce qui sera récolté",
+          "paragraphs": [
+            "Les fruits mûrs aujourd’hui ne sont pas ceux qui seront récoltés toute la semaine : d’autres mûriront dans les prochains jours, plus vite s’il fait chaud."
+          ]
+        },
+        {
+          "heading": "3. Oublier les fruits cachés",
+          "paragraphs": [
+            "Ce qu’on ne voit pas depuis l’allée compte aussi. Si l’on ne mesure jamais la part cachée dans le feuillage, la prévision reste toujours trop basse."
+          ]
+        },
+        {
+          "heading": "4. Un poids moyen dépassé",
+          "paragraphs": [
+            "Le poids des fruits change au fil de la campagne. Une erreur sur le poids passe entièrement dans les kilos : elle ne se compense pas en additionnant."
+          ]
+        },
+        {
+          "heading": "5. Ignorer la météo",
+          "paragraphs": [
+            "Une semaine chaude avance la maturation, une semaine froide la retarde. Prévoir sans regarder la météo, c’est prévoir à l’aveugle."
+          ]
+        },
+        {
+          "heading": "6. Donner un chiffre sans marge",
+          "paragraphs": [
+            "Une prévision sans marge affiche plus de certitude qu’elle n’en a. Avec la marge, on décide mieux combien vendre et combien de personnes appeler."
+          ]
+        },
+        {
+          "heading": "7. Ne pas mesurer sa propre erreur",
+          "paragraphs": [
+            "Si l’on ne compare pas chaque semaine la prévision avec ce qui a été pesé, personne ne sait de combien elle se trompe ni si elle s’améliore. C’est l’erreur la plus coûteuse, car elle cache toutes les autres."
+          ]
+        }
+      ]
+    },
+    "accuracy": {
+      "eyebrow": "Article",
+      "title": "Quelle précision attendre d’une prévision de récolte ?",
+      "lead": "Avant de demander si une prévision est précise, il faut s’entendre sur la façon de la mesurer.",
+      "sections": [
+        {
+          "heading": "Mesurer face à la balance",
+          "paragraphs": [
+            "La seule référence qui vaille, c’est ce qui a été récolté et pesé. Comparer une prévision à une autre estimation ne dit rien de sa précision.",
+            "Et il faut comparer ce qui est comparable : la prévision du lundi au vendredi avec les kilos du lundi au vendredi, pas avec les fruits visibles le jour du tournage."
+          ]
+        },
+        {
+          "heading": "Une erreur qui ne trompe pas",
+          "paragraphs": [
+            "L’erreur de chaque semaine est l’écart entre le prévu et le récolté, en pourcentage du récolté. Pour regrouper des semaines, mieux vaut pondérer par les kilos, afin qu’une petite semaine ne pèse pas autant qu’une grande.",
+            "Le biais compte aussi : si une prévision est toujours trop haute, ou toujours trop basse, on peut la corriger."
+          ]
+        },
+        {
+          "heading": "Une semaine ne suffit pas",
+          "paragraphs": [
+            "Une bonne semaine peut être de la chance. Pour affirmer une précision, il faut plusieurs semaines et plusieurs serres qui n’ont pas servi à régler la méthode.",
+            "Chez Atias, nous en exigeons au moins 8, et que même le haut de l’intervalle de confiance reste sous 10 % d’erreur."
+          ]
+        },
+        {
+          "heading": "Comparer avec ce qui existe",
+          "paragraphs": [
+            "Un chiffre de précision seul dit peu de chose. L’utile est de le comparer à la prévision déjà utilisée, celle du technicien ou du producteur, mesurée de la même façon sur les mêmes semaines.",
+            "Il n’existe pas de chiffre de référence publié pour le secteur. C’est pourquoi nous publions la méthode avant le résultat."
+          ]
+        }
+      ]
+    },
+    "ctaTitle": "On l’essaie dans vos serres ?",
+    "ctaBody": "Essayez Atias gratuitement pendant 4 semaines et comparez sa prévision à votre balance."
   },
 };
