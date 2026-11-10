@@ -225,9 +225,20 @@ export function countedUntil(frame: number): number {
 const camera = new PerspectiveCamera(52, WIDTH / HEIGHT, 0.05, 200);
 const v = new Vector3();
 
-export function projector(frame: number) {
+/**
+ * Ángulo vertical de la cámara según el formato. En vertical (9:16) se abre para que la hilera no
+ * quede como una rendija: 75° en vertical equivalen a unos 47° en horizontal.
+ */
+export const fovFor = (fov: number, width: number, height: number) => (height > width ? 75 : fov);
+
+/** Distancia focal en píxeles: convierte un tamaño en metros a píxeles en pantalla. */
+export const focalFor = (frame: number, width: number, height: number) =>
+  height / 2 / Math.tan((fovFor(poseAt(frame).fov, width, height) * Math.PI) / 360);
+
+export function projector(frame: number, width = WIDTH, height = HEIGHT) {
   const pose = poseAt(frame);
-  camera.fov = pose.fov;
+  camera.fov = fovFor(pose.fov, width, height);
+  camera.aspect = width / height;
   camera.position.set(...pose.pos);
   camera.lookAt(...pose.target);
   camera.updateProjectionMatrix();
@@ -237,6 +248,6 @@ export function projector(frame: number) {
     const depth = -v.z;
     if (depth < 0.2) return null;
     v.set(...p).project(camera);
-    return { x: ((v.x + 1) / 2) * WIDTH, y: ((1 - v.y) / 2) * HEIGHT, depth };
+    return { x: ((v.x + 1) / 2) * width, y: ((1 - v.y) / 2) * height, depth };
   };
 }

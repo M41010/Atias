@@ -7,7 +7,10 @@ const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 /** Rótulo inferior: entra y sale con suavidad dentro de su intervalo. */
 export function Caption({ text, from, to, dark = false }: { text: string; from: number; to: number; dark?: boolean }) {
   const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
   if (frame < from || frame >= to) return null;
+  // En vertical, rótulos más grandes y más arriba: se leen en el móvil y no los tapa la interfaz.
+  const vertical = height > width;
   const opacity = interpolate(frame, [from, from + 10, to - 10, to], [0, 1, 1, 0], clamp);
   const lift = interpolate(frame, [from, from + 14], [24, 0], clamp);
   return (
@@ -16,7 +19,7 @@ export function Caption({ text, from, to, dark = false }: { text: string; from: 
         position: "absolute",
         left: 0,
         right: 0,
-        bottom: 72,
+        bottom: vertical ? 300 : 72,
         display: "flex",
         justifyContent: "center",
         opacity,
@@ -26,16 +29,16 @@ export function Caption({ text, from, to, dark = false }: { text: string; from: 
       <div
         style={{
           fontFamily: FONT,
-          fontSize: 52,
+          fontSize: vertical ? 68 : 52,
           fontWeight: 800,
           fontStretch: "80%",
           letterSpacing: "-0.005em",
           lineHeight: 1.1,
-          maxWidth: 1500,
+          maxWidth: vertical ? 940 : 1500,
           textAlign: "center",
           color: dark ? C.paper : C.ink,
           background: dark ? "rgba(15,43,32,0.0)" : "rgba(241,244,236,0.92)",
-          padding: dark ? 0 : "18px 34px",
+          padding: dark ? 0 : vertical ? "24px 36px" : "18px 34px",
           borderRadius: 18,
           textWrap: "balance",
         }}
@@ -77,7 +80,7 @@ function Wordmark({ size }: { size: number }) {
 
 export function LogoEnd({ t, from }: { t: Texts; from: number }) {
   const frame = useCurrentFrame() - from;
-  const { fps } = useVideoConfig();
+  const { fps, width } = useVideoConfig();
   const progress = interpolate(frame, [6, 60], [0, 1], clamp);
   const dot = spring({ frame: frame - 58, fps, config: { damping: 9, stiffness: 140 } });
   const word = spring({ frame: frame - 70, fps, config: { damping: 18 } });
@@ -88,7 +91,7 @@ export function LogoEnd({ t, from }: { t: Texts; from: number }) {
       <div style={{ opacity: word, transform: `translateY(${(1 - word) * 20}px)` }}>
         <Wordmark size={120} />
       </div>
-      <div style={{ opacity: tag, fontFamily: FONT, fontSize: 40, fontWeight: 500, color: C.paper, letterSpacing: "0.01em" }}>{t.tagline}</div>
+      <div style={{ opacity: tag, fontFamily: FONT, fontSize: 40, fontWeight: 500, color: C.paper, letterSpacing: "0.01em", maxWidth: width * 0.86, textAlign: "center", textWrap: "balance" }}>{t.tagline}</div>
     </AbsoluteFill>
   );
 }
@@ -100,7 +103,8 @@ export type Screen = { file: string; caption: string; focus: { x: number; y: num
 /** Ventana de navegador con capturas reales de la app, recorridas con un zoom lento. */
 export function AppShowcase({ screens, t, from, each }: { screens: Screen[]; t: Texts; from: number; each: number }) {
   const frame = useCurrentFrame() - from;
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
+  const vertical = height > width;
   const index = Math.min(screens.length - 1, Math.floor(frame / each));
   const open = spring({ frame, fps, config: { damping: 20 } });
   return (
@@ -108,10 +112,10 @@ export function AppShowcase({ screens, t, from, each }: { screens: Screen[]; t: 
       <div
         style={{
           position: "absolute",
-          left: 110,
-          right: 110,
-          top: 64,
-          bottom: 210,
+          left: vertical ? 40 : 110,
+          right: vertical ? 40 : 110,
+          top: vertical ? 320 : 64,
+          bottom: vertical ? 740 : 210,
           borderRadius: 18,
           overflow: "hidden",
           boxShadow: "0 30px 80px rgba(15,43,32,0.28)",
@@ -133,8 +137,9 @@ export function AppShowcase({ screens, t, from, each }: { screens: Screen[]; t: 
             const opacity = interpolate(frame, [start - 8, start + 8, start + each - 8, start + each + 8], [0, 1, 1, i === screens.length - 1 ? 1 : 0], clamp);
             const p = interpolate(frame, [start, start + each], [0, 1], clamp);
             const [a, b] = [s.focus[0], s.focus[s.focus.length - 1]];
-            const zoom = a.zoom + (b.zoom - a.zoom) * p;
-            const x = a.x + (b.x - a.x) * p;
+            // En vertical la ventana es estrecha: se acerca más y se salta el menú lateral para que se lea.
+            const zoom = (a.zoom + (b.zoom - a.zoom) * p) * (vertical ? 1.9 : 1);
+            const x = vertical ? 13 + (b.x - a.x) * p * 0.5 : a.x + (b.x - a.x) * p;
             const y = a.y + (b.y - a.y) * p;
             return (
               <Img
@@ -166,10 +171,13 @@ export function AppShowcase({ screens, t, from, each }: { screens: Screen[]; t: 
 
 export function ToApp({ t, from, locale }: { t: Texts; from: number; locale: string }) {
   const frame = useCurrentFrame() - from;
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
   const values = ["4.589", "486 kg", "T3 · 52 kg", "14"];
   const fmtLocale = (v: string) => (locale === "en" ? v.replace(".", ",") : v);
-  const target = { x: 960, y: 520 };
+  const target = { x: width / 2, y: height * 0.48 };
+  // Pantalla de la cooperativa: 720×420 en horizontal; más ancha, en proporción, en vertical.
+  const sw = height > width ? width * 0.8 : 720;
+  const sh = sw * (420 / 720);
   const screen = spring({ frame: frame - 20, fps, config: { damping: 18 } });
   return (
     <AbsoluteFill style={{ background: C.ink }}>
@@ -177,10 +185,10 @@ export function ToApp({ t, from, locale }: { t: Texts; from: number; locale: str
       <div
         style={{
           position: "absolute",
-          left: target.x - 360 * screen,
-          top: target.y - 210 * screen,
-          width: 720 * screen,
-          height: 420 * screen,
+          left: target.x - (sw / 2) * screen,
+          top: target.y - (sh / 2) * screen,
+          width: sw * screen,
+          height: sh * screen,
           borderRadius: 18,
           background: C.paper,
           opacity: screen,
@@ -193,11 +201,12 @@ export function ToApp({ t, from, locale }: { t: Texts; from: number; locale: str
       {values.map((v, i) => {
         const start = 6 + i * 9;
         const p = interpolate(frame, [start, start + 55], [0, 1], { ...clamp, easing: (x) => 1 - (1 - x) ** 3 });
-        const sx = [260, 1660, 380, 1540][i];
-        const sy = [250, 300, 820, 840][i];
+        // Salen de las cuatro esquinas del encuadre (proporcional al formato).
+        const sx = [0.135, 0.865, 0.2, 0.8][i] * width;
+        const sy = [0.23, 0.28, 0.76, 0.78][i] * height;
         // Cada dato aterriza en una esquina de la pantalla de la cooperativa y se queda.
-        const tx = target.x + [-200, 200, -200, 200][i];
-        const ty = target.y + [-110, -110, 110, 110][i];
+        const tx = target.x + [-1, 1, -1, 1][i] * sw * 0.28;
+        const ty = target.y + [-1, -1, 1, 1][i] * sh * 0.26;
         const x = sx + (tx - sx) * p;
         const y = sy + (ty - sy) * p;
         const opacity = interpolate(frame, [start, start + 8, 150, 175], [0, 1, 1, 0], clamp);

@@ -1,6 +1,6 @@
 import { useThree } from "@react-three/fiber";
 import { type ReactNode, useLayoutEffect, useMemo, useRef } from "react";
-import { useCurrentFrame } from "remotion";
+import { useCurrentFrame, useVideoConfig } from "remotion";
 import {
   CapsuleGeometry,
   Color,
@@ -17,16 +17,17 @@ import {
   Vector2,
   Vector3,
 } from "three";
-import { type Crop, LENGTH, poseAt, railZ, ROW_X, SPAN, T, WALL, WORLD } from "./scene";
+import { type Crop, fovFor, LENGTH, poseAt, railZ, ROW_X, SPAN, T, WALL, WORLD } from "./scene";
 import { groundCoverTexture, leafTexture, soilTexture } from "./textures";
 import { C } from "./theme";
 
 /** La cámara de la escena sigue exactamente la pose calculada para cada fotograma. */
 function CameraRig() {
   const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
   const pose = poseAt(frame);
-  camera.fov = pose.fov;
+  camera.fov = fovFor(pose.fov, width, height);
   camera.position.set(...pose.pos);
   camera.lookAt(...pose.target);
   camera.updateProjectionMatrix();
