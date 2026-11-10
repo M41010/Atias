@@ -21,6 +21,21 @@ export function Company({ lang }: { lang: Locale }) {
           <p className="font-bold uppercase tracking-[0.08em] text-ink-soft">{company.title}</p>
           <h1 className="display mt-6 max-w-[16ch] text-[clamp(3.25rem,7vw,6rem)]">{company.headline}</h1>
           <p className="lead mt-8 text-[1.2rem] font-medium leading-relaxed text-ink-soft">{company.lead}</p>
+          {/* Datos clave: solo hechos reales del piloto, ninguna cifra de clientes inventada. */}
+          <dl className="mt-14 grid border-[3px] border-ink bg-paper sm:grid-cols-2 lg:grid-cols-4">
+            {company.facts.map((fact, index) => (
+              <Reveal
+                key={fact.label}
+                delay={index * 100}
+                className={`flex flex-col gap-2 p-6 ${index > 0 ? "border-t-[3px] border-ink sm:border-t-0" : ""} ${
+                  index % 2 === 1 ? "sm:border-l-[3px] sm:border-ink" : ""
+                } ${index >= 2 ? "sm:border-t-[3px] lg:border-t-0" : ""} ${index === 2 ? "lg:border-l-[3px] lg:border-ink" : ""}`}
+              >
+                <dt className="order-2 text-ink-soft">{fact.label}</dt>
+                <dd className="display order-1 text-[clamp(2.5rem,4.4vw,3.5rem)]">{fact.value}</dd>
+              </Reveal>
+            ))}
+          </dl>
         </div>
       </section>
 
@@ -52,6 +67,39 @@ export function Company({ lang }: { lang: Locale }) {
               <ArrowRight size={18} aria-hidden />
             </Link>
           </Reveal>
+        </div>
+      </section>
+
+      {/* Para quién: los tres que usan Atias y qué gana cada uno. */}
+      <section className="plate border-b-[3px] border-ink" aria-labelledby="para-quien">
+        <div className="mx-auto max-w-[1320px] px-4 py-20 sm:px-8 lg:py-28">
+          <h2 id="para-quien" className="display text-[clamp(2.25rem,4.4vw,3.75rem)]">{company.forTitle}</h2>
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {company.forWho.map((who, index) => (
+              <Reveal key={who.name} delay={index * 120} className="label p-6 sm:p-8">
+                <h3 className="display text-[clamp(1.6rem,2.4vw,2rem)]">{who.name}</h3>
+                <p className="mt-3 text-ink-soft">{who.body}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Por qué ahora: lo que hace posible Atias hoy y no hace unos años. */}
+      <section className="bg-trap border-b-[3px] border-ink" aria-labelledby="por-que-ahora">
+        <div className="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:py-28">
+          <h2 id="por-que-ahora" className="display text-[clamp(2.25rem,4.4vw,3.75rem)]">{company.whyNowTitle}</h2>
+          <ol className="border-t-[3px] border-ink">
+            {company.whyNow.map((reason, index) => (
+              <Reveal as="li" key={reason.name} delay={index * 120} className="grid grid-cols-[3rem_minmax(0,1fr)] gap-4 border-b-[3px] border-ink py-6">
+                <span aria-hidden className="display text-[2rem] text-sprout">{index + 1}</span>
+                <div>
+                  <h3 className="text-xl font-bold">{reason.name}</h3>
+                  <p className="mt-2 text-ink-soft">{reason.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </ol>
         </div>
       </section>
 

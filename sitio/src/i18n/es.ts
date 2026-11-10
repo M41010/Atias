@@ -113,6 +113,24 @@ export const es = {
     title: "Quiénes somos",
     headline: "Escuchamos al campo. Ahora queremos cambiarlo.",
     lead: "Atias nació de conversaciones con gente que trabaja en invernaderos. Tiene raíces en el campo y la ambición de cambiar cómo se cultiva bajo plástico.",
+    facts: [
+      { value: "Oct. 2026", label: "Empezamos a construir Atias" },
+      { value: "3", label: "Cultivos en el piloto: tomate cherry, pimiento y pepino" },
+      { value: "1", label: "Invernadero real comparado con la báscula" },
+      { value: "≤ 10 %", label: "El error que nos exigimos, medido frente a lo recogido" },
+    ],
+    forTitle: "Para quién trabajamos",
+    forWho: [
+      { name: "Cooperativas y comercializadoras", body: "Saber cuántos kilos vender y cuántos temporeros contratar, día a día." },
+      { name: "Agricultores", body: "Grabar con el móvil y no perder el trabajo aunque falle la conexión." },
+      { name: "Técnicos", body: "Una segunda opinión contada fruto a fruto para contrastar su previsión." },
+    ],
+    whyNowTitle: "Por qué ahora",
+    whyNow: [
+      { name: "Un móvil basta", body: "Cualquier móvil graba con detalle suficiente para distinguir frutos en la planta." },
+      { name: "La visión artificial ha madurado", body: "Los detectores abiertos de última generación reconocen objetos en vídeo y se pueden entrenar con imágenes del propio invernadero." },
+      { name: "Decidir a ojo sale caro", body: "Vender de más o de menos y contratar a destiempo cuesta dinero cada semana." },
+    ],
     originTitle: "Todo empezó escuchando",
     origin: [
       "Gente que trabaja en invernaderos del sur de España nos contó un problema que se repite cada semana: hay que decidir cuántos kilos vender y a cuántas personas llamar, y casi siempre se hace con una estimación a ojo.",

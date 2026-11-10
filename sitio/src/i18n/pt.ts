@@ -108,6 +108,24 @@ export const pt: Dictionary = {
     title: "Quem somos",
     headline: "Ouvimos o campo. Agora queremos mudá-lo.",
     lead: "A Atias nasceu de conversas com pessoas que trabalham em estufas. Tem raízes no campo e a ambição de mudar a forma como se cultiva sob plástico.",
+    facts: [
+      { value: "Out. 2026", label: "Começámos a construir a Atias" },
+      { value: "3", label: "Culturas no piloto: tomate cereja, pimento e pepino" },
+      { value: "1", label: "Estufa real comparada com a balança" },
+      { value: "≤ 10 %", label: "O erro que nos exigimos, medido face ao que se colhe" },
+    ],
+    forTitle: "Para quem trabalhamos",
+    forWho: [
+      { name: "Cooperativas e comercializadoras", body: "Saber quantos quilos vender e quantos trabalhadores contratar, dia a dia." },
+      { name: "Agricultores", body: "Gravar com o telemóvel sem perder o trabalho, mesmo que a ligação falhe." },
+      { name: "Técnicos", body: "Uma segunda opinião contada fruto a fruto para confrontar a sua previsão." },
+    ],
+    whyNowTitle: "Porquê agora",
+    whyNow: [
+      { name: "Basta um telemóvel", body: "Qualquer telemóvel grava com detalhe suficiente para distinguir frutos na planta." },
+      { name: "A visão artificial amadureceu", body: "Os detetores abertos de última geração reconhecem objetos em vídeo e podem ser treinados com imagens da própria estufa." },
+      { name: "Decidir a olho sai caro", body: "Vender a mais ou a menos e contratar fora de tempo custa dinheiro todas as semanas." },
+    ],
     originTitle: "Tudo começou a ouvir",
     origin: [
       "Pessoas que trabalham em estufas do sul de Espanha contaram-nos um problema que se repete todas as semanas: é preciso decidir quantos quilos vender e quantas pessoas chamar, e quase sempre isso é feito a olho.",

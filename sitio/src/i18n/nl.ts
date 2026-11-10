@@ -108,6 +108,24 @@ export const nl: Dictionary = {
     title: "Over ons",
     headline: "We luisterden naar het veld. Nu willen we het veranderen.",
     lead: "Atias ontstond uit gesprekken met mensen die in kassen werken. Het heeft zijn wortels in het veld en de ambitie om de teelt onder plastic te veranderen.",
+    facts: [
+      { value: "Okt. 2026", label: "We begonnen Atias te bouwen" },
+      { value: "3", label: "Gewassen in de pilot: cherrytomaat, paprika en komkommer" },
+      { value: "1", label: "Echte kas vergeleken met de weegschaal" },
+      { value: "≤ 10 %", label: "De fout die we onszelf opleggen, gemeten tegen de oogst" },
+    ],
+    forTitle: "Voor wie we werken",
+    forWho: [
+      { name: "Coöperaties en handelaren", body: "Weten hoeveel kilo te verkopen en hoeveel plukkers in te huren, dag na dag." },
+      { name: "Telers", body: "Filmen met de telefoon zonder werk te verliezen, ook als de verbinding wegvalt." },
+      { name: "Teeltadviseurs", body: "Een tweede mening, vrucht voor vrucht geteld, om hun prognose naast te leggen." },
+    ],
+    whyNowTitle: "Waarom nu",
+    whyNow: [
+      { name: "Een telefoon is genoeg", body: "Elke telefoon filmt gedetailleerd genoeg om vruchten aan de plant te onderscheiden." },
+      { name: "Computervisie is volwassen", body: "Moderne open detectoren herkennen objecten in video en zijn te trainen met beelden uit de kas zelf." },
+      { name: "Op het oog beslissen is duur", body: "Te veel of te weinig verkopen en op het verkeerde moment inhuren kost elke week geld." },
+    ],
     originTitle: "Het begon met luisteren",
     origin: [
       "Mensen die in kassen in Zuid-Spanje werken, vertelden ons over een probleem dat elke week terugkomt: er moet worden besloten hoeveel kilo te verkopen en hoeveel mensen op te roepen, en dat gebeurt bijna altijd op het oog.",

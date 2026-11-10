@@ -108,6 +108,24 @@ export const en: Dictionary = {
     title: "About us",
     headline: "We listened to the field. Now we want to change it.",
     lead: "Atias was born from conversations with people who work in greenhouses. It has roots in the field and the ambition to change how crops are grown under plastic.",
+    facts: [
+      { value: "Oct 2026", label: "We started building Atias" },
+      { value: "3", label: "Crops in the pilot: cherry tomato, pepper and cucumber" },
+      { value: "1", label: "Real greenhouse checked against the scales" },
+      { value: "≤ 10 %", label: "The error we hold ourselves to, measured against the harvest" },
+    ],
+    forTitle: "Who we work for",
+    forWho: [
+      { name: "Cooperatives and marketers", body: "Know how many kilos to sell and how many pickers to hire, day by day." },
+      { name: "Growers", body: "Film with a phone and never lose the work, even if the connection drops." },
+      { name: "Agronomists", body: "A second opinion counted fruit by fruit to check their forecast against." },
+    ],
+    whyNowTitle: "Why now",
+    whyNow: [
+      { name: "A phone is enough", body: "Any phone films in enough detail to tell fruits apart on the plant." },
+      { name: "Computer vision has matured", body: "State-of-the-art open detectors recognise objects in video and can be trained on images from the greenhouse itself." },
+      { name: "Deciding by eye is expensive", body: "Selling too much or too little and hiring at the wrong time costs money every week." },
+    ],
     originTitle: "It all started by listening",
     origin: [
       "People working in greenhouses in southern Spain told us about a problem that comes back every week: someone has to decide how many kilos to sell and how many people to call in, and it is almost always done by eye.",

@@ -108,6 +108,24 @@ export const it: Dictionary = {
     title: "Chi siamo",
     headline: "Abbiamo ascoltato il campo. Ora vogliamo cambiarlo.",
     lead: "Atias è nato da conversazioni con persone che lavorano in serra. Ha radici nei campi e l’ambizione di cambiare come si coltiva sotto plastica.",
+    facts: [
+      { value: "Ott. 2026", label: "Abbiamo iniziato a costruire Atias" },
+      { value: "3", label: "Colture nel pilota: pomodoro ciliegino, peperone e cetriolo" },
+      { value: "1", label: "Serra reale confrontata con la bilancia" },
+      { value: "≤ 10 %", label: "L’errore che ci imponiamo, misurato rispetto al raccolto" },
+    ],
+    forTitle: "Per chi lavoriamo",
+    forWho: [
+      { name: "Cooperative e commercianti", body: "Sapere quanti chili vendere e quanti braccianti assumere, giorno per giorno." },
+      { name: "Agricoltori", body: "Riprendere con il telefono senza perdere il lavoro, anche se la connessione cade." },
+      { name: "Tecnici", body: "Un secondo parere contato frutto per frutto per confrontare la loro previsione." },
+    ],
+    whyNowTitle: "Perché adesso",
+    whyNow: [
+      { name: "Basta un telefono", body: "Qualsiasi telefono riprende con dettaglio sufficiente a distinguere i frutti sulla pianta." },
+      { name: "La visione artificiale è matura", body: "I rilevatori aperti di ultima generazione riconoscono oggetti nei video e si possono addestrare con immagini della serra stessa." },
+      { name: "Decidere a occhio costa caro", body: "Vendere troppo o troppo poco e assumere nel momento sbagliato costa denaro ogni settimana." },
+    ],
     originTitle: "Tutto è iniziato ascoltando",
     origin: [
       "Persone che lavorano nelle serre del sud della Spagna ci hanno raccontato un problema che si ripete ogni settimana: bisogna decidere quanti chili vendere e quante persone chiamare, e quasi sempre lo si fa a occhio.",

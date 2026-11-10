@@ -108,6 +108,24 @@ export const fr: Dictionary = {
     title: "Qui sommes-nous",
     headline: "Nous avons écouté le terrain. Nous voulons maintenant le changer.",
     lead: "Atias est né de conversations avec des personnes qui travaillent en serre. Ses racines sont dans les champs et son ambition est de changer la culture sous plastique.",
+    facts: [
+      { value: "Oct. 2026", label: "Nous avons commencé à construire Atias" },
+      { value: "3", label: "Cultures dans le pilote : tomate cerise, poivron et concombre" },
+      { value: "1", label: "Serre réelle comparée à la balance" },
+      { value: "≤ 10 %", label: "L’erreur que nous nous imposons, mesurée face à la récolte" },
+    ],
+    forTitle: "Pour qui nous travaillons",
+    forWho: [
+      { name: "Coopératives et expéditeurs", body: "Savoir combien de kilos vendre et combien de saisonniers embaucher, jour après jour." },
+      { name: "Producteurs", body: "Filmer au téléphone sans perdre le travail, même si la connexion coupe." },
+      { name: "Techniciens", body: "Un deuxième avis compté fruit par fruit pour confronter leur prévision." },
+    ],
+    whyNowTitle: "Pourquoi maintenant",
+    whyNow: [
+      { name: "Un téléphone suffit", body: "N’importe quel téléphone filme avec assez de détail pour distinguer les fruits sur la plante." },
+      { name: "La vision par ordinateur a mûri", body: "Les détecteurs ouverts de dernière génération reconnaissent les objets en vidéo et peuvent s’entraîner sur des images de la serre elle-même." },
+      { name: "Décider à l’œil coûte cher", body: "Vendre trop ou trop peu et embaucher au mauvais moment coûte de l’argent chaque semaine." },
+    ],
     originTitle: "Tout a commencé par l’écoute",
     origin: [
       "Des personnes travaillant dans des serres du sud de l’Espagne nous ont parlé d’un problème qui revient chaque semaine : il faut décider combien de kilos vendre et combien de personnes appeler, et presque toujours à l’œil.",
