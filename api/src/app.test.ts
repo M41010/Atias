@@ -1207,6 +1207,24 @@ describe("API", () => {
       assert.equal((await stale.json() as { desactualizado: boolean }).desactualizado, true);
       assert.equal((await week("2026-11-09", "37.5", "-4")).status, 503);
     });
+
+    it("tras un fallo de Open-Meteo no vuelve a intentarlo enseguida: sirve lo guardado al momento", async () => {
+      await week();
+      weatherNow += 2 * 3_600_000;
+      meteoDown = true;
+      await week();
+      const calls = meteoCalls.length;
+      const again = await week();
+      assert.equal(again.status, 200);
+      assert.equal((await again.json() as { desactualizado: boolean }).desactualizado, true);
+      assert.equal(meteoCalls.length, calls, "no debe volver a llamar a Open-Meteo");
+      // Pasado el tiempo de espera, se vuelve a intentar y, si responde, se pone al día.
+      meteoDown = false;
+      weatherNow += 11 * 60_000;
+      const fresh = await week();
+      assert.equal((await fresh.json() as { desactualizado: boolean }).desactualizado, false);
+      assert.ok(meteoCalls.length > calls);
+    });
   });
 
   describe("cooperativa", () => {
