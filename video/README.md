@@ -10,6 +10,11 @@ Vídeo de unos 60 segundos (1920×1080, 30 fps) en los seis idiomas de la web, p
 3. **La app (40–54 s):** capturas reales de la aplicación en modo demostración, con datos de ejemplo.
 4. **Logo (54–60 s).**
 
+## Estado
+
+De momento solo se ha generado la versión en español. Los otros cinco idiomas se generarán más
+adelante, cuando el proyecto esté más avanzado (los rótulos ya están en `src/texts.ts`).
+
 ## Uso
 
 ```powershell
