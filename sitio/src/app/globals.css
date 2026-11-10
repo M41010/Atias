@@ -110,6 +110,11 @@ a {
   white-space: nowrap;
 }
 
+/* Logotipo grande, como pieza de exposición (Quiénes somos). */
+.wordmark.wordmark-xl {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+}
+
 .wordmark svg {
   height: 0.715em;
   width: auto;
@@ -198,6 +203,10 @@ a {
 
 .btn-secondary:hover {
   text-decoration-thickness: 4px;
+}
+
+.on-ink .btn-secondary {
+  color: var(--color-trap);
 }
 
 /* Rango deslizante del contador, en la gramática de la placa. */

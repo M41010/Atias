@@ -106,12 +106,61 @@ export const en: Dictionary = {
   },
   company: {
     title: "About us",
-    pending: "Provisional text, pending review by the company.",
-    lead: "We work so that harvest forecasts come from the fruit on the plant, not from a hunch.",
-    body: [
-      "Atias was born in southern Spain, among greenhouses growing vegetables for export. There, every week, someone has to decide how many kilos to sell and how many people to call in, almost always with an estimate made by eye.",
-      "What we do is turn what can be filmed on a phone into a figure that is useful for that decision: each day's kilos and the pickers needed, with their margin and with a way to check where they come from.",
-      "We work alongside cooperatives, agronomists and growers, and we test it in their greenhouses before calling it ready.",
+    headline: "We listened to the field. Now we want to change it.",
+    lead: "Atias was born from conversations with people who work in greenhouses. It has roots in the field and the ambition to change how crops are grown under plastic.",
+    originTitle: "It all started by listening",
+    origin: [
+      "People working in greenhouses in southern Spain told us about a problem that comes back every week: someone has to decide how many kilos to sell and how many people to call in, and it is almost always done by eye.",
+      "We set out to find a way to solve it. What if the fruit could be counted instead of estimated? A video filmed on a phone, an AI that recognises every ripe fruit, and a figure for each day, with its margin.",
+      "That is how Atias was born. Today we are testing it in a real greenhouse, against what is actually harvested.",
+    ],
+    missionEyebrow: "Our mission",
+    mission: "That no important decision in the greenhouse is made by eye.",
+    missionBody: "We start with the harvest because it can be checked on the scales. Pests, irrigation and climate will follow: the same camera, more questions.",
+    missionLink: "See the roadmap",
+    milestonesTitle: "So far",
+    milestones: [
+      {
+        when: "October 2026",
+        name: "The idea",
+        body: "Conversations with people in the field and research into solving their problem: counting fruit instead of estimating it.",
+      },
+      {
+        when: "November 2026",
+        name: "First prototype",
+        body: "The complete app: video upload from the phone, count per row section, kilos per day and pickers.",
+      },
+      {
+        when: "November 2026",
+        name: "First pilot",
+        body: "Filming in a real greenhouse and comparing with what is harvested that week.",
+      },
+      {
+        when: "Coming next",
+        name: "First season",
+        body: "Weekly use in several greenhouses, measuring accuracy against the scales.",
+      },
+    ],
+    nameTitle: "Why “Atias”",
+    nameBody: "The name does not come from anywhere, but in Spanish it sounds like atisbar: to glimpse what is coming. That is what Atias does with the harvest.",
+    logoTitle: "The symbol, piece by piece",
+    logo: [
+      {
+        name: "Three bays",
+        body: "A multi-tunnel greenhouse seen from the front, like the ones in southern Spain.",
+      },
+      {
+        name: "The central bay is the A",
+        body: "In the wordmark, the middle bay doubles as the first letter of ATIAS.",
+      },
+      {
+        name: "Four marks",
+        body: "The legs of the bays are tally marks: what is counted can be checked.",
+      },
+      {
+        name: "The green dot",
+        body: "The measuring point: the fruit the camera has seen and counted.",
+      },
     ],
     principlesTitle: "How we work",
     principles: [
@@ -132,6 +181,24 @@ export const en: Dictionary = {
         body: "Each grower only sees their own, and videos are deleted once they are no longer needed.",
       },
     ],
+    joinTitle: "Join us",
+    joinLead: "Atias is just starting and is looking for anyone who wants to help move it forward, wherever they are.",
+    join: [
+      {
+        name: "Pilot cooperatives",
+        body: "Try Atias in your greenhouses, anywhere in the world.",
+      },
+      {
+        name: "Investors and partners",
+        body: "For anyone who wants to back the project with capital, know-how or technology.",
+      },
+      {
+        name: "Work with us",
+        body: "Computer vision, agronomy, software, sales: if you can help, we want to meet you.",
+      },
+    ],
+    joinCta: "Write to us",
+    closeTitle: "Shall we talk?",
   },
   product: {
     title: "The product",

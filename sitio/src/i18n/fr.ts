@@ -106,12 +106,61 @@ export const fr: Dictionary = {
   },
   company: {
     title: "Qui sommes-nous",
-    pending: "Texte provisoire, en attente de relecture par l'entreprise.",
-    lead: "Nous travaillons pour que la prévision de récolte vienne des fruits sur la plante, et non de l'intuition.",
-    body: [
-      "Atias est né dans le sud de l'Espagne, au milieu des serres de légumes destinés à l'export. Là-bas, chaque semaine, quelqu'un doit décider combien de kilos vendre et combien de personnes appeler, presque toujours à partir d'une estimation à l'œil.",
-      "Notre métier est de transformer ce qu'on peut filmer avec un téléphone en un chiffre utile pour cette décision : les kilos de chaque jour et la main-d'œuvre nécessaire, avec leur marge et la possibilité de vérifier d'où ils viennent.",
-      "Nous travaillons avec des coopératives, des techniciens et des producteurs, et nous testons dans leurs serres avant de valider.",
+    headline: "Nous avons écouté le terrain. Nous voulons maintenant le changer.",
+    lead: "Atias est né de conversations avec des personnes qui travaillent en serre. Ses racines sont dans les champs et son ambition est de changer la culture sous plastique.",
+    originTitle: "Tout a commencé par l’écoute",
+    origin: [
+      "Des personnes travaillant dans des serres du sud de l’Espagne nous ont parlé d’un problème qui revient chaque semaine : il faut décider combien de kilos vendre et combien de personnes appeler, et presque toujours à l’œil.",
+      "Nous avons cherché comment le résoudre. Et si l’on pouvait compter les fruits au lieu de les estimer ? Une vidéo filmée au téléphone, une intelligence artificielle qui reconnaît chaque fruit mûr et un chiffre pour chaque jour, avec sa marge.",
+      "C’est ainsi qu’est né Atias. Aujourd’hui, nous le testons dans une vraie serre, face à ce qui est réellement récolté.",
+    ],
+    missionEyebrow: "Notre mission",
+    mission: "Qu’aucune décision importante en serre ne se prenne à l’œil.",
+    missionBody: "Nous commençons par la récolte, car elle se vérifie sur la balance. Viendront ensuite les ravageurs, l’irrigation et le climat : la même caméra, plus de questions.",
+    missionLink: "Voir la feuille de route",
+    milestonesTitle: "Jusqu’ici",
+    milestones: [
+      {
+        when: "Octobre 2026",
+        name: "L’idée",
+        body: "Des conversations avec des gens du terrain et des recherches pour résoudre leur problème : compter les fruits au lieu de les estimer.",
+      },
+      {
+        when: "Novembre 2026",
+        name: "Premier prototype",
+        body: "L’application complète : envoi de la vidéo depuis le téléphone, comptage par tronçon de rang, kilos par jour et saisonniers.",
+      },
+      {
+        when: "Novembre 2026",
+        name: "Premier pilote",
+        body: "Tournage dans une vraie serre et comparaison avec ce qui est récolté cette semaine-là.",
+      },
+      {
+        when: "Prochainement",
+        name: "Première saison",
+        body: "Utilisation hebdomadaire dans plusieurs serres, en mesurant la précision face à la balance.",
+      },
+    ],
+    nameTitle: "Pourquoi « Atias »",
+    nameBody: "Le nom ne vient de nulle part, mais en espagnol il sonne comme atisbar : entrevoir ce qui arrive. C’est ce qu’Atias fait avec la récolte.",
+    logoTitle: "Le symbole, pièce par pièce",
+    logo: [
+      {
+        name: "Trois nefs",
+        body: "Une serre multichapelle vue de face, comme celles du sud de l’Espagne.",
+      },
+      {
+        name: "La nef centrale est le A",
+        body: "Dans le logotype, la nef du milieu sert de première lettre à ATIAS.",
+      },
+      {
+        name: "Quatre marques",
+        body: "Les pieds des nefs sont des marques de comptage : ce qui est compté peut être vérifié.",
+      },
+      {
+        name: "Le point vert",
+        body: "Le point de mesure : le fruit que la caméra a vu et compté.",
+      },
     ],
     principlesTitle: "Notre façon de travailler",
     principles: [
@@ -132,6 +181,24 @@ export const fr: Dictionary = {
         body: "Chaque producteur ne voit que les siennes, et les vidéos sont effacées dès qu'elles ne servent plus.",
       },
     ],
+    joinTitle: "Rejoignez-nous",
+    joinLead: "Atias démarre et cherche des personnes prêtes à l’aider à avancer, où qu’elles soient.",
+    join: [
+      {
+        name: "Coopératives pilotes",
+        body: "Essayez Atias dans vos serres, partout dans le monde.",
+      },
+      {
+        name: "Investisseurs et partenaires",
+        body: "Pour qui souhaite soutenir le projet avec du capital, du savoir-faire ou de la technologie.",
+      },
+      {
+        name: "Travailler avec nous",
+        body: "Vision par ordinateur, agronomie, développement, ventes : si vous pouvez aider, nous voulons vous rencontrer.",
+      },
+    ],
+    joinCta: "Écrivez-nous",
+    closeTitle: "On en parle ?",
   },
   product: {
     title: "Le produit",

@@ -106,12 +106,61 @@ export const nl: Dictionary = {
   },
   company: {
     title: "Over ons",
-    pending: "Voorlopige tekst, nog te controleren door het bedrijf.",
-    lead: "We werken eraan dat oogstprognoses uit het fruit aan de plant komen, niet uit een gevoel.",
-    body: [
-      "Atias is ontstaan in Zuid-Spanje, tussen kassen met groenten voor de export. Daar moet elke week iemand beslissen hoeveel kilo er verkocht wordt en hoeveel mensen er komen, bijna altijd op basis van een schatting op het oog.",
-      "Ons werk is om wat je met een telefoon kunt filmen om te zetten in een bruikbaar cijfer voor die beslissing: de kilo's per dag en de benodigde plukkers, met marge en met de mogelijkheid om na te gaan waar ze vandaan komen.",
-      "We werken samen met coöperaties, teeltadviseurs en telers, en we testen in hun kassen voordat we iets goed noemen.",
+    headline: "We luisterden naar het veld. Nu willen we het veranderen.",
+    lead: "Atias ontstond uit gesprekken met mensen die in kassen werken. Het heeft zijn wortels in het veld en de ambitie om de teelt onder plastic te veranderen.",
+    originTitle: "Het begon met luisteren",
+    origin: [
+      "Mensen die in kassen in Zuid-Spanje werken, vertelden ons over een probleem dat elke week terugkomt: er moet worden besloten hoeveel kilo te verkopen en hoeveel mensen op te roepen, en dat gebeurt bijna altijd op het oog.",
+      "We gingen onderzoeken hoe dat op te lossen. Wat als je het fruit kon tellen in plaats van schatten? Een video gefilmd met de telefoon, kunstmatige intelligentie die elke rijpe vrucht herkent, en een cijfer voor elke dag, met zijn marge.",
+      "Zo ontstond Atias. Vandaag testen we het in een echte kas, tegen wat er werkelijk wordt geoogst.",
+    ],
+    missionEyebrow: "Onze missie",
+    mission: "Dat in de kas geen belangrijke beslissing op het oog wordt genomen.",
+    missionBody: "We beginnen bij de oogst, omdat die op de weegschaal te controleren is. Daarna volgen plagen, irrigatie en klimaat: dezelfde camera, meer vragen.",
+    missionLink: "Bekijk de roadmap",
+    milestonesTitle: "Tot nu toe",
+    milestones: [
+      {
+        when: "Oktober 2026",
+        name: "Het idee",
+        body: "Gesprekken met mensen uit het veld en onderzoek om hun probleem op te lossen: fruit tellen in plaats van schatten.",
+      },
+      {
+        when: "November 2026",
+        name: "Eerste prototype",
+        body: "De volledige app: video uploaden vanaf de telefoon, telling per rijdeel, kilo’s per dag en plukkers.",
+      },
+      {
+        when: "November 2026",
+        name: "Eerste pilot",
+        body: "Filmen in een echte kas en vergelijken met wat die week wordt geoogst.",
+      },
+      {
+        when: "Binnenkort",
+        name: "Eerste seizoen",
+        body: "Wekelijks gebruik in meerdere kassen, met de nauwkeurigheid gemeten tegen de weegschaal.",
+      },
+    ],
+    nameTitle: "Waarom ‘Atias’",
+    nameBody: "De naam komt nergens vandaan, maar in het Spaans klinkt hij als atisbar: zien wat eraan komt. Dat is wat Atias met de oogst doet.",
+    logoTitle: "Het symbool, stuk voor stuk",
+    logo: [
+      {
+        name: "Drie kappen",
+        body: "Een multitunnelkas van voren gezien, zoals die in Zuid-Spanje.",
+      },
+      {
+        name: "De middelste kap is de A",
+        body: "In het woordmerk is de middelste kap de eerste letter van ATIAS.",
+      },
+      {
+        name: "Vier streepjes",
+        body: "De poten van de kappen zijn turfstreepjes: wat geteld is, is te controleren.",
+      },
+      {
+        name: "De groene stip",
+        body: "Het meetpunt: de vrucht die de camera heeft gezien en geteld.",
+      },
     ],
     principlesTitle: "Hoe we werken",
     principles: [
@@ -132,6 +181,24 @@ export const nl: Dictionary = {
         body: "Elke teler ziet alleen zijn eigen gegevens, en video's worden gewist zodra ze niet meer nodig zijn.",
       },
     ],
+    joinTitle: "Doe mee",
+    joinLead: "Atias staat aan het begin en zoekt mensen die willen helpen het verder te brengen, waar ze ook zijn.",
+    join: [
+      {
+        name: "Pilotcoöperaties",
+        body: "Probeer Atias in uw kassen, waar ook ter wereld.",
+      },
+      {
+        name: "Investeerders en partners",
+        body: "Voor wie het project wil steunen met kapitaal, kennis of technologie.",
+      },
+      {
+        name: "Bij ons werken",
+        body: "Computervisie, agronomie, ontwikkeling, verkoop: als u kunt helpen, willen we u leren kennen.",
+      },
+    ],
+    joinCta: "Schrijf ons",
+    closeTitle: "Zullen we praten?",
   },
   product: {
     title: "Het product",
