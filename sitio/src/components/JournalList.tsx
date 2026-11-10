@@ -6,7 +6,12 @@ import { Reveal } from "./Reveal";
  * Entradas del diario del piloto, de la más reciente a la más antigua, sobre una línea de tiempo.
  * La web es estática: «Próximo» se decide con la fecha del día en que se compila.
  */
-export function JournalList({ lang, limit }: { lang: Locale; limit?: number }) {
+/**
+ * En la página del diario las entradas cuelgan del título de la página (h2); en la portada, de
+ * «Últimas novedades» (h3). Así los lectores de pantalla no se saltan niveles.
+ */
+export function JournalList({ lang, limit, headingLevel = 3 }: { lang: Locale; limit?: number; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const ui = DIARIO_UI[lang];
   const today = new Date().toISOString().slice(0, 10);
   const entries = limit ? DIARIO.slice(0, limit) : DIARIO;
@@ -32,7 +37,7 @@ export function JournalList({ lang, limit }: { lang: Locale; limit?: number }) {
               {upcoming && <span className="border-2 border-ink px-2 py-0.5 text-[0.75rem] text-ink">{ui.upcoming}</span>}
             </p>
             <div>
-              <h3 className="display text-[clamp(1.6rem,2.6vw,2.25rem)]">{text.title}</h3>
+              <Heading className="display text-[clamp(1.6rem,2.6vw,2.25rem)]">{text.title}</Heading>
               <p className="prose-measure mt-2 text-ink-soft">{text.body}</p>
             </div>
           </Reveal>

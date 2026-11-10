@@ -6,7 +6,7 @@
  */
 
 export const TARGET_PCT = 10;
-/** Propuesta pendiente de confirmar con el negocio. */
+/** Criterio confirmado por el usuario el 2026-11-10 (docs/VALIDACION.md). */
 export const MIN_PAIRS = 8;
 
 export type Pair = {

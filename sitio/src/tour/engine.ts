@@ -35,7 +35,7 @@ import {
   WebGLRenderer,
 } from "three";
 import { groundCoverTexture, leafTexture, soilTexture } from "./textures";
-import { buildWorld, countedAt, type Crop, LENGTH, poseAt, ROW_X, SPAN, WALL, walkZ, WALK } from "./world";
+import { buildWorld, type Crop, LENGTH, poseAt, ROW_X, SPAN, WALL, walkZ, WALK } from "./world";
 
 /**
  * Motor del recorrido: dibuja el invernadero con three.js y mueve la cámara según el avance del
@@ -60,14 +60,17 @@ const DETECT = "#8fd14f";
 export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tour {
   const renderer = new WebGLRenderer({ canvas, antialias: !lite, powerPreference: "high-performance" });
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, lite ? 1.25 : 2));
+  let pixelRatio = Math.min(window.devicePixelRatio, lite ? 1.25 : 2);
+  renderer.setPixelRatio(pixelRatio);
   renderer.shadowMap.enabled = !lite;
   renderer.shadowMap.type = PCFSoftShadowMap;
 
   const scene = new Scene();
   scene.background = new Color("#e6eef1");
-  scene.fog = new Fog("#e8eff1", 12, lite ? 34 : 48);
-  const camera = new PerspectiveCamera(52, 16 / 9, 0.05, 120);
+  const FOG_END = lite ? 34 : 48;
+  scene.fog = new Fog("#e8eff1", 12, FOG_END);
+  // Más allá de la niebla no se ve nada: tampoco se dibuja.
+  const camera = new PerspectiveCamera(52, 16 / 9, 0.05, FOG_END + 2);
 
   scene.add(new HemisphereLight("#f6fafb", "#b8a27a", 1.35));
   scene.add(new AmbientLight("#ffffff", 0.25));
@@ -94,6 +97,8 @@ export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tou
   const v = new Vector3();
   const s = new Vector3();
   const tint = new Color();
+  // Una sola malla por tipo de pieza: en el móvil cuesta más cada llamada de dibujo que cada hoja.
+  // (Probado: repartirla en tramos de la hilera para descartar los que no se ven iba más lento.)
   const instances = (geometry: BufferGeometry, material: Material, items: Instance[], shadows = true) => {
     const mesh = new InstancedMesh(keep(geometry), keep(material), items.length);
     items.forEach((it, i) => {
@@ -106,7 +111,7 @@ export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tou
     mesh.castShadow = shadows && !lite;
     mesh.receiveShadow = !lite;
     scene.add(mesh);
-    return mesh;
+    return [mesh];
   };
 
   // Plantas: tallos, hilos de entutorado y hojas recortadas (también en la sombra).
@@ -125,12 +130,13 @@ export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tou
   instances(new CylinderGeometry(0.0025, 0.0025, 1, 3), new MeshStandardMaterial({ color: "#d8cfb4", roughness: 0.9 }), twine, false);
   for (const crop of Object.keys(leaves) as Crop[]) {
     const map: Texture = keep(leafTexture(crop));
-    const mesh = instances(
+    const meshes = instances(
       new PlaneGeometry(1, 1),
       new MeshStandardMaterial({ map, alphaTest: 0.5, side: DoubleSide, roughness: 0.75, metalness: 0 }),
       leaves[crop],
     );
-    mesh.customDepthMaterial = keep(new MeshDepthMaterial({ depthPacking: RGBADepthPacking, map, alphaTest: 0.5 }));
+    const depth = keep(new MeshDepthMaterial({ depthPacking: RGBADepthPacking, map, alphaTest: 0.5 }));
+    for (const mesh of meshes) mesh.customDepthMaterial = depth;
   }
 
   // Frutos: tomate en esfera, pepino en cápsula y pimiento en campana; piel brillante salvo el pepino.
@@ -220,7 +226,23 @@ export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tou
   let ratio = 1;
   let shown = -1;
   let counted = -1;
-  const ripe = world.fruits.filter((f) => f.ripe);
+  // Frutos maduros ordenados por su posición en la hilera: en cada fotograma solo se miran los
+  // cercanos a la cámara (búsqueda binaria), no los miles del invernadero.
+  const ripe = world.fruits.filter((f) => f.ripe).sort((a, b) => a.pos[2] - b.pos[2]);
+  const ripeZ = ripe.map((f) => f.pos[2]);
+  /** Primer índice con z >= valor. */
+  const firstAtLeast = (value: number) => {
+    let lo = 0;
+    let hi = ripeZ.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (ripeZ[mid] < value) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  };
+  /** Igual que countedAt(world, progress), sin recorrer todos los frutos. */
+  const countedNow = (progress: number) => (progress <= 0 ? 0 : ripeZ.length - firstAtLeast(walkZ(progress) - 0.9 + 1e-9));
   const p = new Vector3();
 
   function drawDetections(progress: number) {
@@ -233,7 +255,10 @@ export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tou
     const camZ = walkZ(progress);
     const focal = height / 2 / Math.tan((camera.fov * Math.PI) / 360);
     ctx.lineWidth = 2;
-    for (const f of ripe) {
+    // Solo los que están entre 6 m por delante y 0,6 m por detrás de la cámara.
+    const end = firstAtLeast(camZ + 0.6 + 1e-9);
+    for (let i = firstAtLeast(camZ - 6); i < end; i++) {
+      const f = ripe[i];
       const ahead = camZ - f.pos[2];
       if (ahead < -0.6 || ahead > 6) continue;
       p.set(...f.pos).applyMatrix4(camera.matrixWorldInverse);
@@ -270,7 +295,7 @@ export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tou
     sun.target.updateMatrixWorld();
     renderer.render(scene, camera);
     drawDetections(progress);
-    const n = countedAt(world, Math.min(progress, WALK));
+    const n = countedNow(Math.min(progress, WALK));
     if (n !== counted) {
       counted = n;
       onCount(n);
@@ -281,8 +306,30 @@ export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tou
   let target = 0;
   let current = 0;
   let frameId = 0;
-  const tick = () => {
+  // Resolución adaptable: se mide el tiempo entre fotogramas mientras se mueve. Si la media pasa
+  // de ~30 ms (menos de 33 imágenes por segundo), se baja un escalón la resolución, hasta 0,6.
+  let lastFrame = 0;
+  let slowSum = 0;
+  let slowCount = 0;
+  const adapt = (now: number) => {
+    if (lastFrame && now - lastFrame < 200) {
+      slowSum += now - lastFrame;
+      slowCount += 1;
+      if (slowCount >= 24) {
+        if (slowSum / slowCount > 30 && pixelRatio > 0.6) {
+          pixelRatio = Math.max(0.6, pixelRatio * 0.8);
+          renderer.setPixelRatio(pixelRatio);
+          renderer.setSize(width, height, false);
+        }
+        slowSum = 0;
+        slowCount = 0;
+      }
+    }
+    lastFrame = now;
+  };
+  const tick = (now: number) => {
     frameId = 0;
+    adapt(now);
     const delta = target - current;
     current = Math.abs(delta) < 0.0004 ? target : current + delta * 0.14;
     if (current !== shown) {
@@ -301,7 +348,7 @@ export function createTour({ canvas, overlay, lite, onCount }: TourOptions): Tou
     // En vertical se abre el ángulo para que quepa la hilera.
     camera.fov = width / height < 1 ? 68 : 52;
     camera.updateProjectionMatrix();
-    ratio = Math.min(window.devicePixelRatio, 2);
+    ratio = Math.min(window.devicePixelRatio, lite ? 1.5 : 2);
     overlay.width = Math.round(width * ratio);
     overlay.height = Math.round(height * ratio);
     shown = -1;

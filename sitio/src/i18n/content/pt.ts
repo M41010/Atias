@@ -54,6 +54,22 @@ export const contentPt: Content = {
       title: "Diário do piloto: como avança a Atias | Atias",
       description: "Novidades datadas do piloto da Atias: do primeiro protótipo à primeira gravação numa estufa real. Só factos, sem números por medir.",
     },
+    articles: {
+      title: "Artigos sobre previsão de colheita em estufa | Atias",
+      description: "Guias práticos sobre estimativa de colheita, planeamento de trabalhadores e precisão das previsões em estufa.",
+    },
+    articlePickers: {
+      title: "Como planear os trabalhadores com a previsão de colheita | Atias",
+      description: "Dos quilos previstos às pessoas, dia a dia: a conta básica, os quilos por jorna e como usar a margem da previsão para contratar.",
+    },
+    articleMistakes: {
+      title: "Sete erros frequentes ao prever a colheita em estufa | Atias",
+      description: "Poucas plantas, fruta escondida, peso médio desatualizado, o tempo e não medir o próprio erro: as falhas mais comuns.",
+    },
+    articleAccuracy: {
+      title: "Que precisão é razoável numa previsão de colheita | Atias",
+      description: "Como medir a precisão de uma previsão de colheita: face à balança, erro ponderado por quilos, enviesamento e porque uma semana não chega.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal do site da Atias." },
     privacy: { title: "Política de privacidade | Atias", description: "Política de privacidade do site da Atias." },
   },
@@ -69,6 +85,7 @@ export const contentPt: Content = {
     measure: "Como medimos",
     investors: "Investidores",
     journal: "Diário do piloto",
+    articles: "Artigos",
     breadcrumb: "Percurso de navegação",
   },
   guide: {
@@ -503,7 +520,7 @@ export const contentPt: Content = {
     "title": "O que a cooperativa vê todas as segundas-feiras",
     "lead": "Ecrãs reais da aplicação, com dados de exemplo. Cada um responde a uma decisão da semana.",
     "sample": "Dados de exemplo",
-    "blurred": "Os nomes das variedades aparecem desfocados.",
+    "blurred": "Os nomes das variedades são genéricos.",
     "uiLanguage": "A aplicação é mostrada em espanhol.",
     "tabsLabel": "Ecrãs da aplicação",
     "screens": [
@@ -563,5 +580,197 @@ export const contentPt: Content = {
     ],
     "pending": "O prazo para apagar os vídeos em uso ainda não está fixado.",
     "more": "Mais sobre segurança e dados"
+  },
+  compare: {
+    "eyebrow": "Comparação",
+    "title": "Como se prevê hoje a colheita, e como o faz a Atias",
+    "lead": "Sem exagerar: o que cada forma de prever traz, e o que não traz.",
+    "methods": [
+      "A olho",
+      "Contagem manual",
+      "Atias"
+    ],
+    "rows": [
+      {
+        "criterion": "O que se observa",
+        "values": [
+          "Algumas plantas de passagem",
+          "Algumas plantas de amostra",
+          "Toda a linha, troço a troço"
+        ]
+      },
+      {
+        "criterion": "Esforço",
+        "values": [
+          "Uma visita por estufa",
+          "Horas a contar à mão",
+          "Alguns minutos de vídeo por linha"
+        ]
+      },
+      {
+        "criterion": "Que número dá",
+        "values": [
+          "Quilos da semana",
+          "Frutos por planta, a extrapolar",
+          "Quilos por dia, de segunda a sexta"
+        ]
+      },
+      {
+        "criterion": "Margem de erro",
+        "values": [
+          "Não indicada",
+          "Não indicada",
+          "Sempre, junto ao número"
+        ]
+      },
+      {
+        "criterion": "Pode comprovar-se",
+        "values": [
+          "Dificilmente",
+          "Só nas plantas contadas",
+          "Sim: cada troço, e face à balança"
+        ]
+      },
+      {
+        "criterion": "Precisão publicada",
+        "values": [
+          "Não",
+          "Não",
+          "Será publicada com o método «Como medimos»"
+        ]
+      }
+    ],
+    "note": "A Atias não substitui o técnico: dá-lhe um número contado para confrontar o seu."
+      },
+  articles: {
+    "index": {
+      "eyebrow": "Artigos",
+      "title": "Artigos sobre previsão de colheita",
+      "lead": "O que aprendemos sobre estimativa de colheita, trabalhadores e precisão, escrito para quem trabalha na estufa.",
+      "read": "Ler"
+    },
+    "date": "2026-11-11",
+    "updated": "Publicado em novembro de 2026",
+    "pickers": {
+      "eyebrow": "Artigo",
+      "title": "Como planear os trabalhadores da semana com a previsão de colheita",
+      "lead": "Contratar a mais custa jornas; a menos, deixa fruta por colher. Uma forma simples de passar dos quilos previstos às pessoas, dia a dia.",
+      "sections": [
+        {
+          "heading": "A conta básica",
+          "paragraphs": [
+            "As pessoas necessárias num dia são, no essencial, os quilos a colher nesse dia divididos pelos quilos que uma pessoa colhe numa jorna.",
+            "Um exemplo com números inventados: se na terça-feira é preciso colher 2.400 kg e uma pessoa colhe cerca de 300 kg por jorna nessa cultura, são precisas 8 pessoas."
+          ]
+        },
+        {
+          "heading": "Os quilos por jorna mudam",
+          "paragraphs": [
+            "Colher tomate cereja não é o mesmo que colher pimento ou pepino, nem o início da campanha é igual ao pico. Convém registar o valor por cultura e atualizá-lo com o que se colhe realmente cada semana.",
+            "Um valor mal estimado desloca toda a conta: usar 300 quando a equipa colhe 250 deixa uma pessoa a menos em cada seis."
+          ]
+        },
+        {
+          "heading": "Planear com a margem, não só com o número",
+          "paragraphs": [
+            "Uma previsão útil dá um número e uma margem. Para contratar, o prudente é olhar para o extremo alto da margem nos dias fortes e para o valor central nos restantes.",
+            "Assim evita-se ficar curto no dia que mais pesa, sem encher a semana de jornas a mais."
+          ]
+        },
+        {
+          "heading": "Repartir a semana dia a dia",
+          "paragraphs": [
+            "A fruta não amadurece por igual: o calor adianta e o frio atrasa. Por isso serve mais uma previsão por dia, de segunda a sexta, do que um número semanal dividido em partes iguais.",
+            "A Atias calcula os trabalhadores de cada dia a partir da sua previsão diária e dos quilos por jorna indicados pela cooperativa, e mostra também o extremo alto."
+          ]
+        }
+      ]
+    },
+    "mistakes": {
+      "eyebrow": "Artigo",
+      "title": "Sete erros frequentes ao prever a colheita em estufa",
+      "lead": "A maioria não vem de fazer mal as contas, mas do que não se observa.",
+      "sections": [
+        {
+          "heading": "1. Olhar para poucas plantas",
+          "paragraphs": [
+            "Algumas plantas vistas de passagem não representam uma estufa inteira: as linhas das bordas, as zonas com mais sombra ou com rega diferente comportam-se de outra forma."
+          ]
+        },
+        {
+          "heading": "2. Confundir o maduro com o que se vai colher",
+          "paragraphs": [
+            "A fruta madura de hoje não é a que se vai colher toda a semana: outra parte vai amadurecer nos próximos dias, mais depressa se estiver calor."
+          ]
+        },
+        {
+          "heading": "3. Esquecer a fruta escondida",
+          "paragraphs": [
+            "O que não se vê do corredor também conta. Se nunca se mede que parte fica escondida entre as folhas, a previsão fica sempre curta."
+          ]
+        },
+        {
+          "heading": "4. Um peso médio desatualizado",
+          "paragraphs": [
+            "O peso de cada fruto muda ao longo da campanha. Um erro no peso passa inteiro para os quilos: não se compensa ao somar."
+          ]
+        },
+        {
+          "heading": "5. Ignorar o tempo",
+          "paragraphs": [
+            "Uma semana de calor adianta a maturação e uma de frio atrasa-a. Prever sem olhar para a previsão meteorológica é prever às cegas."
+          ]
+        },
+        {
+          "heading": "6. Dar um número sem margem",
+          "paragraphs": [
+            "Uma previsão sem margem aparenta mais segurança do que tem. Com a margem decide-se melhor quanto vender e quantas pessoas chamar."
+          ]
+        },
+        {
+          "heading": "7. Não medir o próprio erro",
+          "paragraphs": [
+            "Se não se compara todas as semanas a previsão com o que foi pesado na balança, ninguém sabe quanto se engana nem se melhora. É o erro mais caro, porque esconde todos os outros."
+          ]
+        }
+      ]
+    },
+    "accuracy": {
+      "eyebrow": "Artigo",
+      "title": "Que precisão é razoável numa previsão de colheita?",
+      "lead": "Antes de perguntar quanto acerta uma previsão, é preciso combinar como se mede.",
+      "sections": [
+        {
+          "heading": "Medir face à balança",
+          "paragraphs": [
+            "A única referência válida é o que foi colhido e pesado. Comparar uma previsão com outra estimativa não diz nada sobre a sua precisão.",
+            "E é preciso comparar o mesmo: a previsão de segunda a sexta com os quilos de segunda a sexta, não com a fruta visível no dia da gravação."
+          ]
+        },
+        {
+          "heading": "Um erro que não engana",
+          "paragraphs": [
+            "O erro de cada semana é a diferença entre o previsto e o colhido, em percentagem do colhido. Ao juntar semanas convém ponderar por quilos, para que uma semana pequena não pese tanto como uma grande.",
+            "O enviesamento também importa: se uma previsão fica sempre acima, ou sempre abaixo, pode ser corrigida."
+          ]
+        },
+        {
+          "heading": "Uma semana não chega",
+          "paragraphs": [
+            "Uma boa semana pode ser sorte. Para afirmar uma precisão são precisas várias semanas e estufas que não tenham sido usadas para afinar o método.",
+            "Na Atias exigimos pelo menos 8, e que até o extremo alto do intervalo de confiança fique abaixo de 10 % de erro."
+          ]
+        },
+        {
+          "heading": "Comparar com o que já se usa",
+          "paragraphs": [
+            "Um número de precisão sozinho diz pouco. O útil é compará-lo com a previsão que já se usa, a do técnico ou a do agricultor, medida da mesma forma nas mesmas semanas.",
+            "Não há um número de referência publicado para o setor. Por isso publicamos o método antes do resultado."
+          ]
+        }
+      ]
+    },
+    "ctaTitle": "Experimentamos nas suas estufas?",
+    "ctaBody": "Experimente a Atias gratuitamente durante 4 semanas e compare a previsão com a sua balança."
   },
 };
