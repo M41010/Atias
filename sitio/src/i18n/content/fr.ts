@@ -50,6 +50,10 @@ export const contentFr: Content = {
       title: "Investisseurs et partenaires : investir dans Atias | Atias",
       description: "Atias compte les fruits de chaque rang pour prévoir la récolte en serre. Nous cherchons des investisseurs et des partenaires pour l’amener à sa première saison.",
     },
+    journal: {
+      title: "Journal du pilote : comment avance Atias | Atias",
+      description: "Les nouvelles datées du pilote d’Atias : du premier prototype au premier tournage dans une vraie serre. Uniquement des faits, sans chiffres non mesurés.",
+    },
     notice: { title: "Mentions légales | Atias", description: "Mentions légales du site d'Atias." },
     privacy: { title: "Politique de confidentialité | Atias", description: "Politique de confidentialité du site d'Atias." },
   },
@@ -64,6 +68,7 @@ export const contentFr: Content = {
     vision: "Vision",
     measure: "Comment nous mesurons",
     investors: "Investisseurs",
+    journal: "Journal du pilote",
     breadcrumb: "Fil d'Ariane",
   },
   guide: {

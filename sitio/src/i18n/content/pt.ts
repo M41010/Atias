@@ -50,6 +50,10 @@ export const contentPt: Content = {
       title: "Investidores e parceiros: investir na Atias | Atias",
       description: "A Atias conta a fruta de cada linha para prever a colheita em estufa. Procuramos investidores e parceiros que nos ajudem a levá-la à primeira campanha.",
     },
+    journal: {
+      title: "Diário do piloto: como avança a Atias | Atias",
+      description: "Novidades datadas do piloto da Atias: do primeiro protótipo à primeira gravação numa estufa real. Só factos, sem números por medir.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal do site da Atias." },
     privacy: { title: "Política de privacidade | Atias", description: "Política de privacidade do site da Atias." },
   },
@@ -64,6 +68,7 @@ export const contentPt: Content = {
     vision: "Visão",
     measure: "Como medimos",
     investors: "Investidores",
+    journal: "Diário do piloto",
     breadcrumb: "Percurso de navegação",
   },
   guide: {

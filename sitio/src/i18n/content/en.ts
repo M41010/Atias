@@ -50,6 +50,10 @@ export const contentEn: Content = {
       title: "Investors and partners: invest in Atias | Atias",
       description: "Atias counts the fruit in every row to forecast greenhouse harvests. We are looking for investors and partners to help take it to its first season.",
     },
+    journal: {
+      title: "Pilot journal: how Atias is progressing | Atias",
+      description: "Dated news from the Atias pilot: from the first prototype to the first recording in a real greenhouse. Facts only, no unmeasured figures.",
+    },
     notice: { title: "Legal notice | Atias", description: "Legal notice for the Atias website." },
     privacy: { title: "Privacy policy | Atias", description: "Privacy policy for the Atias website." },
   },
@@ -64,6 +68,7 @@ export const contentEn: Content = {
     vision: "Vision",
     measure: "How we measure",
     investors: "Investors",
+    journal: "Pilot journal",
     breadcrumb: "Breadcrumb",
   },
   guide: {

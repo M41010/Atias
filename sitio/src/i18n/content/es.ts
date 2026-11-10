@@ -53,6 +53,10 @@ export const contentEs = {
       title: "Inversores y socios: invertir en Atias | Atias",
       description: "Atias cuenta la fruta de cada hilera para prever la cosecha en invernadero. Buscamos inversores y socios que nos ayuden a llevarlo a su primera temporada.",
     },
+    journal: {
+      title: "Diario del piloto: cómo avanza Atias | Atias",
+      description: "Novedades fechadas del piloto de Atias: del primer prototipo a la primera grabación en un invernadero real. Solo hechos, sin cifras sin medir.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal de la web de Atias." },
     privacy: { title: "Política de privacidad | Atias", description: "Política de privacidad de la web de Atias." },
   },
@@ -67,6 +71,7 @@ export const contentEs = {
     vision: "Visión",
     measure: "Cómo medimos",
     investors: "Inversores",
+    journal: "Diario del piloto",
     breadcrumb: "Ruta de navegación",
   },
   guide: {

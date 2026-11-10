@@ -50,6 +50,10 @@ export const contentNl: Content = {
       title: "Investeerders en partners: investeren in Atias | Atias",
       description: "Atias telt het fruit in elke rij om de oogst in de kas te voorspellen. We zoeken investeerders en partners om het naar het eerste seizoen te brengen.",
     },
+    journal: {
+      title: "Pilotlogboek: hoe Atias vordert | Atias",
+      description: "Gedateerd nieuws uit de Atias-pilot: van het eerste prototype tot de eerste opname in een echte kas. Alleen feiten, geen ongemeten cijfers.",
+    },
     notice: { title: "Juridische informatie | Atias", description: "Juridische informatie over de website van Atias." },
     privacy: { title: "Privacybeleid | Atias", description: "Privacybeleid van de website van Atias." },
   },
@@ -64,6 +68,7 @@ export const contentNl: Content = {
     vision: "Visie",
     measure: "Hoe we meten",
     investors: "Investeerders",
+    journal: "Pilotlogboek",
     breadcrumb: "Kruimelpad",
   },
   guide: {
