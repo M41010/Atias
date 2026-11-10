@@ -38,6 +38,10 @@ export const contentNl: Content = {
       description:
         "Oogstraming van cherrytomaat, paprika en komkommer in de kas met computervisie: wat Atias per gewas telt en wat nog getest wordt.",
     },
+    vision: {
+      "title": "Visie: van vruchten tellen naar de hele kas verzorgen | Atias",
+      "description": "Waar Atias naartoe gaat: van oogstprognose naar gewasbescherming en gewasconditie, versie na versie. Atias adviseert, de teeltadviseur beslist."
+    },
     notice: { title: "Juridische informatie | Atias", description: "Juridische informatie over de website van Atias." },
     privacy: { title: "Privacybeleid | Atias", description: "Privacybeleid van de website van Atias." },
   },
@@ -49,6 +53,7 @@ export const contentNl: Content = {
     guideTeaser: "Hoe oogstraming nu gebeurt en waarom het misgaat",
     faqTeaser: "Antwoorden op de meest gestelde vragen",
     cropTeaser: "Bekijk de gewaspagina",
+    vision: "Visie",
     breadcrumb: "Kruimelpad",
   },
   guide: {
@@ -253,5 +258,84 @@ export const contentNl: Content = {
     "control": "Telling van de camera tegen de handtelling in de controlesecties: {value} verschil.",
     "method": "Fout: verschil tussen prognose en oogst, als percentage van de geplukte kilo's. Positieve afwijking: overschatting.",
     "caution": "Met minder dan 8 gemeten weken geeft het resultaat een richting, geen bewijs."
+  },
+  vision: {
+    "eyebrow": "Visie",
+    "title": "Van vruchten tellen naar de hele kas verzorgen",
+    "lead": "Dezelfde camera die rijpe vruchten telt, kan ook plagen, ziekten en de conditie van elke plant zien. We beginnen met de oogst, omdat die op de weegschaal te controleren is; de rest volgt versie na versie.",
+    "roadmapTitle": "Routekaart",
+    "roadmapLead": "Elke versie bouwt voort op de vorige en begint pas als die heeft bewezen dat ze werkt.",
+    "versions": [
+      {
+        "version": "0.9",
+        "name": "Pilot",
+        "when": "Nu",
+        "line": "De oogstprognose in echte kassen meten tegen wat er geplukt wordt.",
+        "items": [
+          "Eén video per rij, gefilmd met de telefoon",
+          "Rijpe vruchten geteld per rijsectie",
+          "Vergelijking met de prognose van de teler en de teeltadviseur"
+        ]
+      },
+      {
+        "version": "1.0",
+        "name": "Eerste seizoen",
+        "when": "Daarna",
+        "line": "De coöperatie gebruikt Atias elke week om te beslissen wat ze verkoopt en wie ze inhuurt.",
+        "items": [
+          "Draait in de cloud",
+          "Gekoppeld aan het beheersysteem van de coöperatie",
+          "Nauwkeurigheid week na week gemeten"
+        ]
+      },
+      {
+        "version": "1.x",
+        "name": "Continue verbetering",
+        "when": "Tijdens het seizoen",
+        "line": "De prognose verfijnen met wat we elke week leren.",
+        "items": [
+          "Sensoren in de kas",
+          "Meldingen als een rij ontbreekt of een video mislukt",
+          "Wekelijkse rapporten"
+        ]
+      },
+      {
+        "version": "2.0",
+        "name": "Niet meer handmatig filmen",
+        "when": "Later",
+        "line": "Niemand hoeft meer te filmen en de dagoogst is bekend vóór het wegen.",
+        "items": [
+          "Een camera die over een rail langs de rij rijdt",
+          "Kilo's in elke krat van de plukkers"
+        ]
+      },
+      {
+        "version": "3.0",
+        "name": "Gewasbescherming",
+        "when": "Later",
+        "line": "Plagen en ziekten vinden voordat ze zich verspreiden.",
+        "items": [
+          "Detectie op de plant en op vangplaten",
+          "Kaart van haarden per rij",
+          "Risicomelding op basis van het klimaat en wat te doen per zone"
+        ]
+      },
+      {
+        "version": "4.0",
+        "name": "Gewasconditie",
+        "when": "Later",
+        "line": "Weten hoe elke zone van het gewas ervoor staat en hoe die te sturen.",
+        "items": [
+          "Droogtestress en irrigatie",
+          "Voeding",
+          "Groei, bloei en vruchtzetting",
+          "Kasklimaat"
+        ]
+      }
+    ],
+    "principleEyebrow": "Ons principe",
+    "principleTitle": "Atias adviseert, de teeltadviseur beslist",
+    "principleBody": "Atias vervangt niemand: het geeft wie het gewas kent ogen in elke rij. Beslissingen over verkoop, behandeling en teelt blijven bij mensen.",
+    "closeTitle": "Wil je de pilot zien?"
   },
 };

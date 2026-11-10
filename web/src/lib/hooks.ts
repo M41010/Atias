@@ -36,6 +36,52 @@ export function useDocumentTitle(title: string): void {
   }, [title]);
 }
 
+/**
+ * Mantiene la pantalla encendida mientras `active`. En el móvil, si la pantalla se apaga en mitad de
+ * una subida, el navegador congela la página y la subida se corta. El bloqueo se pierde al cambiar de
+ * pestaña, así que se vuelve a pedir al regresar. Sin soporte (navegadores antiguos), no hace nada.
+ */
+export function useWakeLock(active: boolean): void {
+  useEffect(() => {
+    if (!active || !("wakeLock" in navigator)) return;
+    let lock: WakeLockSentinel | null = null;
+    let cancelled = false;
+    const request = () => {
+      if (document.visibilityState !== "visible") return;
+      navigator.wakeLock
+        .request("screen")
+        .then((sentinel) => {
+          if (cancelled) void sentinel.release();
+          else lock = sentinel;
+        })
+        .catch(() => {});
+    };
+    request();
+    document.addEventListener("visibilitychange", request);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", request);
+      void lock?.release().catch(() => {});
+    };
+  }, [active]);
+}
+
+type NetworkInformation = { type?: string; saveData?: boolean; addEventListener?: (event: "change", fn: () => void) => void; removeEventListener?: (event: "change", fn: () => void) => void };
+
+/** Si el móvil sube con datos móviles. Solo lo saben algunos navegadores (Chrome en Android). */
+export function useCellular(): boolean {
+  const [cellular, setCellular] = useState(false);
+  useEffect(() => {
+    const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
+    if (!connection) return;
+    const update = () => setCellular(connection.type === "cellular" || Boolean(connection.saveData));
+    update();
+    connection.addEventListener?.("change", update);
+    return () => connection.removeEventListener?.("change", update);
+  }, []);
+  return cellular;
+}
+
 export function useOnline(): boolean {
   const [online, setOnline] = useState(true);
   useEffect(() => {

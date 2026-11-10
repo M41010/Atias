@@ -13,6 +13,7 @@ export const es = {
     company: "Quiénes somos",
     product: "Producto",
     contact: "Contacto",
+    vision: "Visión",
     pilot: "Piloto en curso",
     language: "Idioma",
     menu: "Menú",

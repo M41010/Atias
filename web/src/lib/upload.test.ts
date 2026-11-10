@@ -20,6 +20,7 @@ import {
   summarize,
   uploadKey,
   validateVideo,
+  videoMimeType,
 } from "./upload";
 
 const MB = 1024 ** 2;
@@ -48,6 +49,26 @@ describe("validateVideo", () => {
     expect(validateVideo({ type: "image/jpeg", size: MB })).toMatch(/no es un vídeo/);
     expect(validateVideo({ type: "video/mp4", size: 0 })).toMatch(/vacío/);
     expect(validateVideo({ type: "video/mp4", size: MAX_VIDEO_BYTES + 1 })).toMatch(/8 GB/);
+  });
+
+  it("acepta vídeos de galerías de Android sin tipo, por la extensión", () => {
+    expect(validateVideo({ name: "VID_20261114.mp4", type: "", size: MB })).toBeNull();
+    expect(validateVideo({ name: "clip.MOV", type: "", size: MB })).toBeNull();
+    expect(validateVideo({ name: "clip.m4v", type: "video/x-m4v", size: MB })).toBeNull();
+  });
+
+  it("explica que el formato no se admite cuando es un vídeo raro", () => {
+    expect(validateVideo({ name: "clip.avi", type: "video/x-msvideo", size: MB })).toMatch(/formato/);
+    expect(validateVideo({ name: "sin-extension", type: "", size: MB })).toMatch(/formato/);
+  });
+});
+
+describe("videoMimeType", () => {
+  it("da el tipo que espera el servidor", () => {
+    expect(videoMimeType({ name: "a.mp4", type: "video/mp4" })).toBe("video/mp4");
+    expect(videoMimeType({ name: "a.m4v", type: "video/x-m4v" })).toBe("video/mp4");
+    expect(videoMimeType({ name: "a.3gp", type: "" })).toBe("video/3gpp");
+    expect(videoMimeType({ name: "a.jpg", type: "image/jpeg" })).toBeNull();
   });
 });
 

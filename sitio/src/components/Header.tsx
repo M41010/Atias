@@ -10,10 +10,11 @@ import { Wordmark } from "./Mark";
 
 type Props = { locale: Locale; nav: Dictionary["nav"] };
 
-const LINKS: { page: Page; key: "home" | "company" | "product" | "contact" }[] = [
+const LINKS: { page: Page; key: "home" | "company" | "product" | "vision" | "contact" }[] = [
   { page: "", key: "home" },
   { page: "empresa", key: "company" },
   { page: "producto", key: "product" },
+  { page: "vision", key: "vision" },
   { page: "contacto", key: "contact" },
 ];
 
@@ -35,7 +36,7 @@ export function Header({ locale, nav }: Props) {
         </Link>
 
         <nav aria-label={nav.menu} className="ml-6 hidden items-center gap-1 md:flex">
-          {LINKS.slice(1, 3).map(({ page, key }) => (
+          {LINKS.slice(1, 4).map(({ page, key }) => (
             <Link
               key={page}
               href={pathFor(locale, page)}

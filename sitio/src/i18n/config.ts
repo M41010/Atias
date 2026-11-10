@@ -48,6 +48,7 @@ export const PAGES = [
   "aforo-de-cosecha",
   "preguntas-frecuentes",
   "cultivos",
+  "vision",
 ] as const;
 export type Page = (typeof PAGES)[number];
 export type SubPage = Exclude<Page, "">;
@@ -69,6 +70,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "aforo-de-cosecha": "aforo-de-cosecha",
     "preguntas-frecuentes": "preguntas-frecuentes",
     cultivos: "cultivos",
+    vision: "vision",
   },
   en: {
     empresa: "about",
@@ -79,6 +81,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "aforo-de-cosecha": "crop-yield-estimation",
     "preguntas-frecuentes": "faq",
     cultivos: "crops",
+    vision: "vision",
   },
   fr: {
     empresa: "a-propos",
@@ -89,6 +92,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "aforo-de-cosecha": "estimation-de-recolte",
     "preguntas-frecuentes": "questions-frequentes",
     cultivos: "cultures",
+    vision: "vision",
   },
   nl: {
     empresa: "over-ons",
@@ -99,6 +103,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "aforo-de-cosecha": "oogstraming",
     "preguntas-frecuentes": "veelgestelde-vragen",
     cultivos: "gewassen",
+    vision: "visie",
   },
   it: {
     empresa: "chi-siamo",
@@ -109,6 +114,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "aforo-de-cosecha": "stima-del-raccolto",
     "preguntas-frecuentes": "domande-frequenti",
     cultivos: "colture",
+    vision: "visione",
   },
   pt: {
     empresa: "quem-somos",
@@ -119,6 +125,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     "aforo-de-cosecha": "estimativa-de-colheita",
     "preguntas-frecuentes": "perguntas-frequentes",
     cultivos: "culturas",
+    vision: "visao",
   },
 };
 

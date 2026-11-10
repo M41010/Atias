@@ -38,6 +38,10 @@ export const contentFr: Content = {
       description:
         "Estimation de récolte de tomate cerise, poivron et concombre sous serre par vision artificielle : ce qu'Atias compte et ce qui est encore en test.",
     },
+    vision: {
+      "title": "Vision : de compter les fruits à soigner la serre | Atias",
+      "description": "Où va Atias : de la prévision de récolte à la santé des plantes et à l'état des cultures, version après version. Atias recommande, le technicien décide."
+    },
     notice: { title: "Mentions légales | Atias", description: "Mentions légales du site d'Atias." },
     privacy: { title: "Politique de confidentialité | Atias", description: "Politique de confidentialité du site d'Atias." },
   },
@@ -49,6 +53,7 @@ export const contentFr: Content = {
     guideTeaser: "Comment on estime la récolte aujourd'hui et pourquoi ça échoue",
     faqTeaser: "Réponses aux questions les plus courantes",
     cropTeaser: "Voir la page de la culture",
+    vision: "Vision",
     breadcrumb: "Fil d'Ariane",
   },
   guide: {
@@ -253,5 +258,84 @@ export const contentFr: Content = {
     "control": "Comptage de la caméra face au comptage manuel dans les tronçons de contrôle : {value} d'écart.",
     "method": "Erreur : écart entre la prévision et la récolte, en pourcentage des kilos récoltés. Biais positif : surestimation.",
     "caution": "Avec moins de 8 semaines mesurées, le résultat oriente mais ne prouve pas."
+  },
+  vision: {
+    "eyebrow": "Vision",
+    "title": "De compter les fruits à soigner toute la serre",
+    "lead": "La caméra qui compte les fruits mûrs peut aussi voir les ravageurs, les maladies et l'état de chaque plante. Nous commençons par la récolte, car elle se vérifie sur la balance ; le reste viendra version après version.",
+    "roadmapTitle": "Feuille de route",
+    "roadmapLead": "Chaque version s'appuie sur la précédente et ne commence que lorsque celle-ci a prouvé qu'elle fonctionne.",
+    "versions": [
+      {
+        "version": "0.9",
+        "name": "Pilote",
+        "when": "Maintenant",
+        "line": "Mesurer la prévision de récolte dans de vraies serres face à ce qui est récolté.",
+        "items": [
+          "Une vidéo par rang filmée au téléphone",
+          "Comptage des fruits mûrs par tronçon de rang",
+          "Comparaison avec la prévision du producteur et du technicien"
+        ]
+      },
+      {
+        "version": "1.0",
+        "name": "Première saison",
+        "when": "Ensuite",
+        "line": "La coopérative utilise Atias chaque semaine pour décider quoi vendre et qui embaucher.",
+        "items": [
+          "Fonctionnement dans le cloud",
+          "Connexion au système de gestion de la coopérative",
+          "Précision mesurée semaine après semaine"
+        ]
+      },
+      {
+        "version": "1.x",
+        "name": "Amélioration continue",
+        "when": "Pendant la saison",
+        "line": "Affiner la prévision avec ce que l'on apprend chaque semaine.",
+        "items": [
+          "Capteurs dans la serre",
+          "Alertes quand il manque un rang ou qu'une vidéo est ratée",
+          "Rapports hebdomadaires"
+        ]
+      },
+      {
+        "version": "2.0",
+        "name": "Sans filmer à la main",
+        "when": "Plus tard",
+        "line": "Plus personne ne filme, et la récolte du jour est connue avant la pesée.",
+        "items": [
+          "Une caméra qui parcourt le rang sur un rail",
+          "Les kilos de chaque caisse des cueilleurs"
+        ]
+      },
+      {
+        "version": "3.0",
+        "name": "Santé des plantes",
+        "when": "Plus tard",
+        "line": "Trouver ravageurs et maladies avant qu'ils ne s'étendent.",
+        "items": [
+          "Détection sur la plante et sur les pièges chromatiques",
+          "Carte des foyers par rang",
+          "Alerte de risque selon le climat et quoi faire dans chaque zone"
+        ]
+      },
+      {
+        "version": "4.0",
+        "name": "État de la plante",
+        "when": "Plus tard",
+        "line": "Savoir comment va chaque zone de la culture et comment la conduire.",
+        "items": [
+          "Stress hydrique et irrigation",
+          "Nutrition",
+          "Croissance, floraison et nouaison",
+          "Climat de la serre"
+        ]
+      }
+    ],
+    "principleEyebrow": "Notre principe",
+    "principleTitle": "Atias recommande, le technicien décide",
+    "principleBody": "Atias ne remplace personne : il donne des yeux sur chaque rang à ceux qui connaissent la culture. Les décisions de vente, de traitement et de conduite restent humaines.",
+    "closeTitle": "Envie de voir le pilote ?"
   },
 };

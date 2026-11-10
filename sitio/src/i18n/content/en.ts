@@ -38,6 +38,10 @@ export const contentEn: Content = {
       description:
         "Yield estimation for greenhouse cherry tomato, pepper and cucumber with computer vision: what Atias counts in each crop and what is still being tested.",
     },
+    vision: {
+      "title": "Vision: from counting fruit to caring for the greenhouse | Atias",
+      "description": "Where Atias is heading: from harvest forecasting to plant health and crop condition, one version at a time. Atias recommends, the agronomist decides."
+    },
     notice: { title: "Legal notice | Atias", description: "Legal notice for the Atias website." },
     privacy: { title: "Privacy policy | Atias", description: "Privacy policy for the Atias website." },
   },
@@ -49,6 +53,7 @@ export const contentEn: Content = {
     guideTeaser: "How yield estimation is done today and why it fails",
     faqTeaser: "Answers to the most common questions",
     cropTeaser: "See the crop page",
+    vision: "Vision",
     breadcrumb: "Breadcrumb",
   },
   guide: {
@@ -253,5 +258,84 @@ export const contentEn: Content = {
     "control": "Camera count against the hand count in the control sections: {value} difference.",
     "method": "Error: difference between forecast and harvest, as a percentage of the kilos picked. Positive bias: overestimating.",
     "caution": "With fewer than 8 weeks measured, the result is a pointer, not proof."
+  },
+  vision: {
+    "eyebrow": "Vision",
+    "title": "From counting fruit to caring for the whole greenhouse",
+    "lead": "The same camera that counts ripe fruit can spot pests, diseases and how each plant is doing. We start with the harvest because it can be checked on the scale; the rest comes one version at a time.",
+    "roadmapTitle": "Roadmap",
+    "roadmapLead": "Each version builds on the previous one and only starts once that one has proven it works.",
+    "versions": [
+      {
+        "version": "0.9",
+        "name": "Pilot",
+        "when": "Now",
+        "line": "Measure the harvest forecast in real greenhouses against what is picked.",
+        "items": [
+          "One phone video per row",
+          "Ripe fruit counted per row section",
+          "Compared with the grower's and the agronomist's forecast"
+        ]
+      },
+      {
+        "version": "1.0",
+        "name": "First season",
+        "when": "Next",
+        "line": "The cooperative uses Atias every week to decide what to sell and whom to hire.",
+        "items": [
+          "Runs in the cloud",
+          "Connected to the cooperative's management system",
+          "Accuracy measured week by week"
+        ]
+      },
+      {
+        "version": "1.x",
+        "name": "Continuous improvement",
+        "when": "During the season",
+        "line": "Sharpen the forecast with what is learned each week.",
+        "items": [
+          "Sensors inside the greenhouse",
+          "Alerts when a row is missing or a video goes wrong",
+          "Weekly reports"
+        ]
+      },
+      {
+        "version": "2.0",
+        "name": "No more manual recording",
+        "when": "Later",
+        "line": "Nobody has to record, and the day's harvest is known before weighing.",
+        "items": [
+          "A camera that runs along the row on a rail",
+          "Kilos in each picker's crate"
+        ]
+      },
+      {
+        "version": "3.0",
+        "name": "Plant health",
+        "when": "Later",
+        "line": "Find pests and diseases before they spread.",
+        "items": [
+          "Detection on the plant and on sticky traps",
+          "Map of hotspots per row",
+          "Climate-based risk alerts and what to do in each zone"
+        ]
+      },
+      {
+        "version": "4.0",
+        "name": "Crop condition",
+        "when": "Later",
+        "line": "Know how each zone of the crop is doing and how to manage it.",
+        "items": [
+          "Water stress and irrigation",
+          "Nutrition",
+          "Growth, flowering and fruit set",
+          "Greenhouse climate"
+        ]
+      }
+    ],
+    "principleEyebrow": "Our principle",
+    "principleTitle": "Atias recommends, the agronomist decides",
+    "principleBody": "Atias replaces nobody: it gives the people who know the crop eyes on every row. Decisions on sales, treatments and crop management stay with people.",
+    "closeTitle": "Want to see the pilot?"
   },
 };

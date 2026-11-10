@@ -38,6 +38,10 @@ export const contentIt: Content = {
       description:
         "Stima del raccolto di pomodoro ciliegino, peperone e cetriolo in serra con visione artificiale: cosa conta Atias e cosa è ancora in prova.",
     },
+    vision: {
+      "title": "Visione: dal contare i frutti al curare la serra | Atias",
+      "description": "Dove va Atias: dalla previsione del raccolto alla difesa delle piante e allo stato della coltura, versione dopo versione. Atias consiglia, il tecnico decide."
+    },
     notice: { title: "Note legali | Atias", description: "Note legali del sito di Atias." },
     privacy: { title: "Informativa sulla privacy | Atias", description: "Informativa sulla privacy del sito di Atias." },
   },
@@ -49,6 +53,7 @@ export const contentIt: Content = {
     guideTeaser: "Come si stima oggi il raccolto e perché sbaglia",
     faqTeaser: "Le risposte alle domande più comuni",
     cropTeaser: "Vedi la pagina della coltura",
+    vision: "Visione",
     breadcrumb: "Percorso di navigazione",
   },
   guide: {
@@ -253,5 +258,84 @@ export const contentIt: Content = {
     "control": "Conteggio della telecamera rispetto al conteggio manuale nei tratti di controllo: {value} di differenza.",
     "method": "Errore: differenza tra previsione e raccolto, in percentuale dei chili raccolti. Distorsione positiva: sovrastima.",
     "caution": "Con meno di 8 settimane misurate, il risultato orienta ma non dimostra."
+  },
+  vision: {
+    "eyebrow": "Visione",
+    "title": "Dal contare i frutti al curare tutta la serra",
+    "lead": "La stessa telecamera che conta i frutti maturi può vedere parassiti, malattie e lo stato di ogni pianta. Partiamo dal raccolto perché si verifica sulla bilancia; il resto arriva versione dopo versione.",
+    "roadmapTitle": "Tabella di marcia",
+    "roadmapLead": "Ogni versione si basa sulla precedente e inizia solo quando quella ha dimostrato di funzionare.",
+    "versions": [
+      {
+        "version": "0.9",
+        "name": "Pilota",
+        "when": "Ora",
+        "line": "Misurare la previsione del raccolto in serre reali rispetto a quanto raccolto.",
+        "items": [
+          "Un video per fila girato con il telefono",
+          "Conteggio dei frutti maturi per tratto di fila",
+          "Confronto con la previsione dell'agricoltore e del tecnico"
+        ]
+      },
+      {
+        "version": "1.0",
+        "name": "Prima stagione",
+        "when": "Dopo",
+        "line": "La cooperativa usa Atias ogni settimana per decidere cosa vendere e chi assumere.",
+        "items": [
+          "Funzionamento nel cloud",
+          "Collegamento al gestionale della cooperativa",
+          "Precisione misurata settimana dopo settimana"
+        ]
+      },
+      {
+        "version": "1.x",
+        "name": "Miglioramento continuo",
+        "when": "Durante la stagione",
+        "line": "Affinare la previsione con ciò che si impara ogni settimana.",
+        "items": [
+          "Sensori dentro la serra",
+          "Avvisi quando manca una fila o un video non va bene",
+          "Report settimanali"
+        ]
+      },
+      {
+        "version": "2.0",
+        "name": "Senza riprese manuali",
+        "when": "Più avanti",
+        "line": "Nessuno deve più filmare e il raccolto del giorno si conosce prima della pesata.",
+        "items": [
+          "Una telecamera che percorre la fila su una rotaia",
+          "I chili di ogni cassetta dei raccoglitori"
+        ]
+      },
+      {
+        "version": "3.0",
+        "name": "Difesa delle piante",
+        "when": "Più avanti",
+        "line": "Trovare parassiti e malattie prima che si diffondano.",
+        "items": [
+          "Rilevamento sulla pianta e sulle trappole cromotropiche",
+          "Mappa dei focolai per fila",
+          "Avviso di rischio in base al clima e cosa fare in ogni zona"
+        ]
+      },
+      {
+        "version": "4.0",
+        "name": "Stato della pianta",
+        "when": "Più avanti",
+        "line": "Sapere come sta ogni zona della coltura e come gestirla.",
+        "items": [
+          "Stress idrico e irrigazione",
+          "Nutrizione",
+          "Crescita, fioritura e allegagione",
+          "Clima della serra"
+        ]
+      }
+    ],
+    "principleEyebrow": "Il nostro principio",
+    "principleTitle": "Atias consiglia, il tecnico decide",
+    "principleBody": "Atias non sostituisce nessuno: dà occhi su ogni fila a chi conosce la coltura. Le decisioni di vendita, trattamento e gestione restano alle persone.",
+    "closeTitle": "Vuoi vedere il pilota?"
   },
 };

@@ -38,6 +38,10 @@ export const contentPt: Content = {
       description:
         "Estimativa de colheita de tomate cereja, pimento e pepino em estufa com visão artificial: o que a Atias conta em cada cultura e o que ainda está em teste.",
     },
+    vision: {
+      "title": "Visão: de contar fruta a cuidar da estufa | Atias",
+      "description": "Para onde vai a Atias: da previsão de colheita à sanidade vegetal e ao estado da planta, versão a versão. A Atias recomenda, o técnico decide."
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal do site da Atias." },
     privacy: { title: "Política de privacidade | Atias", description: "Política de privacidade do site da Atias." },
   },
@@ -49,6 +53,7 @@ export const contentPt: Content = {
     guideTeaser: "Como se estima hoje a colheita e porque falha",
     faqTeaser: "Respostas às dúvidas mais comuns",
     cropTeaser: "Ver a página da cultura",
+    vision: "Visão",
     breadcrumb: "Percurso de navegação",
   },
   guide: {
@@ -253,5 +258,84 @@ export const contentPt: Content = {
     "control": "Contagem da câmara face à contagem manual nos troços de controlo: {value} de diferença.",
     "method": "Erro: diferença entre a previsão e a colheita, em percentagem dos quilos colhidos. Enviesamento positivo: sobrestimar.",
     "caution": "Com menos de 8 semanas medidas, o resultado orienta mas não demonstra."
+  },
+  vision: {
+    "eyebrow": "Visão",
+    "title": "De contar fruta a cuidar de toda a estufa",
+    "lead": "A mesma câmara que conta a fruta madura consegue ver pragas, doenças e o estado de cada planta. Começamos pela colheita porque se confirma na balança; o resto chega versão a versão.",
+    "roadmapTitle": "Roteiro",
+    "roadmapLead": "Cada versão apoia-se na anterior e só começa quando esta demonstrou que funciona.",
+    "versions": [
+      {
+        "version": "0.9",
+        "name": "Piloto",
+        "when": "Agora",
+        "line": "Medir a previsão de colheita em estufas reais face ao que se colhe.",
+        "items": [
+          "Um vídeo por linha gravado com o telemóvel",
+          "Contagem da fruta madura por troço de linha",
+          "Comparação com a previsão do agricultor e do técnico"
+        ]
+      },
+      {
+        "version": "1.0",
+        "name": "Primeira campanha",
+        "when": "A seguir",
+        "line": "A cooperativa usa a Atias todas as semanas para decidir o que vender e quem contratar.",
+        "items": [
+          "Funcionamento na nuvem",
+          "Ligação ao sistema de gestão da cooperativa",
+          "Precisão medida semana a semana"
+        ]
+      },
+      {
+        "version": "1.x",
+        "name": "Melhoria contínua",
+        "when": "Durante a campanha",
+        "line": "Afinar a previsão com o que se aprende cada semana.",
+        "items": [
+          "Sensores dentro da estufa",
+          "Avisos quando falta uma linha ou um vídeo sai mal",
+          "Relatórios semanais"
+        ]
+      },
+      {
+        "version": "2.0",
+        "name": "Sem gravar à mão",
+        "when": "Mais tarde",
+        "line": "Ninguém precisa de gravar e a colheita do dia conhece-se antes da pesagem.",
+        "items": [
+          "Uma câmara que percorre a linha sobre um carril",
+          "Os quilos de cada caixa dos apanhadores"
+        ]
+      },
+      {
+        "version": "3.0",
+        "name": "Sanidade vegetal",
+        "when": "Mais tarde",
+        "line": "Encontrar pragas e doenças antes de se espalharem.",
+        "items": [
+          "Deteção na planta e nas armadilhas cromáticas",
+          "Mapa de focos por linha",
+          "Aviso de risco segundo o clima e o que fazer em cada zona"
+        ]
+      },
+      {
+        "version": "4.0",
+        "name": "Estado da planta",
+        "when": "Mais tarde",
+        "line": "Saber como está cada zona da cultura e como a conduzir.",
+        "items": [
+          "Stress hídrico e rega",
+          "Nutrição",
+          "Crescimento, floração e vingamento",
+          "Clima da estufa"
+        ]
+      }
+    ],
+    "principleEyebrow": "O nosso princípio",
+    "principleTitle": "A Atias recomenda, o técnico decide",
+    "principleBody": "A Atias não substitui ninguém: dá olhos em cada linha a quem conhece a cultura. As decisões de venda, tratamento e condução continuam a ser das pessoas.",
+    "closeTitle": "Quer ver o piloto?"
   },
 };
