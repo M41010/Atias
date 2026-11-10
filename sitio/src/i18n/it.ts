@@ -106,12 +106,85 @@ export const it: Dictionary = {
   },
   company: {
     title: "Chi siamo",
-    pending: "Testo provvisorio, in attesa di revisione da parte dell'azienda.",
-    lead: "Lavoriamo perché la previsione del raccolto nasca dalla frutta sulla pianta, non dall'intuito.",
-    body: [
-      "Atias nasce nel sud della Spagna, tra serre di ortaggi per l'esportazione. Lì, ogni settimana, qualcuno deve decidere quanti chili vendere e quante persone chiamare, quasi sempre con una stima fatta a occhio.",
-      "Il nostro lavoro è trasformare ciò che si può filmare con un telefono in una cifra utile per quella decisione: i chili di ogni giorno e i raccoglitori necessari, con il loro margine e la possibilità di verificarne l'origine.",
-      "Lavoriamo insieme a cooperative, tecnici e produttori, e lo proviamo nelle loro serre prima di considerarlo pronto.",
+    headline: "Abbiamo ascoltato il campo. Ora vogliamo cambiarlo.",
+    lead: "Atias è nato da conversazioni con persone che lavorano in serra. Ha radici nei campi e l’ambizione di cambiare come si coltiva sotto plastica.",
+    facts: [
+      { value: "Ott. 2026", label: "Abbiamo iniziato a costruire Atias" },
+      { value: "3", label: "Colture nel pilota: pomodoro ciliegino, peperone e cetriolo" },
+      { value: "1", label: "Serra reale confrontata con la bilancia" },
+      { value: "≤ 10 %", label: "L’errore che ci imponiamo, misurato rispetto al raccolto" },
+    ],
+    forTitle: "Per chi lavoriamo",
+    forWho: [
+      { name: "Cooperative e commercianti", body: "Sapere quanti chili vendere e quanti braccianti assumere, giorno per giorno." },
+      { name: "Agricoltori", body: "Riprendere con il telefono senza perdere il lavoro, anche se la connessione cade." },
+      { name: "Tecnici", body: "Un secondo parere contato frutto per frutto per confrontare la loro previsione." },
+    ],
+    whyNowTitle: "Perché adesso",
+    whyNow: [
+      { name: "Basta un telefono", body: "Qualsiasi telefono riprende con dettaglio sufficiente a distinguere i frutti sulla pianta." },
+      { name: "La visione artificiale è matura", body: "I rilevatori aperti di ultima generazione riconoscono oggetti nei video e si possono addestrare con immagini della serra stessa." },
+      { name: "Decidere a occhio costa caro", body: "Vendere troppo o troppo poco e assumere nel momento sbagliato costa denaro ogni settimana." },
+    ],
+    originTitle: "Tutto è iniziato ascoltando",
+    origin: [
+      "Persone che lavorano nelle serre del sud della Spagna ci hanno raccontato un problema che si ripete ogni settimana: bisogna decidere quanti chili vendere e quante persone chiamare, e quasi sempre lo si fa a occhio.",
+      "Ci siamo messi a cercare come risolverlo. E se la frutta si potesse contare invece di stimarla? Un video girato con il telefono, un’intelligenza artificiale che riconosce ogni frutto maturo e una cifra per ogni giorno, con il suo margine.",
+      "Così è nato Atias. Oggi lo stiamo provando in una serra vera, confrontandolo con ciò che si raccoglie davvero.",
+    ],
+    missionEyebrow: "La nostra missione",
+    mission: "Che in serra nessuna decisione importante si prenda a occhio.",
+    missionBody: "Cominciamo dal raccolto perché si può verificare sulla bilancia. Poi verranno parassiti, irrigazione e clima: la stessa telecamera, più domande.",
+    missionLink: "Vedi la roadmap",
+    milestonesTitle: "Fin qui",
+    milestones: [
+      {
+        when: "Ottobre 2026",
+        name: "L’idea",
+        body: "Conversazioni con persone del settore e ricerca per risolvere il loro problema: contare la frutta invece di stimarla.",
+      },
+      {
+        when: "Novembre 2026",
+        name: "Primo prototipo",
+        body: "L’app completa: caricamento del video dal telefono, conteggio per tratto di fila, chili al giorno e braccianti.",
+      },
+      {
+        when: "Novembre 2026",
+        name: "Primo pilota",
+        body: "Riprese in una serra vera e confronto con ciò che si raccoglie quella settimana.",
+      },
+      {
+        when: "Prossimamente",
+        name: "Prima stagione",
+        body: "Uso settimanale in diverse serre, misurando la precisione rispetto alla bilancia.",
+      },
+    ],
+    nameTitle: "Cosa significa ATIAS",
+    nameBody: "Quattro parole spagnole che riassumono ciò che facciamo: portare la tecnologia e l’intelligenza artificiale in agricoltura per offrire soluzioni verificabili.",
+    nameParts: [
+      { letter: "A", word: "Agricultura", meaning: "Agricoltura" },
+      { letter: "T", word: "Tecnología", meaning: "Tecnologia" },
+      { letter: "IA", word: "Inteligencia Artificial", meaning: "Intelligenza Artificiale" },
+      { letter: "S", word: "Soluciones", meaning: "Soluzioni" },
+    ],
+    logoTitle: "Il simbolo, pezzo per pezzo",
+    logo: [
+      {
+        name: "Tre navate",
+        body: "Una serra multitunnel vista di fronte, come quelle del sud della Spagna.",
+      },
+      {
+        name: "La navata centrale è la A",
+        body: "Nel logotipo, la navata di mezzo fa da prima lettera di ATIAS.",
+      },
+      {
+        name: "Quattro tacche",
+        body: "I piedi delle navate sono tacche di conteggio: ciò che si conta si può verificare.",
+      },
+      {
+        name: "Il punto verde",
+        body: "Il punto di misura: il frutto che la telecamera ha visto e contato.",
+      },
     ],
     principlesTitle: "Come lavoriamo",
     principles: [
@@ -132,6 +205,24 @@ export const it: Dictionary = {
         body: "Ogni produttore vede solo i propri, e i video vengono cancellati quando non servono più.",
       },
     ],
+    joinTitle: "Unisciti a noi",
+    joinLead: "Atias sta iniziando e cerca chi voglia aiutarlo ad andare avanti, ovunque si trovi.",
+    join: [
+      {
+        name: "Cooperative pilota",
+        body: "Prova Atias nelle tue serre, in qualsiasi parte del mondo.",
+      },
+      {
+        name: "Investitori e partner",
+        body: "Per chi vuole sostenere il progetto con capitale, conoscenze o tecnologia.",
+      },
+      {
+        name: "Lavora con noi",
+        body: "Visione artificiale, agronomia, sviluppo, vendite: se puoi aiutare, vogliamo conoscerti.",
+      },
+    ],
+    joinCta: "Scrivici",
+    closeTitle: "Ne parliamo?",
   },
   product: {
     title: "Il prodotto",

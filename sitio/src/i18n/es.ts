@@ -111,12 +111,85 @@ export const es = {
   },
   company: {
     title: "Quiénes somos",
-    pending: "Texto provisional pendiente de revisión por la empresa.",
-    lead: "Trabajamos para que la previsión de cosecha salga de la fruta que hay en la planta, no de la intuición.",
-    body: [
-      "Atias nace en el sur de España, entre invernaderos de hortícolas para exportación. Allí, cada semana, alguien tiene que decidir cuántos kilos vender y a cuántas personas llamar, casi siempre con una estimación hecha a ojo.",
-      "Nos dedicamos a convertir lo que se puede grabar con un móvil en una cifra útil para esa decisión: los kilos de cada día y los temporeros necesarios, con su margen y con la posibilidad de comprobar de dónde sale.",
-      "Trabajamos junto a cooperativas, técnicos y agricultores, y lo probamos en sus invernaderos antes de darlo por bueno.",
+    headline: "Escuchamos al campo. Ahora queremos cambiarlo.",
+    lead: "Atias nació de conversaciones con gente que trabaja en invernaderos. Tiene raíces en el campo y la ambición de cambiar cómo se cultiva bajo plástico.",
+    facts: [
+      { value: "Oct. 2026", label: "Empezamos a construir Atias" },
+      { value: "3", label: "Cultivos en el piloto: tomate cherry, pimiento y pepino" },
+      { value: "1", label: "Invernadero real comparado con la báscula" },
+      { value: "≤ 10 %", label: "El error que nos exigimos, medido frente a lo recogido" },
+    ],
+    forTitle: "Para quién trabajamos",
+    forWho: [
+      { name: "Cooperativas y comercializadoras", body: "Saber cuántos kilos vender y cuántos temporeros contratar, día a día." },
+      { name: "Agricultores", body: "Grabar con el móvil y no perder el trabajo aunque falle la conexión." },
+      { name: "Técnicos", body: "Una segunda opinión contada fruto a fruto para contrastar su previsión." },
+    ],
+    whyNowTitle: "Por qué ahora",
+    whyNow: [
+      { name: "Un móvil basta", body: "Cualquier móvil graba con detalle suficiente para distinguir frutos en la planta." },
+      { name: "La visión artificial ha madurado", body: "Los detectores abiertos de última generación reconocen objetos en vídeo y se pueden entrenar con imágenes del propio invernadero." },
+      { name: "Decidir a ojo sale caro", body: "Vender de más o de menos y contratar a destiempo cuesta dinero cada semana." },
+    ],
+    originTitle: "Todo empezó escuchando",
+    origin: [
+      "Gente que trabaja en invernaderos del sur de España nos contó un problema que se repite cada semana: hay que decidir cuántos kilos vender y a cuántas personas llamar, y casi siempre se hace con una estimación a ojo.",
+      "Nos pusimos a investigar cómo resolverlo. ¿Y si la fruta se pudiera contar en lugar de estimar? Un vídeo grabado con el móvil, una inteligencia artificial que reconoce cada fruto maduro y una cifra para cada día, con su margen.",
+      "Así nació Atias. Hoy lo estamos probando en un invernadero real, frente a lo que se recoge de verdad.",
+    ],
+    missionEyebrow: "Nuestra misión",
+    mission: "Que en el invernadero ninguna decisión importante se tome a ojo.",
+    missionBody: "Empezamos por la cosecha porque se puede comprobar en la báscula. Después vendrán las plagas, el riego y el clima: la misma cámara, más preguntas.",
+    missionLink: "Ver la hoja de ruta",
+    milestonesTitle: "Hasta aquí",
+    milestones: [
+      {
+        when: "Octubre de 2026",
+        name: "La idea",
+        body: "Conversaciones con gente del campo e investigación para resolver su problema: contar la fruta en lugar de estimarla.",
+      },
+      {
+        when: "Noviembre de 2026",
+        name: "Primer prototipo",
+        body: "La aplicación completa: subida del vídeo desde el móvil, conteo por tramo de hilera, kilos por día y temporeros.",
+      },
+      {
+        when: "Noviembre de 2026",
+        name: "Primer piloto",
+        body: "Grabación en un invernadero real y comparación con lo que se recoge esa semana.",
+      },
+      {
+        when: "Próximamente",
+        name: "Primera temporada",
+        body: "Uso semanal en varios invernaderos, midiendo la precisión frente a la báscula.",
+      },
+    ],
+    nameTitle: "Qué significa ATIAS",
+    nameBody: "Cuatro palabras que resumen lo que hacemos: llevar la tecnología y la inteligencia artificial a la agricultura para dar soluciones que se pueden comprobar.",
+    nameParts: [
+      { letter: "A", word: "Agricultura", meaning: "" },
+      { letter: "T", word: "Tecnología", meaning: "" },
+      { letter: "IA", word: "Inteligencia Artificial", meaning: "" },
+      { letter: "S", word: "Soluciones", meaning: "" },
+    ],
+    logoTitle: "El símbolo, pieza a pieza",
+    logo: [
+      {
+        name: "Tres naves",
+        body: "Un invernadero multitúnel visto de frente, como los que hay en el sur de España.",
+      },
+      {
+        name: "La nave central es la A",
+        body: "En el logotipo, la nave del centro hace de primera letra de ATIAS.",
+      },
+      {
+        name: "Cuatro marcas",
+        body: "Las patas de las naves son marcas de conteo: lo que se cuenta se puede comprobar.",
+      },
+      {
+        name: "El punto verde",
+        body: "El punto de medida: el fruto que la cámara ha visto y contado.",
+      },
     ],
     principlesTitle: "Cómo trabajamos",
     principles: [
@@ -137,6 +210,24 @@ export const es = {
         body: "Cada agricultor solo ve lo suyo, y los vídeos se borran cuando ya no hacen falta.",
       },
     ],
+    joinTitle: "Súmate",
+    joinLead: "Atias está empezando y busca a quien quiera ayudar a sacarlo adelante, esté donde esté.",
+    join: [
+      {
+        name: "Cooperativas piloto",
+        body: "Prueba Atias en tus invernaderos, en cualquier parte del mundo.",
+      },
+      {
+        name: "Inversores y socios",
+        body: "Para quien quiera impulsar el proyecto con capital, conocimiento o tecnología.",
+      },
+      {
+        name: "Trabajar con nosotros",
+        body: "Visión artificial, agronomía, desarrollo, ventas: si puedes ayudar, queremos conocerte.",
+      },
+    ],
+    joinCta: "Escríbenos",
+    closeTitle: "¿Hablamos?",
   },
   product: {
     title: "El producto",

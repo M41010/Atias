@@ -106,12 +106,85 @@ export const pt: Dictionary = {
   },
   company: {
     title: "Quem somos",
-    pending: "Texto provisório, a rever pela empresa.",
-    lead: "Trabalhamos para que a previsão da colheita venha da fruta que está na planta, e não da intuição.",
-    body: [
-      "A Atias nasce no sul de Espanha, entre estufas de hortícolas para exportação. Aí, todas as semanas, alguém tem de decidir quantos quilos vender e quantas pessoas chamar, quase sempre com uma estimativa feita a olho.",
-      "O nosso trabalho é transformar o que se pode filmar com um telemóvel num número útil para essa decisão: os quilos de cada dia e os trabalhadores necessários, com a sua margem e com a possibilidade de verificar de onde vêm.",
-      "Trabalhamos com cooperativas, técnicos e agricultores, e testamos nas suas estufas antes de dar por bom.",
+    headline: "Ouvimos o campo. Agora queremos mudá-lo.",
+    lead: "A Atias nasceu de conversas com pessoas que trabalham em estufas. Tem raízes no campo e a ambição de mudar a forma como se cultiva sob plástico.",
+    facts: [
+      { value: "Out. 2026", label: "Começámos a construir a Atias" },
+      { value: "3", label: "Culturas no piloto: tomate cereja, pimento e pepino" },
+      { value: "1", label: "Estufa real comparada com a balança" },
+      { value: "≤ 10 %", label: "O erro que nos exigimos, medido face ao que se colhe" },
+    ],
+    forTitle: "Para quem trabalhamos",
+    forWho: [
+      { name: "Cooperativas e comercializadoras", body: "Saber quantos quilos vender e quantos trabalhadores contratar, dia a dia." },
+      { name: "Agricultores", body: "Gravar com o telemóvel sem perder o trabalho, mesmo que a ligação falhe." },
+      { name: "Técnicos", body: "Uma segunda opinião contada fruto a fruto para confrontar a sua previsão." },
+    ],
+    whyNowTitle: "Porquê agora",
+    whyNow: [
+      { name: "Basta um telemóvel", body: "Qualquer telemóvel grava com detalhe suficiente para distinguir frutos na planta." },
+      { name: "A visão artificial amadureceu", body: "Os detetores abertos de última geração reconhecem objetos em vídeo e podem ser treinados com imagens da própria estufa." },
+      { name: "Decidir a olho sai caro", body: "Vender a mais ou a menos e contratar fora de tempo custa dinheiro todas as semanas." },
+    ],
+    originTitle: "Tudo começou a ouvir",
+    origin: [
+      "Pessoas que trabalham em estufas do sul de Espanha contaram-nos um problema que se repete todas as semanas: é preciso decidir quantos quilos vender e quantas pessoas chamar, e quase sempre isso é feito a olho.",
+      "Pusemo-nos a investigar como o resolver. E se a fruta pudesse ser contada em vez de estimada? Um vídeo gravado com o telemóvel, uma inteligência artificial que reconhece cada fruto maduro e um número para cada dia, com a sua margem.",
+      "Foi assim que nasceu a Atias. Hoje estamos a testá-la numa estufa real, face ao que realmente se colhe.",
+    ],
+    missionEyebrow: "A nossa missão",
+    mission: "Que na estufa nenhuma decisão importante se tome a olho.",
+    missionBody: "Começamos pela colheita porque se pode comprovar na balança. Depois virão as pragas, a rega e o clima: a mesma câmara, mais perguntas.",
+    missionLink: "Ver o roteiro",
+    milestonesTitle: "Até aqui",
+    milestones: [
+      {
+        when: "Outubro de 2026",
+        name: "A ideia",
+        body: "Conversas com pessoas do campo e investigação para resolver o seu problema: contar a fruta em vez de a estimar.",
+      },
+      {
+        when: "Novembro de 2026",
+        name: "Primeiro protótipo",
+        body: "A aplicação completa: envio do vídeo a partir do telemóvel, contagem por troço de linha, quilos por dia e trabalhadores.",
+      },
+      {
+        when: "Novembro de 2026",
+        name: "Primeiro piloto",
+        body: "Gravação numa estufa real e comparação com o que se colhe nessa semana.",
+      },
+      {
+        when: "Em breve",
+        name: "Primeira campanha",
+        body: "Utilização semanal em várias estufas, medindo a precisão face à balança.",
+      },
+    ],
+    nameTitle: "O que significa ATIAS",
+    nameBody: "Quatro palavras espanholas que resumem o que fazemos: levar a tecnologia e a inteligência artificial à agricultura para oferecer soluções que se podem comprovar.",
+    nameParts: [
+      { letter: "A", word: "Agricultura", meaning: "Agricultura" },
+      { letter: "T", word: "Tecnología", meaning: "Tecnologia" },
+      { letter: "IA", word: "Inteligencia Artificial", meaning: "Inteligência Artificial" },
+      { letter: "S", word: "Soluciones", meaning: "Soluções" },
+    ],
+    logoTitle: "O símbolo, peça a peça",
+    logo: [
+      {
+        name: "Três naves",
+        body: "Uma estufa multitúnel vista de frente, como as do sul de Espanha.",
+      },
+      {
+        name: "A nave central é o A",
+        body: "No logótipo, a nave do meio faz de primeira letra de ATIAS.",
+      },
+      {
+        name: "Quatro marcas",
+        body: "Os pés das naves são marcas de contagem: o que se conta pode ser comprovado.",
+      },
+      {
+        name: "O ponto verde",
+        body: "O ponto de medida: o fruto que a câmara viu e contou.",
+      },
     ],
     principlesTitle: "Como trabalhamos",
     principles: [
@@ -132,6 +205,24 @@ export const pt: Dictionary = {
         body: "Cada agricultor só vê os seus, e os vídeos apagam-se quando já não são precisos.",
       },
     ],
+    joinTitle: "Junte-se a nós",
+    joinLead: "A Atias está a começar e procura quem queira ajudar a levá-la para a frente, esteja onde estiver.",
+    join: [
+      {
+        name: "Cooperativas piloto",
+        body: "Experimente a Atias nas suas estufas, em qualquer parte do mundo.",
+      },
+      {
+        name: "Investidores e parceiros",
+        body: "Para quem queira impulsionar o projeto com capital, conhecimento ou tecnologia.",
+      },
+      {
+        name: "Trabalhar connosco",
+        body: "Visão artificial, agronomia, desenvolvimento, vendas: se pode ajudar, queremos conhecê-lo.",
+      },
+    ],
+    joinCta: "Escreva-nos",
+    closeTitle: "Falamos?",
   },
   product: {
     title: "O produto",
