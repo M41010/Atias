@@ -53,8 +53,9 @@ export function poseAt(frame: number): Pose {
   if (frame < T.rail) {
     const z = 0.5 - (frame - T.enter) * SPEED;
     // Un leve balanceo, como al andar.
-    const bob = Math.sin(frame * 0.35) * 0.015;
-    return { pos: [0.05, 1.35 + bob, z], target: [0.35, 1.15, z - 3.5], fov: 52 };
+    const bob = Math.sin(frame * 0.35) * 0.015 + Math.sin(frame * 0.071) * 0.01;
+    const sway = Math.sin(frame * 0.047) * 0.04 + Math.sin(frame * 0.13) * 0.012;
+    return { pos: [0.05, 1.35 + bob, z], target: [0.35 + sway, 1.15 + bob * 0.5, z - 3.5], fov: 52 };
   }
   // El raíl: vista desde arriba del pasillo, la cámara del raíl avanza por encima de la hilera.
   const t = (frame - T.rail) / (T.railEnd - T.rail);
@@ -82,7 +83,55 @@ export type Fruit = {
   right: boolean;
 };
 
-export type Plant = { pos: [number, number, number]; crop: Crop; height: number; leaves: [number, number, number, number][] };
+/** Una hoja (o foliolo): posición, giro y tamaño en metros. */
+export type Leaf = { pos: [number, number, number]; rot: [number, number, number]; size: number; shade: number };
+export type Plant = { pos: [number, number, number]; crop: Crop; height: number; leaves: Leaf[]; side: boolean };
+
+/** Las hojas no invaden el pasillo central más allá de este margen. */
+const AISLE_EDGE = 0.42;
+
+/**
+ * Hojas de una planta. Tomate: hojas compuestas de foliolos a lo largo del tallo. Pepino: hojas
+ * grandes palmeadas con peciolo. Pimiento: mata baja y tupida de hojas ovaladas.
+ */
+function leavesOf(crop: Crop, x: number, z: number, height: number, side: number, random: () => number, dense = 1): Leaf[] {
+  const leaves: Leaf[] = [];
+  const clampX = (value: number) => (side > 0 ? Math.max(AISLE_EDGE, value) : Math.min(-AISLE_EDGE, value));
+  const push = (lx: number, ly: number, lz: number, yaw: number, size: number) =>
+    leaves.push({
+      pos: [clampX(lx), ly, lz],
+      // Casi horizontales, algo caídas, giradas hacia donde crece el peciolo.
+      // Unas casi horizontales y otras de canto: así cubren como una mata de verdad.
+      rot: [-Math.PI / 2 + 0.2 + random() * 1.1, yaw, (random() - 0.5) * 0.9],
+      size,
+      shade: random(),
+    });
+  if (crop === "tomato") {
+    for (let y = 0.25; y < height + 0.1; y += 0.1 / dense) {
+      const yaw = random() * Math.PI * 2;
+      const reach = 0.18 + random() * 0.22;
+      for (let k = 1; k <= 7; k += 1) {
+        const d = (k / 7) * reach;
+        const off = (k % 2 ? 1 : -1) * 0.05;
+        push(x + Math.cos(yaw) * d - Math.sin(yaw) * off, y - d * 0.3, z + Math.sin(yaw) * d + Math.cos(yaw) * off, yaw, 0.11 + random() * 0.07);
+      }
+    }
+  } else if (crop === "cucumber") {
+    for (let y = 0.3; y < height + 0.1; y += 0.09 / dense) {
+      const yaw = random() * Math.PI * 2;
+      const d = 0.08 + random() * 0.16;
+      push(x + Math.cos(yaw) * d, y - 0.04, z + Math.sin(yaw) * d, yaw, 0.2 + random() * 0.12);
+    }
+  } else {
+    for (let i = 0; i < 95 * dense; i += 1) {
+      const yaw = random() * Math.PI * 2;
+      const y = 0.2 + random() * (height - 0.15);
+      const d = random() * 0.32 * (1 - (y / height) * 0.3);
+      push(x + Math.cos(yaw) * d, y, z + Math.sin(yaw) * d, yaw, 0.09 + random() * 0.05);
+    }
+  }
+  return leaves;
+}
 
 const SPACING = 0.5;
 
@@ -95,36 +144,26 @@ function build() {
     for (let z = -0.6; z > -LENGTH + 0.5; z -= SPACING) {
       const crop = cropAt(z);
       const x = side * ROW_X;
-      const height = 2.0 + random() * 0.3;
-      const leaves: Plant["leaves"] = [];
-      const leafCount = crop === "cucumber" ? 12 : 11;
-      for (let i = 0; i < leafCount; i += 1) {
-        const y = 0.35 + (i / leafCount) * (height - 0.3);
-        leaves.push([
-          // Las hojas se quedan en la hilera y no invaden el pasillo.
-          x + (random() - 0.5) * 0.3 + side * 0.05,
-          y,
-          z + (random() - 0.5) * 0.45,
-          (crop === "pepper" ? 0.15 : 0.13) + random() * 0.05,
-        ]);
-      }
-      plants.push({ pos: [x, 0, z], crop, height, leaves });
+      const height = crop === "pepper" ? 1.45 + random() * 0.25 : 2.0 + random() * 0.3;
+      const leaves = leavesOf(crop, x, z, height, side, random);
+      plants.push({ pos: [x, 0, z], crop, height, leaves, side: false });
       // Los frutos asoman hacia el pasillo.
       const face = x - side * 0.2;
       if (crop === "tomato") {
         for (let truss = 0; truss < 2; truss += 1) {
           const ty = 0.65 + truss * 0.55 + random() * 0.2;
           const ripeTruss = truss === 0 ? random() < 0.85 : random() < 0.45;
-          for (let k = 0; k < 7; k += 1) {
+          for (let k = 0; k < 12; k += 1) {
             const ripe = ripeTruss && random() < 0.85;
             const turning = !ripe && random() < 0.3;
+            // El racimo cuelga en zigzag.
             fruits.push({
               id: id++,
               crop,
-              pos: [face + (random() - 0.5) * 0.12, ty - k * 0.045 + random() * 0.03, z + (random() - 0.5) * 0.2],
+              pos: [face + (random() - 0.5) * 0.07, ty - k * 0.03 + random() * 0.012, z + (k % 2 ? 0.025 : -0.025) + (random() - 0.5) * 0.03],
               color: ripe ? C.tomatoRipe : turning ? C.tomatoTurning : C.tomatoGreen,
               ripe,
-              size: 0.028 + random() * 0.008,
+              size: 0.015 + random() * 0.004,
               right: side === 1,
             });
           }
@@ -149,7 +188,7 @@ function build() {
           fruits.push({
             id: id++,
             crop,
-            pos: [face + (random() - 0.5) * 0.1, 0.6 + random() * 0.9, z + (random() - 0.5) * 0.3],
+            pos: [face + (random() - 0.5) * 0.1, 0.45 + random() * 0.8, z + (random() - 0.5) * 0.3],
             color: ripe ? (random() < 0.6 ? C.pepperRed : C.pepperYellow) : C.pepperGreen,
             ripe,
             size: 0.055 + random() * 0.015,
@@ -162,12 +201,11 @@ function build() {
   // Hileras de las naves laterales: solo hojas, se ven desde fuera y a través del plástico.
   for (const x of [-SPAN - ROW_X, -SPAN + ROW_X, SPAN - ROW_X, SPAN + ROW_X]) {
     for (let z = -0.6; z > -LENGTH + 0.5; z -= SPACING * 1.4) {
-      const height = 1.9 + random() * 0.3;
-      const leaves: Plant["leaves"] = [];
-      for (let i = 0; i < 5; i += 1) {
-        leaves.push([x + (random() - 0.5) * 0.4, 0.4 + (i / 5) * (height - 0.3), z + (random() - 0.5) * 0.5, 0.22 + random() * 0.08]);
-      }
-      plants.push({ pos: [x, 0, z], crop: cropAt(z), height, leaves });
+      const crop = cropAt(z);
+      const height = crop === "pepper" ? 1.5 : 2.0 + random() * 0.3;
+      // Las naves laterales se ven de lejos: menos hojas y más grandes.
+      const leaves = leavesOf(crop, x, z, height, x > 0 ? 1 : -1, random, 0.6).map((l) => ({ ...l, size: l.size * 1.5 }));
+      plants.push({ pos: [x, 0, z], crop, height, leaves, side: true });
     }
   }
   return { plants, fruits };

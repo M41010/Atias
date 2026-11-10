@@ -17,7 +17,7 @@ for (const locale of locales) {
     "npx",
     [
       "remotion", "render", "src/index.ts", `Atias-${locale}`, `out/atias-${locale}.mp4`,
-      "--gl=angle", "--codec=h264", "--crf=20", "--timeout=60000",
+      "--gl=angle", "--codec=h264", "--crf=20", "--timeout=120000", `--concurrency=${process.env.CONCURRENCY ?? 2}`,
       ...(chrome ? [`--browser-executable="${chrome}"`] : []),
     ],
     { stdio: "inherit", shell: true },

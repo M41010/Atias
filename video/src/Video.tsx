@@ -35,10 +35,12 @@ export function AtiasVideo({ locale }: { locale: Locale }) {
   );
   return (
     <AbsoluteFill style={{ background: "#000" }}>
-      <ThreeCanvas width={WIDTH} height={HEIGHT} durationInFrames={TO_APP} gl={{ antialias: true, preserveDrawingBuffer: true }}>
+      <ThreeCanvas width={WIDTH} height={HEIGHT} durationInFrames={TO_APP} shadows gl={{ antialias: true, preserveDrawingBuffer: true }}>
         <Greenhouse />
       </ThreeCanvas>
       <Sequence durationInFrames={TO_APP} layout="none">
+        {/* Viñeta suave, como la de una lente */}
+        <AbsoluteFill style={{ background: "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(10,25,18,0.38) 100%)" }} />
         <Detections />
         <CounterHud t={t} locale={numbers} />
         <PhoneFrame t={t} />
