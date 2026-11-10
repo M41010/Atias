@@ -9,6 +9,8 @@ dist/
 data/
 *.mp4
 *.mov
+# Excepción: el vídeo de presentación de la web pública (recreación animada, sin datos reales).
+!sitio/public/video/*.mp4
 *.sqlite
 *.db
 
