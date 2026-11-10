@@ -54,6 +54,22 @@ export const contentEn: Content = {
       title: "Pilot journal: how Atias is progressing | Atias",
       description: "Dated news from the Atias pilot: from the first prototype to the first recording in a real greenhouse. Facts only, no unmeasured figures.",
     },
+    articles: {
+      title: "Articles on greenhouse harvest forecasting | Atias",
+      description: "Practical guides on harvest estimation, planning pickers and forecast accuracy in greenhouses.",
+    },
+    articlePickers: {
+      title: "How to plan pickers with the harvest forecast | Atias",
+      description: "From forecast kilos to people, day by day: the basic sum, kilos per picker-day and how to use the forecast margin when hiring.",
+    },
+    articleMistakes: {
+      title: "Seven mistakes when forecasting greenhouse harvests | Atias",
+      description: "Too few plants, hidden fruit, an outdated average weight, the weather and not measuring your own error: the most common estimation pitfalls.",
+    },
+    articleAccuracy: {
+      title: "What accuracy is reasonable for a harvest forecast | Atias",
+      description: "How to measure the accuracy of a harvest forecast: against the scales, kilo-weighted error, bias and why one week is not enough.",
+    },
     notice: { title: "Legal notice | Atias", description: "Legal notice for the Atias website." },
     privacy: { title: "Privacy policy | Atias", description: "Privacy policy for the Atias website." },
   },
@@ -69,6 +85,7 @@ export const contentEn: Content = {
     measure: "How we measure",
     investors: "Investors",
     journal: "Pilot journal",
+    articles: "Articles",
     breadcrumb: "Breadcrumb",
   },
   guide: {
@@ -624,5 +641,136 @@ export const contentEn: Content = {
       }
     ],
     "note": "Atias does not replace the agronomist: it gives them a counted figure to check theirs against."
+      },
+  articles: {
+    "index": {
+      "eyebrow": "Articles",
+      "title": "Articles on harvest forecasting",
+      "lead": "What we are learning about harvest estimates, pickers and accuracy, written for people who work in greenhouses.",
+      "read": "Read"
+    },
+    "date": "2026-11-11",
+    "updated": "Published November 2026",
+    "pickers": {
+      "eyebrow": "Article",
+      "title": "How to plan the week's pickers with the harvest forecast",
+      "lead": "Hiring too many costs wages; too few leaves fruit unpicked. A simple way to go from forecast kilos to people, day by day.",
+      "sections": [
+        {
+          "heading": "The basic sum",
+          "paragraphs": [
+            "The people needed on a given day are, in essence, the kilos to pick that day divided by the kilos one person picks in a working day.",
+            "An example with made-up figures: if 2,400 kg must be picked on Tuesday and one person picks about 300 kg a day in that crop, you need 8 people."
+          ]
+        },
+        {
+          "heading": "Kilos per picker-day change",
+          "paragraphs": [
+            "Picking cherry tomatoes is not the same as picking peppers or cucumbers, nor is the start of the season the same as its peak. Keep the figure per crop and update it with what is actually picked each week.",
+            "A badly estimated kilos-per-day figure shifts the whole sum: using 300 when the crew picks 250 leaves you one person short in every six."
+          ]
+        },
+        {
+          "heading": "Plan with the margin, not just the figure",
+          "paragraphs": [
+            "A useful forecast gives a figure and a margin. When hiring, the prudent choice is the high end of the margin on the busiest days and the central value on the rest.",
+            "That way you avoid falling short on the day that matters most, without filling the week with wages you don't need."
+          ]
+        },
+        {
+          "heading": "Spread the week day by day",
+          "paragraphs": [
+            "Fruit does not ripen evenly: heat brings it forward and cold holds it back. A forecast for each day, Monday to Friday, is more useful than a weekly figure split into equal parts.",
+            "Atias calculates each day's pickers from its daily forecast and the kilos per picker-day set by the cooperative, and also shows the high end."
+          ]
+        }
+      ]
+    },
+    "mistakes": {
+      "eyebrow": "Article",
+      "title": "Seven common mistakes when forecasting greenhouse harvests",
+      "lead": "Most of them don't come from bad arithmetic, but from what nobody looks at.",
+      "sections": [
+        {
+          "heading": "1. Looking at too few plants",
+          "paragraphs": [
+            "A handful of plants seen in passing does not represent a whole greenhouse: edge rows, shadier areas or zones with different irrigation behave differently."
+          ]
+        },
+        {
+          "heading": "2. Confusing what is ripe with what will be picked",
+          "paragraphs": [
+            "The ripe fruit today is not what will be picked all week: more will ripen over the next days, faster if it is hot."
+          ]
+        },
+        {
+          "heading": "3. Forgetting hidden fruit",
+          "paragraphs": [
+            "What cannot be seen from the aisle counts too. If nobody ever measures how much stays hidden among the leaves, the forecast always falls short."
+          ]
+        },
+        {
+          "heading": "4. An outdated average weight",
+          "paragraphs": [
+            "Fruit weight changes over the season. An error in the weight passes straight into the kilos: it does not cancel out when adding up."
+          ]
+        },
+        {
+          "heading": "5. Ignoring the weather",
+          "paragraphs": [
+            "A hot week brings ripening forward and a cold one holds it back. Forecasting without looking at the weather forecast is forecasting blind."
+          ]
+        },
+        {
+          "heading": "6. Giving a figure without a margin",
+          "paragraphs": [
+            "A forecast without a margin claims more certainty than it has. With the margin it is easier to decide how much to sell and how many people to call."
+          ]
+        },
+        {
+          "heading": "7. Not measuring your own error",
+          "paragraphs": [
+            "If the forecast is not compared every week with what was weighed on the scales, nobody knows how wrong it is or whether it improves. It is the most expensive mistake, because it hides all the others."
+          ]
+        }
+      ]
+    },
+    "accuracy": {
+      "eyebrow": "Article",
+      "title": "What accuracy is reasonable for a harvest forecast?",
+      "lead": "Before asking how accurate a forecast is, you have to agree on how to measure it.",
+      "sections": [
+        {
+          "heading": "Measure against the scales",
+          "paragraphs": [
+            "The only reference that counts is what was picked and weighed. Comparing one forecast with another estimate says nothing about its accuracy.",
+            "And like must be compared with like: the Monday-to-Friday forecast with the Monday-to-Friday kilos, not with the fruit visible on filming day."
+          ]
+        },
+        {
+          "heading": "An error that doesn't mislead",
+          "paragraphs": [
+            "Each week's error is the difference between forecast and harvest, as a percentage of the harvest. When combining weeks, weight them by kilos so a small week doesn't count as much as a big one.",
+            "Bias matters too: if a forecast is always too high, or always too low, it can be corrected."
+          ]
+        },
+        {
+          "heading": "One week is not enough",
+          "paragraphs": [
+            "One good week can be luck. Claiming an accuracy takes several weeks and greenhouses that were not used to tune the method.",
+            "At Atias we require at least 8, and that even the high end of the confidence interval stays below a 10 % error."
+          ]
+        },
+        {
+          "heading": "Compare with what is already used",
+          "paragraphs": [
+            "An accuracy figure on its own says little. What helps is comparing it with the forecast already in use, the agronomist's or the grower's, measured the same way over the same weeks.",
+            "There is no standard published figure for the sector. That is why we publish the method before the result."
+          ]
+        }
+      ]
+    },
+    "ctaTitle": "Shall we try it in your greenhouses?",
+    "ctaBody": "Try Atias free for 4 weeks and compare its forecast with your scales."
   },
 };
