@@ -11,6 +11,7 @@ export const fr: Dictionary = {
     company: "Qui sommes-nous",
     product: "Produit",
     contact: "Contact",
+    vision: "Vision",
     pilot: "Pilote en cours",
     language: "Langue",
     menu: "Menu",
