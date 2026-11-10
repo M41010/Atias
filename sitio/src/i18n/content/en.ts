@@ -529,4 +529,29 @@ export const contentEn: Content = {
       }
     ]
   },
+  dataTrust: {
+    "eyebrow": "Your data",
+    "title": "What happens to your videos, no small print",
+    "lead": "This is how it works today, exactly as it is built.",
+    "points": [
+      {
+        "name": "One link per greenhouse and week",
+        "body": "Growers need no account. Their link only opens their greenhouse and week, expires when the harvest starts and the cooperative can revoke it."
+      },
+      {
+        "name": "The cooperative signs in",
+        "body": "Its screens ask for a username and password. Passwords are not stored in plain text and repeated failed attempts are blocked."
+      },
+      {
+        "name": "Videos stay within Atias",
+        "body": "They are counted by our own detector. Only the greenhouse location is used to look up the weather."
+      },
+      {
+        "name": "What is removed is deleted",
+        "body": "If a grower replaces or removes a video, the old one is deleted for good after seven days."
+      }
+    ],
+    "pending": "The retention period for current videos has not been set yet.",
+    "more": "More on security and data"
+  },
 };
