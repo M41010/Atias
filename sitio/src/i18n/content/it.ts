@@ -372,4 +372,29 @@ export const contentIt: Content = {
     "principleBody": "Atias non sostituisce nessuno: dà occhi su ogni fila a chi conosce la coltura. Le decisioni di vendita, trattamento e gestione restano alle persone.",
     "closeTitle": "Vuoi vedere il pilota?"
   },
+  dataTrust: {
+    "eyebrow": "I tuoi dati",
+    "title": "Cosa succede ai tuoi video, senza clausole nascoste",
+    "lead": "Funziona così oggi, esattamente come è programmato.",
+    "points": [
+      {
+        "name": "Un link per serra e settimana",
+        "body": "L’agricoltore non ha bisogno di un account. Il suo link apre solo la sua serra e la sua settimana, scade all’inizio della raccolta e la cooperativa può revocarlo."
+      },
+      {
+        "name": "La cooperativa, con password",
+        "body": "Le sue schermate chiedono utente e password. Le password non sono salvate in chiaro e i tentativi falliti ripetuti vengono bloccati."
+      },
+      {
+        "name": "I video restano in Atias",
+        "body": "Li conta il nostro rilevatore. Per il meteo si usa solo la posizione della serra."
+      },
+      {
+        "name": "Ciò che si toglie si cancella",
+        "body": "Se l’agricoltore sostituisce o rimuove un video, quello precedente viene cancellato definitivamente dopo sette giorni."
+      }
+    ],
+    "pending": "Il periodo di conservazione dei video in uso non è ancora stabilito.",
+    "more": "Di più su sicurezza e dati"
+  },
 };

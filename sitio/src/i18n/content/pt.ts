@@ -372,4 +372,29 @@ export const contentPt: Content = {
     "principleBody": "A Atias não substitui ninguém: dá olhos em cada linha a quem conhece a cultura. As decisões de venda, tratamento e condução continuam a ser das pessoas.",
     "closeTitle": "Quer ver o piloto?"
   },
+  dataTrust: {
+    "eyebrow": "Os seus dados",
+    "title": "O que acontece aos seus vídeos, sem letra miudinha",
+    "lead": "É assim que funciona hoje, tal como está programado.",
+    "points": [
+      {
+        "name": "Uma ligação por estufa e semana",
+        "body": "O agricultor não precisa de conta. A sua ligação só abre a sua estufa e a sua semana, expira ao começar a colheita e a cooperativa pode anulá-la."
+      },
+      {
+        "name": "A cooperativa, com palavra-passe",
+        "body": "Os seus ecrãs pedem utilizador e palavra-passe. As palavras-passe não são guardadas em claro e as tentativas falhadas repetidas são bloqueadas."
+      },
+      {
+        "name": "Os vídeos não saem da Atias",
+        "body": "São contados pelo nosso próprio detetor. Para a meteorologia só se usa a localização da estufa."
+      },
+      {
+        "name": "O que se retira, apaga-se",
+        "body": "Se o agricultor substituir ou retirar um vídeo, o anterior é apagado de vez ao fim de sete dias."
+      }
+    ],
+    "pending": "O prazo para apagar os vídeos em uso ainda não está fixado.",
+    "more": "Mais sobre segurança e dados"
+  },
 };

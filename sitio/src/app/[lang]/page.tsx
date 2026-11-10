@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Counter } from "@/components/Counter";
+import { DataTrust } from "@/components/DataTrust";
 import { NaveMark } from "@/components/Mark";
 import { PilotResults } from "@/components/PilotResults";
 import { PresentationVideo } from "@/components/PresentationVideo";
@@ -134,6 +135,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </dl>
         </div>
       </section>
+
+      {/* Tus datos: lo que pasa con los vídeos, justo antes de hablar del piloto. */}
+      <DataTrust lang={lang} trust={content.dataTrust} />
 
       {/* Resultados medidos del piloto: no aparece hasta que haya cifras reales en content/resultados.ts. */}
       <PilotResults lang={lang} />

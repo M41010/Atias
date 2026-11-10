@@ -202,7 +202,7 @@ export const nl: Dictionary = {
       },
       {
         name: "Ieders gegevens blijven van henzelf",
-        body: "Elke teler ziet alleen zijn eigen gegevens, en video's worden gewist zodra ze niet meer nodig zijn.",
+        body: "Elke teler ziet alleen zijn eigen gegevens, en video's die hij vervangt of verwijdert worden na zeven dagen gewist.",
       },
     ],
     joinTitle: "Doe mee",
@@ -261,6 +261,8 @@ export const nl: Dictionary = {
       "Elke link opent alleen zijn eigen kas en week, verloopt vanzelf en kan worden ingetrokken.",
       "De coöperatie logt in met een eigen account. Wachtwoorden worden versleuteld opgeslagen.",
       "Vervangen of verwijderde video's worden na zeven dagen gewist.",
+      "Video's worden geteld door onze eigen detector en niet naar andere diensten gestuurd. Alleen de locatie van de kas wordt gebruikt voor het weer.",
+      "De bewaartermijn van actuele video's ligt nog niet vast.",
     ],
   },
   contact: {

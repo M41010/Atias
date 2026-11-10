@@ -372,4 +372,29 @@ export const contentFr: Content = {
     "principleBody": "Atias ne remplace personne : il donne des yeux sur chaque rang à ceux qui connaissent la culture. Les décisions de vente, de traitement et de conduite restent humaines.",
     "closeTitle": "Envie de voir le pilote ?"
   },
+  dataTrust: {
+    "eyebrow": "Vos données",
+    "title": "Ce que deviennent vos vidéos, sans petits caractères",
+    "lead": "Voici comment cela fonctionne aujourd’hui, tel que c’est programmé.",
+    "points": [
+      {
+        "name": "Un lien par serre et par semaine",
+        "body": "Le producteur n’a pas besoin de compte. Son lien n’ouvre que sa serre et sa semaine, expire au début de la récolte et la coopérative peut l’annuler."
+      },
+      {
+        "name": "La coopérative, avec mot de passe",
+        "body": "Ses écrans demandent un identifiant et un mot de passe. Les mots de passe ne sont pas stockés en clair et les échecs répétés sont bloqués."
+      },
+      {
+        "name": "Les vidéos restent chez Atias",
+        "body": "Elles sont comptées par notre propre détecteur. Seule la localisation de la serre sert à consulter la météo."
+      },
+      {
+        "name": "Ce qui est retiré est effacé",
+        "body": "Si le producteur remplace ou retire une vidéo, l’ancienne est effacée définitivement au bout de sept jours."
+      }
+    ],
+    "pending": "La durée de conservation des vidéos en cours n’est pas encore fixée.",
+    "more": "En savoir plus sur la sécurité et les données"
+  },
 };

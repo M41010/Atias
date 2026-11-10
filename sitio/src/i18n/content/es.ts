@@ -375,6 +375,31 @@ export const contentEs = {
     "principleBody": "Atias no sustituye a nadie: da ojos en cada hilera a quien conoce el cultivo. Las decisiones de venta, de tratamiento y de manejo siguen siendo de las personas.",
     "closeTitle": "¿Quieres ver el piloto?"
   },
+  dataTrust: {
+    "eyebrow": "Tus datos",
+    "title": "Lo que pasa con tus vídeos, sin letra pequeña",
+    "lead": "Así funciona hoy, tal como está programado.",
+    "points": [
+      {
+        "name": "Un enlace por invernadero y semana",
+        "body": "El agricultor no necesita cuenta. Su enlace solo abre su invernadero y su semana, caduca al empezar la recolección y la cooperativa puede anularlo."
+      },
+      {
+        "name": "La cooperativa, con contraseña",
+        "body": "Sus pantallas piden usuario y contraseña. Las contraseñas no se guardan en claro y los intentos fallidos repetidos se bloquean."
+      },
+      {
+        "name": "Los vídeos no salen de Atias",
+        "body": "Los cuenta nuestro propio detector. Para la meteorología solo se usa la ubicación del invernadero."
+      },
+      {
+        "name": "Lo que se quita, se borra",
+        "body": "Si el agricultor cambia o quita un vídeo, el anterior se borra del todo a los siete días."
+      }
+    ],
+    "pending": "El plazo para borrar los vídeos vigentes aún no está fijado.",
+    "more": "Más sobre seguridad y datos"
+  },
 };
 
 export type Content = typeof contentEs;

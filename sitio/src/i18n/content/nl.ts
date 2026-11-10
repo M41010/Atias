@@ -372,4 +372,29 @@ export const contentNl: Content = {
     "principleBody": "Atias vervangt niemand: het geeft wie het gewas kent ogen in elke rij. Beslissingen over verkoop, behandeling en teelt blijven bij mensen.",
     "closeTitle": "Wil je de pilot zien?"
   },
+  dataTrust: {
+    "eyebrow": "Uw gegevens",
+    "title": "Wat er met uw video’s gebeurt, zonder kleine lettertjes",
+    "lead": "Zo werkt het vandaag, precies zoals het is gebouwd.",
+    "points": [
+      {
+        "name": "Eén link per kas en week",
+        "body": "De teler heeft geen account nodig. Zijn link opent alleen zijn kas en week, verloopt bij het begin van de oogst en de coöperatie kan hem intrekken."
+      },
+      {
+        "name": "De coöperatie, met wachtwoord",
+        "body": "De schermen vragen om gebruikersnaam en wachtwoord. Wachtwoorden worden niet leesbaar opgeslagen en herhaalde mislukte pogingen worden geblokkeerd."
+      },
+      {
+        "name": "Video’s blijven bij Atias",
+        "body": "Ze worden geteld door onze eigen detector. Alleen de locatie van de kas wordt gebruikt voor het weer."
+      },
+      {
+        "name": "Wat verwijderd wordt, wordt gewist",
+        "body": "Als de teler een video vervangt of verwijdert, wordt de oude na zeven dagen definitief gewist."
+      }
+    ],
+    "pending": "De bewaartermijn van actuele video’s ligt nog niet vast.",
+    "more": "Meer over beveiliging en gegevens"
+  },
 };
