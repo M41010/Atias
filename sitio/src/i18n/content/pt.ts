@@ -42,6 +42,10 @@ export const contentPt: Content = {
       "title": "Visão: de contar fruta a cuidar da estufa | Atias",
       "description": "Para onde vai a Atias: da previsão de colheita à sanidade vegetal e ao estado da planta, versão a versão. A Atias recomenda, o técnico decide."
     },
+    measure: {
+      title: "Como medimos a precisão da previsão de colheita | Atias",
+      description: "Comparamos cada previsão com os quilos pesados na balança, junto com a do agricultor e a do técnico. Método, critério dos 10 % e o que ainda está em teste.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal do site da Atias." },
     privacy: { title: "Política de privacidade | Atias", description: "Política de privacidade do site da Atias." },
   },
@@ -54,6 +58,7 @@ export const contentPt: Content = {
     faqTeaser: "Respostas às dúvidas mais comuns",
     cropTeaser: "Ver a página da cultura",
     vision: "Visão",
+    measure: "Como medimos",
     breadcrumb: "Percurso de navegação",
   },
   guide: {
@@ -371,5 +376,88 @@ export const contentPt: Content = {
     "principleTitle": "A Atias recomenda, o técnico decide",
     "principleBody": "A Atias não substitui ninguém: dá olhos em cada linha a quem conhece a cultura. As decisões de venda, tratamento e condução continuam a ser das pessoas.",
     "closeTitle": "Quer ver o piloto?"
+  },
+  measure: {
+    eyebrow: "Como medimos",
+    title: "A precisão mede-se na balança, não se promete",
+    lead: "Quase ninguém no setor publica quanto a sua previsão falha. Nós publicamos o método antes do resultado, para que qualquer pessoa o possa verificar.",
+    compareTitle: "O que comparamos",
+    compare: [
+      {
+        name: "A Atias prevê",
+        body: "Os quilos que se vão colher cada dia de segunda a sexta, a partir do vídeo de sábado.",
+      },
+      {
+        name: "O agricultor e o técnico também",
+        body: "Registamos a previsão deles antes da colheita, dia a dia e em separado.",
+      },
+      {
+        name: "A balança decide",
+        body: "Os quilos realmente colhidos são pesados todos os dias.",
+      },
+      {
+        name: "Comparamos as três",
+        body: "Todas as semanas vê-se quem esteve mais perto da colheita, e por quanto.",
+      },
+    ],
+    metricsTitle: "Como calculamos o erro",
+    formula: "erro = |quilos previstos − quilos colhidos| ÷ quilos colhidos",
+    metrics: [
+      {
+        name: "Erro da semana",
+        body: "Soma-se quanto falha cada estufa e divide-se por tudo o que foi colhido. Assim, uma colheita pequena não dispara a percentagem.",
+      },
+      {
+        name: "Enviesamento",
+        body: "Se a previsão tende a ficar abaixo ou a passar. Um enviesamento estável pode ser corrigido.",
+      },
+      {
+        name: "Margem de confiança",
+        body: "Com poucas semanas, o erro real pode ser maior do que o medido. Calculamos entre que valores está, com 90 % de confiança.",
+      },
+      {
+        name: "Semanas dentro do objetivo",
+        body: "Quantas semanas o erro ficou em 10 % ou menos.",
+      },
+    ],
+    criteriaTitle: "Quando dizemos que os 10 % se cumprem",
+    criteriaLead: "Só se as quatro condições se verificarem ao mesmo tempo:",
+    criteria: [
+      "Todos os dados são reais: nada simulado nos vídeos, nos parâmetros ou na colheita.",
+      "As semanas avaliadas não foram usadas para calibrar o sistema.",
+      "Há pelo menos 8 semanas e estufas medidas.",
+      "Até o extremo alto da margem de confiança fica em 10 % ou menos.",
+    ],
+    criteriaNote: "Mesmo assim, o resultado vale para essa estufa, essa cultura e essa forma de gravar. Antes de o afirmar noutro sítio, mede-se de novo.",
+    linksTitle: "Onde se perde a precisão",
+    linksLead: "O erro total não diz o que falha. Medimos cada elo em separado:",
+    links: [
+      {
+        name: "A contagem da câmara",
+        body: "Em troços de controlo marcados com fita, a fruta é contada à mão e comparada com o que a Atias contou no mesmo troço de linha.",
+      },
+      {
+        name: "A fruta escondida",
+        body: "Nesses troços conta-se também a que só se vê afastando as folhas: a que nenhuma câmara vê a partir do corredor.",
+      },
+      {
+        name: "O peso por fruto",
+        body: "Pesa-se uma amostra de frutos para passar de frutos contados a quilos.",
+      },
+      {
+        name: "A maturação",
+        body: "O que amadurece depois de gravar reparte-se segundo o calor de cada dia e confronta-se com a colheita.",
+      },
+    ],
+    statusTitle: "O que está provado e o que não está",
+    proven: {
+      name: "Provado",
+      body: "O sistema funciona de ponta a ponta: envio do vídeo, contagem por troço, quilos por dia e comparação automática com a balança.",
+    },
+    testing: {
+      name: "Em teste",
+      body: "A precisão real. Em novembro de 2026 começámos a medi-la numa estufa real. Vamos publicar o resultado com este método, seja bom ou mau.",
+    },
+    closeTitle: "Medimos nas suas estufas?",
   },
 };

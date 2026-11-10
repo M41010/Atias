@@ -42,6 +42,10 @@ export const contentNl: Content = {
       "title": "Visie: van vruchten tellen naar de hele kas verzorgen | Atias",
       "description": "Waar Atias naartoe gaat: van oogstprognose naar gewasbescherming en gewasconditie, versie na versie. Atias adviseert, de teeltadviseur beslist."
     },
+    measure: {
+      title: "Hoe we de nauwkeurigheid van de oogstprognose meten | Atias",
+      description: "We vergelijken elke prognose met de kilo’s op de weegschaal, naast die van de teler en de teeltadviseur. Methode, het 10 %-criterium en wat nog getest wordt.",
+    },
     notice: { title: "Juridische informatie | Atias", description: "Juridische informatie over de website van Atias." },
     privacy: { title: "Privacybeleid | Atias", description: "Privacybeleid van de website van Atias." },
   },
@@ -54,6 +58,7 @@ export const contentNl: Content = {
     faqTeaser: "Antwoorden op de meest gestelde vragen",
     cropTeaser: "Bekijk de gewaspagina",
     vision: "Visie",
+    measure: "Hoe we meten",
     breadcrumb: "Kruimelpad",
   },
   guide: {
@@ -371,5 +376,88 @@ export const contentNl: Content = {
     "principleTitle": "Atias adviseert, de teeltadviseur beslist",
     "principleBody": "Atias vervangt niemand: het geeft wie het gewas kent ogen in elke rij. Beslissingen over verkoop, behandeling en teelt blijven bij mensen.",
     "closeTitle": "Wil je de pilot zien?"
+  },
+  measure: {
+    eyebrow: "Hoe we meten",
+    title: "Nauwkeurigheid meet je op de weegschaal, je belooft haar niet",
+    lead: "Bijna niemand in de sector publiceert hoeveel zijn prognose ernaast zit. Wij publiceren de methode vóór het resultaat, zodat iedereen het kan controleren.",
+    compareTitle: "Wat we vergelijken",
+    compare: [
+      {
+        name: "Atias voorspelt",
+        body: "De kilo’s die elke dag van maandag tot vrijdag geoogst worden, op basis van de video van zaterdag.",
+      },
+      {
+        name: "De teler en de adviseur ook",
+        body: "We noteren hun prognose vóór de oogst, per dag en apart.",
+      },
+      {
+        name: "De weegschaal beslist",
+        body: "De werkelijk geoogste kilo’s worden elke dag gewogen.",
+      },
+      {
+        name: "We vergelijken alle drie",
+        body: "Elke week zie je wie het dichtst bij de oogst zat, en hoeveel.",
+      },
+    ],
+    metricsTitle: "Hoe we de fout berekenen",
+    formula: "fout = |voorspelde kilo’s − geoogste kilo’s| ÷ geoogste kilo’s",
+    metrics: [
+      {
+        name: "Weekfout",
+        body: "We tellen op hoeveel elke kas ernaast zit en delen door alles wat geoogst is. Zo blaast een kleine oogst het percentage niet op.",
+      },
+      {
+        name: "Bias",
+        body: "Of de prognose de neiging heeft te laag of te hoog uit te komen. Een stabiele bias kun je corrigeren.",
+      },
+      {
+        name: "Betrouwbaarheidsmarge",
+        body: "Met weinig weken kan de echte fout groter zijn dan de gemeten fout. We berekenen de marge met 90 % betrouwbaarheid.",
+      },
+      {
+        name: "Weken binnen het doel",
+        body: "Hoeveel weken de fout op 10 % of minder bleef.",
+      },
+    ],
+    criteriaTitle: "Wanneer we zeggen dat de 10 % gehaald is",
+    criteriaLead: "Alleen als aan alle vier de voorwaarden tegelijk is voldaan:",
+    criteria: [
+      "Alle gegevens zijn echt: niets gesimuleerd in de video’s, de parameters of de oogst.",
+      "De beoordeelde weken zijn niet gebruikt om het systeem te kalibreren.",
+      "Er zijn minstens 8 weken en kassen gemeten.",
+      "Zelfs de bovenkant van de betrouwbaarheidsmarge blijft op 10 % of minder.",
+    ],
+    criteriaNote: "Ook dan geldt het resultaat voor die kas, dat gewas en die manier van filmen. Voordat we het elders beweren, meten we opnieuw.",
+    linksTitle: "Waar nauwkeurigheid verloren gaat",
+    linksLead: "De totale fout zegt niet wat er misgaat. We meten elke schakel apart:",
+    links: [
+      {
+        name: "De telling van de camera",
+        body: "In controlestukken gemarkeerd met tape wordt het fruit met de hand geteld en vergeleken met wat Atias op hetzelfde stuk rij telde.",
+      },
+      {
+        name: "Verborgen fruit",
+        body: "In die stukken tellen we ook het fruit dat je alleen ziet door bladeren opzij te doen: wat geen camera vanuit het pad ziet.",
+      },
+      {
+        name: "Gewicht per vrucht",
+        body: "Er wordt een monster vruchten gewogen om getelde vruchten om te rekenen naar kilo’s.",
+      },
+      {
+        name: "Rijping",
+        body: "Wat na het filmen rijpt, wordt verdeeld naar de warmte van elke dag en vergeleken met de oogst.",
+      },
+    ],
+    statusTitle: "Wat bewezen is en wat niet",
+    proven: {
+      name: "Bewezen",
+      body: "Het systeem werkt van begin tot eind: video uploaden, telling per stuk rij, kilo’s per dag en automatische vergelijking met de weegschaal.",
+    },
+    testing: {
+      name: "In test",
+      body: "De echte nauwkeurigheid. In november 2026 zijn we begonnen haar te meten in een echte kas. We publiceren het resultaat met deze methode, goed of slecht.",
+    },
+    closeTitle: "Zullen we het in uw kassen meten?",
   },
 };

@@ -86,6 +86,10 @@ export function Product({ lang }: { lang: Locale }) {
                 {content.links.faq}
                 <ArrowRight size={18} aria-hidden />
               </Link>
+              <Link href={pathFor(lang, "como-medimos")} className="btn-secondary">
+                {content.links.measure}
+                <ArrowRight size={18} aria-hidden />
+              </Link>
             </div>
           </div>
           <div>

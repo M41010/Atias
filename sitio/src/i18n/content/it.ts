@@ -42,6 +42,10 @@ export const contentIt: Content = {
       "title": "Visione: dal contare i frutti al curare la serra | Atias",
       "description": "Dove va Atias: dalla previsione del raccolto alla difesa delle piante e allo stato della coltura, versione dopo versione. Atias consiglia, il tecnico decide."
     },
+    measure: {
+      title: "Come misuriamo la precisione delle previsioni | Atias",
+      description: "Confrontiamo ogni previsione con i chili pesati sulla bilancia, insieme a quella dell’agricoltore e del tecnico. Metodo, criterio del 10 % e cosa è ancora in prova.",
+    },
     notice: { title: "Note legali | Atias", description: "Note legali del sito di Atias." },
     privacy: { title: "Informativa sulla privacy | Atias", description: "Informativa sulla privacy del sito di Atias." },
   },
@@ -54,6 +58,7 @@ export const contentIt: Content = {
     faqTeaser: "Le risposte alle domande più comuni",
     cropTeaser: "Vedi la pagina della coltura",
     vision: "Visione",
+    measure: "Come misuriamo",
     breadcrumb: "Percorso di navigazione",
   },
   guide: {
@@ -371,5 +376,88 @@ export const contentIt: Content = {
     "principleTitle": "Atias consiglia, il tecnico decide",
     "principleBody": "Atias non sostituisce nessuno: dà occhi su ogni fila a chi conosce la coltura. Le decisioni di vendita, trattamento e gestione restano alle persone.",
     "closeTitle": "Vuoi vedere il pilota?"
+  },
+  measure: {
+    eyebrow: "Come misuriamo",
+    title: "La precisione si misura sulla bilancia, non si promette",
+    lead: "Quasi nessuno nel settore pubblica di quanto sbaglia la propria previsione. Noi pubblichiamo il metodo prima del risultato, perché chiunque possa verificarlo.",
+    compareTitle: "Cosa confrontiamo",
+    compare: [
+      {
+        name: "Atias prevede",
+        body: "I chili che si raccoglieranno ogni giorno dal lunedì al venerdì, a partire dal video del sabato.",
+      },
+      {
+        name: "Anche l’agricoltore e il tecnico",
+        body: "Annotiamo la loro previsione prima della raccolta, giorno per giorno e separatamente.",
+      },
+      {
+        name: "Decide la bilancia",
+        body: "Ogni giorno si pesano i chili raccolti davvero.",
+      },
+      {
+        name: "Confrontiamo le tre",
+        body: "Ogni settimana si vede chi si è avvicinato di più al raccolto, e di quanto.",
+      },
+    ],
+    metricsTitle: "Come calcoliamo l’errore",
+    formula: "errore = |chili previsti − chili raccolti| ÷ chili raccolti",
+    metrics: [
+      {
+        name: "Errore della settimana",
+        body: "Si somma lo scarto di ogni serra e si divide per tutto il raccolto: così un raccolto piccolo non gonfia la percentuale.",
+      },
+      {
+        name: "Distorsione",
+        body: "Se la previsione tende a restare sotto o a superare. Una distorsione stabile si può correggere.",
+      },
+      {
+        name: "Margine di confidenza",
+        body: "Con poche settimane, l’errore reale può essere maggiore di quello misurato. Ne calcoliamo l’intervallo con il 90 % di confidenza.",
+      },
+      {
+        name: "Settimane nell’obiettivo",
+        body: "Quante settimane l’errore è rimasto al 10 % o meno.",
+      },
+    ],
+    criteriaTitle: "Quando diciamo che il 10 % è raggiunto",
+    criteriaLead: "Solo se si verificano tutte e quattro le condizioni:",
+    criteria: [
+      "Tutti i dati sono reali: niente di simulato nei video, nei parametri o nel raccolto.",
+      "Le settimane valutate non sono servite a calibrare il sistema.",
+      "Sono state misurate almeno 8 settimane e serre.",
+      "Anche l’estremo alto del margine di confidenza resta al 10 % o meno.",
+    ],
+    criteriaNote: "Anche così, il risultato vale per quella serra, quella coltura e quel modo di riprendere. Prima di affermarlo altrove, si misura di nuovo.",
+    linksTitle: "Dove si perde la precisione",
+    linksLead: "L’errore totale non dice cosa non funziona. Misuriamo ogni anello separatamente:",
+    links: [
+      {
+        name: "Il conteggio della telecamera",
+        body: "In tratti di controllo segnati con nastro, la frutta si conta a mano e si confronta con ciò che ha contato Atias nello stesso tratto di fila.",
+      },
+      {
+        name: "La frutta nascosta",
+        body: "In quei tratti si conta anche quella che si vede solo spostando le foglie: quella che nessuna telecamera vede dal corridoio.",
+      },
+      {
+        name: "Il peso per frutto",
+        body: "Si pesa un campione di frutti per passare dai frutti contati ai chili.",
+      },
+      {
+        name: "La maturazione",
+        body: "Ciò che matura dopo le riprese si distribuisce secondo il caldo di ogni giorno e si confronta con il raccolto.",
+      },
+    ],
+    statusTitle: "Cosa è provato e cosa no",
+    proven: {
+      name: "Provato",
+      body: "Il sistema funziona dall’inizio alla fine: caricamento del video, conteggio per tratto, chili al giorno e confronto automatico con la bilancia.",
+    },
+    testing: {
+      name: "In prova",
+      body: "La precisione reale. A novembre 2026 abbiamo iniziato a misurarla in una serra vera. Pubblicheremo il risultato con questo metodo, buono o cattivo che sia.",
+    },
+    closeTitle: "La misuriamo nelle tue serre?",
   },
 };

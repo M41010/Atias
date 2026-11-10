@@ -45,6 +45,10 @@ export const contentEs = {
       "title": "Visión: de contar fruta a cuidar el invernadero | Atias",
       "description": "Hacia dónde va Atias: de la previsión de cosecha a la sanidad vegetal y el estado de la planta, versión a versión. Atias recomienda y el técnico decide."
     },
+    measure: {
+      title: "Cómo medimos la precisión de la previsión de cosecha | Atias",
+      description: "Comparamos cada previsión con los kilos pesados en la báscula, junto a la del agricultor y la del técnico. Método, criterio del 10 % y lo que aún está en pruebas.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal de la web de Atias." },
     privacy: { title: "Política de privacidad | Atias", description: "Política de privacidad de la web de Atias." },
   },
@@ -57,6 +61,7 @@ export const contentEs = {
     faqTeaser: "Resolvemos las dudas más habituales",
     cropTeaser: "Ver la página del cultivo",
     vision: "Visión",
+    measure: "Cómo medimos",
     breadcrumb: "Ruta de navegación",
   },
   guide: {
@@ -374,6 +379,89 @@ export const contentEs = {
     "principleTitle": "Atias recomienda, el técnico decide",
     "principleBody": "Atias no sustituye a nadie: da ojos en cada hilera a quien conoce el cultivo. Las decisiones de venta, de tratamiento y de manejo siguen siendo de las personas.",
     "closeTitle": "¿Quieres ver el piloto?"
+  },
+  measure: {
+    eyebrow: "Cómo medimos",
+    title: "La precisión se mide en la báscula, no se promete",
+    lead: "Casi nadie en el sector publica cuánto se equivoca su previsión. Nosotros publicamos el método antes que el resultado, para que cualquiera pueda comprobarlo.",
+    compareTitle: "Qué comparamos",
+    compare: [
+      {
+        name: "Atias prevé",
+        body: "Los kilos que se recogerán cada día de lunes a viernes, a partir del vídeo del sábado.",
+      },
+      {
+        name: "El agricultor y el técnico también",
+        body: "Apuntamos su previsión antes de recoger, día a día y por separado.",
+      },
+      {
+        name: "La báscula decide",
+        body: "Se pesan los kilos recogidos de verdad cada día.",
+      },
+      {
+        name: "Comparamos las tres",
+        body: "Cada semana se ve quién se acercó más a lo recogido y por cuánto.",
+      },
+    ],
+    metricsTitle: "Cómo calculamos el error",
+    formula: "error = |kilos previstos − kilos recogidos| ÷ kilos recogidos",
+    metrics: [
+      {
+        name: "Error de la semana",
+        body: "Se suma lo que se equivoca cada invernadero y se divide entre todo lo recogido. Así una cosecha pequeña no dispara el porcentaje.",
+      },
+      {
+        name: "Sesgo",
+        body: "Si la previsión tiende a quedarse corta o a pasarse. Un sesgo estable se puede corregir.",
+      },
+      {
+        name: "Margen de confianza",
+        body: "Con pocas semanas, el error real puede ser mayor que el medido. Calculamos entre qué valores está con un 90 % de confianza.",
+      },
+      {
+        name: "Semanas dentro del objetivo",
+        body: "Cuántas semanas quedó el error en el 10 % o menos.",
+      },
+    ],
+    criteriaTitle: "Cuándo decimos que se cumple el 10 %",
+    criteriaLead: "Solo si se dan las cuatro condiciones a la vez:",
+    criteria: [
+      "Todos los datos son reales: nada simulado en los vídeos, los parámetros ni la cosecha.",
+      "Las semanas evaluadas no se usaron para calibrar el sistema.",
+      "Hay al menos 8 semanas e invernaderos medidos.",
+      "Incluso el extremo alto del margen de confianza queda en el 10 % o menos.",
+    ],
+    criteriaNote: "Aun así, el resultado vale para ese invernadero, ese cultivo y esa forma de grabar. Antes de afirmarlo en otro sitio, se vuelve a medir.",
+    linksTitle: "Dónde se pierde la precisión",
+    linksLead: "El error total no dice qué falla. Medimos cada eslabón por separado:",
+    links: [
+      {
+        name: "El conteo de la cámara",
+        body: "En tramos de control marcados con cinta se cuenta la fruta a mano y se compara con lo que contó Atias en el mismo trozo de hilera.",
+      },
+      {
+        name: "La fruta tapada",
+        body: "En esos tramos también se cuenta la que solo se ve apartando hojas: es la que ninguna cámara ve desde el pasillo.",
+      },
+      {
+        name: "El peso por fruto",
+        body: "Se pesa una muestra de frutos para pasar de frutos contados a kilos.",
+      },
+      {
+        name: "La maduración",
+        body: "Lo que madura después de grabar se reparte según el calor de cada día y se contrasta con lo recogido.",
+      },
+    ],
+    statusTitle: "Lo que está probado y lo que no",
+    proven: {
+      name: "Probado",
+      body: "El sistema funciona de punta a punta: subida del vídeo, conteo por tramos, kilos por día y comparación automática con la báscula.",
+    },
+    testing: {
+      name: "En pruebas",
+      body: "La precisión real. En noviembre de 2026 empezamos a medirla en un invernadero real. Publicaremos el resultado con este método, sea bueno o malo.",
+    },
+    closeTitle: "¿Lo medimos en tus invernaderos?",
   },
 };
 

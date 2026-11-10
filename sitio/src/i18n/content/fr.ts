@@ -42,6 +42,10 @@ export const contentFr: Content = {
       "title": "Vision : de compter les fruits à soigner la serre | Atias",
       "description": "Où va Atias : de la prévision de récolte à la santé des plantes et à l'état des cultures, version après version. Atias recommande, le technicien décide."
     },
+    measure: {
+      title: "Comment nous mesurons la précision des prévisions | Atias",
+      description: "Nous comparons chaque prévision aux kilos pesés sur la balance, avec celle du producteur et celle du technicien. Méthode, critère des 10 % et ce qui est encore en test.",
+    },
     notice: { title: "Mentions légales | Atias", description: "Mentions légales du site d'Atias." },
     privacy: { title: "Politique de confidentialité | Atias", description: "Politique de confidentialité du site d'Atias." },
   },
@@ -54,6 +58,7 @@ export const contentFr: Content = {
     faqTeaser: "Réponses aux questions les plus courantes",
     cropTeaser: "Voir la page de la culture",
     vision: "Vision",
+    measure: "Comment nous mesurons",
     breadcrumb: "Fil d'Ariane",
   },
   guide: {
@@ -371,5 +376,88 @@ export const contentFr: Content = {
     "principleTitle": "Atias recommande, le technicien décide",
     "principleBody": "Atias ne remplace personne : il donne des yeux sur chaque rang à ceux qui connaissent la culture. Les décisions de vente, de traitement et de conduite restent humaines.",
     "closeTitle": "Envie de voir le pilote ?"
+  },
+  measure: {
+    eyebrow: "Comment nous mesurons",
+    title: "La précision se mesure sur la balance, elle ne se promet pas",
+    lead: "Presque personne dans le secteur ne publie de combien sa prévision se trompe. Nous publions la méthode avant le résultat, pour que chacun puisse la vérifier.",
+    compareTitle: "Ce que nous comparons",
+    compare: [
+      {
+        name: "Atias prévoit",
+        body: "Les kilos récoltés chaque jour du lundi au vendredi, à partir de la vidéo du samedi.",
+      },
+      {
+        name: "Le producteur et le technicien aussi",
+        body: "Nous notons leur prévision avant la récolte, jour par jour et séparément.",
+      },
+      {
+        name: "La balance tranche",
+        body: "Les kilos réellement récoltés sont pesés chaque jour.",
+      },
+      {
+        name: "Nous comparons les trois",
+        body: "Chaque semaine, on voit qui s’est le plus approché de la récolte, et de combien.",
+      },
+    ],
+    metricsTitle: "Comment nous calculons l’erreur",
+    formula: "erreur = |kilos prévus − kilos récoltés| ÷ kilos récoltés",
+    metrics: [
+      {
+        name: "Erreur de la semaine",
+        body: "On additionne l’écart de chaque serre et on divise par tout ce qui a été récolté : une petite récolte ne gonfle pas le pourcentage.",
+      },
+      {
+        name: "Biais",
+        body: "Si la prévision a tendance à rester en dessous ou à dépasser. Un biais stable peut se corriger.",
+      },
+      {
+        name: "Marge de confiance",
+        body: "Avec peu de semaines, l’erreur réelle peut dépasser l’erreur mesurée. Nous calculons sa fourchette avec 90 % de confiance.",
+      },
+      {
+        name: "Semaines dans l’objectif",
+        body: "Combien de semaines l’erreur est restée à 10 % ou moins.",
+      },
+    ],
+    criteriaTitle: "Quand nous disons que les 10 % sont atteints",
+    criteriaLead: "Seulement si les quatre conditions sont réunies :",
+    criteria: [
+      "Toutes les données sont réelles : rien de simulé dans les vidéos, les paramètres ou la récolte.",
+      "Les semaines évaluées n’ont pas servi à calibrer le système.",
+      "Au moins 8 semaines et serres ont été mesurées.",
+      "Même le haut de la marge de confiance reste à 10 % ou moins.",
+    ],
+    criteriaNote: "Même alors, le résultat vaut pour cette serre, cette culture et cette façon de filmer. Avant de l’affirmer ailleurs, on mesure de nouveau.",
+    linksTitle: "Où se perd la précision",
+    linksLead: "L’erreur totale ne dit pas ce qui échoue. Nous mesurons chaque maillon séparément :",
+    links: [
+      {
+        name: "Le comptage de la caméra",
+        body: "Dans des tronçons de contrôle marqués au ruban, les fruits sont comptés à la main et comparés à ce qu’Atias a compté au même endroit.",
+      },
+      {
+        name: "Les fruits cachés",
+        body: "Dans ces tronçons, on compte aussi ceux qu’on ne voit qu’en écartant les feuilles : ceux qu’aucune caméra ne voit depuis l’allée.",
+      },
+      {
+        name: "Le poids par fruit",
+        body: "On pèse un échantillon de fruits pour passer des fruits comptés aux kilos.",
+      },
+      {
+        name: "La maturation",
+        body: "Ce qui mûrit après le tournage est réparti selon la chaleur de chaque jour et confronté à la récolte.",
+      },
+    ],
+    statusTitle: "Ce qui est prouvé et ce qui ne l’est pas",
+    proven: {
+      name: "Prouvé",
+      body: "Le système fonctionne de bout en bout : envoi de la vidéo, comptage par tronçon, kilos par jour et comparaison automatique avec la balance.",
+    },
+    testing: {
+      name: "En test",
+      body: "La précision réelle. En novembre 2026, nous avons commencé à la mesurer dans une vraie serre. Nous publierons le résultat avec cette méthode, bon ou mauvais.",
+    },
+    closeTitle: "On la mesure dans vos serres ?",
   },
 };
