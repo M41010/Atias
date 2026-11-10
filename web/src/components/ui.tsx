@@ -22,7 +22,7 @@ export function PageHeader({
   return (
     <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-balance">{title}</h1>
+        <h1 className="display text-[2.25rem]">{title}</h1>
         {description && <p className="mt-1 text-sm text-muted">{description}</p>}
       </div>
       {actions}
@@ -244,7 +244,7 @@ export function EmptyState({ title, children }: { title: string; children: React
 
 export function SummaryPanel({ report }: { report: HarvestReport }) {
   const scale = report.forecast.max * 1.04;
-  const secondary = "mt-2 text-3xl font-semibold tracking-tight tabular-nums";
+  const secondary = "mt-2 text-3xl numeral";
   const partial = <PartialNote missing={report.missingHileras} total={report.totalHileras} />;
   const closed = report.realKg !== null;
   return (
@@ -255,7 +255,7 @@ export function SummaryPanel({ report }: { report: HarvestReport }) {
             {closed ? "Previsión de esa recolección" : "Previsión para la venta"}
             <Pill tone="warn">Experimental</Pill>
           </p>
-          <p className="mt-2 text-5xl font-semibold tracking-tight tabular-nums">
+          <p className="mt-2 text-5xl numeral">
             <AnimatedNumber value={report.forecast.kg} /> <span className="text-xl font-medium tracking-normal text-muted">kg</span>
           </p>
           <RangeBand range={report.forecast} scaleMax={scale} tone="warn" />

@@ -1,7 +1,7 @@
 // Permite abrir las pantallas de la cooperativa sin conexión. Solo guarda la aplicación:
 // nunca intercepta /api (datos, vídeos, subidas) ni /subir, cuya dirección contiene un enlace privado.
 
-const CACHE = "atias-pantallas-v1";
+const CACHE = "atias-pantallas-v2";
 const OFFLINE_PAGE = "/sin-conexion.html";
 const SCREENS = ["/", "/invernaderos", "/videos", "/enlaces", "/cosecha", "/temporeros", "/parametros"];
 const ASSET = /\/_next\/static\/[^"'\\\s)<>]+/g;

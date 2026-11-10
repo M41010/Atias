@@ -312,7 +312,7 @@ export default function GreenhousePage() {
   const g = greenhouse;
   const scale = g.forecast.max * 1.04;
   const done = g.videos.filter((v) => v.status !== "analizando").length;
-  const number = "mt-2 text-3xl font-semibold tracking-tight tabular-nums";
+  const number = "mt-2 text-3xl numeral";
   const partial = <PartialNote missing={g.missingHileras} total={g.hileras.length} />;
 
   return (

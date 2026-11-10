@@ -1,18 +1,24 @@
 @import "tailwindcss";
 
+/*
+ * Marca de Atias: la paleta «Hoja» de la web pública (fondo verde muy claro, tinta verde profundo,
+ * acento verde brote) y la tipografía Archivo. Los nombres de los tokens no cambian.
+ */
 @theme {
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --color-canvas: #f7f8f6;
-  --color-sunken: #eef0ec;
+  --font-sans: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --color-canvas: #f1f4ec;
+  --color-sunken: #e6ecdf;
   --color-surface: #ffffff;
-  --color-ink: #16201a;
-  --color-muted: #5a665e;
-  --color-line: #e3e6e1;
-  --color-line-strong: #c9cec7;
-  --color-control: #89938b;
+  --color-ink: #0f2b20;
+  --color-muted: #4f5f55;
+  --color-line: #dbe3d3;
+  --color-line-strong: #c0ccb6;
+  --color-control: #7c8c80;
   --color-brand: #17803d;
   --color-brand-ink: #11632f;
   --color-brand-soft: #e7f4ea;
+  --color-sprout: #3f8f2a;
+  --color-sprout-light: #8fd14f;
   --color-ok-soft: #e5f4e9;
   --color-ok-ink: #1a6836;
   --color-warn: #c98a0c;
@@ -40,12 +46,12 @@ body {
 }
 
 ::selection {
-  background: var(--color-brand-soft);
-  color: var(--color-brand-ink);
+  background: var(--color-ink);
+  color: var(--color-canvas);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -143,17 +149,18 @@ body {
     gap: 0.5rem;
     min-height: 2.5rem;
     padding: 0 0.875rem;
-    border: 1px solid var(--color-brand-ink);
+    border: 1px solid var(--color-ink);
     border-radius: 0.375rem;
-    background: var(--color-brand-ink);
+    background: var(--color-ink);
     color: #ffffff;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: background-color 150ms;
+    transition: background-color 150ms, border-color 150ms;
   }
 
   .btn-primary:hover {
-    background: var(--color-ink);
+    background: var(--color-brand-ink);
+    border-color: var(--color-brand-ink);
   }
 
   .btn-secondary {
@@ -190,4 +197,40 @@ body {
 .data-table.compact tbody th,
 .data-table.compact td {
   padding-inline: 0.625rem;
+}
+
+/* Titulares y cifras grandes: la voz condensada de la web pública. */
+.display {
+  font-stretch: 75%;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.numeral {
+  font-stretch: 80%;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Logotipo: la nave central del símbolo hace de A delante de «TIAS», como en la web. */
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  font-stretch: 88%;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-ink);
+}
+
+.wordmark svg {
+  height: 0.715em;
+  width: auto;
+  margin-right: 0.06em;
+  flex: none;
 }

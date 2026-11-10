@@ -60,7 +60,7 @@ export default function TemporerosPage() {
               <p className="flex flex-wrap items-center gap-2 text-sm font-medium">
                 Temporeros necesarios <Pill tone="warn">Según previsión experimental</Pill>
               </p>
-              <p className="mt-2 text-5xl font-semibold tracking-tight tabular-nums">
+              <p className="mt-2 text-5xl numeral">
                 {data.workers === null ? "—" : <AnimatedNumber value={data.workers} format={(n) => String(Math.round(n))} />}
                 <span className="ml-2 text-xl font-medium tracking-normal text-muted">personas</span>
               </p>
