@@ -51,8 +51,8 @@ La aplicación solo muestra **«Cumple en este piloto»** si se dan todas estas 
 1. Datos reales: ningún dato simulado en vídeo, parámetros ni cosecha.
 2. Estimación y cosecha comparables (tabla anterior).
 3. Evaluación **fuera de muestra**: semanas no usadas para calibrar.
-4. Al menos 8 pares por grupo evaluado. *Propuesta a confirmar.*
-5. **Extremo superior del IC 90 % del WAPE ≤ 10 %**. *Propuesta a confirmar:* es más exigente que pedir
+4. Al menos 8 pares por grupo evaluado. *Confirmado por el usuario el 2026-11-10.*
+5. **Extremo superior del IC 90 % del WAPE ≤ 10 %**. *Confirmado el 2026-11-10:* es más exigente que pedir
    una media ≤ 10 %, y evita declarar el éxito por una racha de semanas buenas.
 
 Aun así, el resultado vale para **ese invernadero, cultivo y método de captura**. Antes de escalar hay que

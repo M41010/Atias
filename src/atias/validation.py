@@ -23,7 +23,7 @@ import numpy as np
 from .domain import HarvestScope, Origin, Semantics
 
 TARGET = 0.10
-# Propuesta pendiente de confirmar con el negocio (ver docs/VALIDACION.md).
+# Criterio confirmado por el usuario el 2026-11-10 (ver docs/VALIDACION.md).
 DEFAULT_MIN_PAIRS = 8
 
 
