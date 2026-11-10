@@ -89,7 +89,19 @@ export function Company({ lang }: { lang: Locale }) {
           <div>
             <h2 id="nombre" className="display text-[clamp(2.25rem,4.4vw,3.75rem)]">{company.nameTitle}</h2>
             <p className="lead mt-6 text-[1.2rem] font-medium text-ink-soft">{company.nameBody}</p>
-            <p className="mt-10">
+            {/* Cada letra con su palabra: la sigla se lee de arriba abajo. */}
+            <dl className="mt-10 border-t-[3px] border-ink">
+              {company.nameParts.map((part, index) => (
+                <Reveal key={part.letter} delay={index * 120} className="flex items-baseline gap-5 border-b-[3px] border-ink py-4">
+                  <dt className="display w-[2.4ch] shrink-0 text-[clamp(2.75rem,5vw,4rem)] text-sprout">{part.letter}</dt>
+                  <dd>
+                    <span className="display block text-[clamp(1.6rem,2.6vw,2.25rem)]">{part.word}</span>
+                    {part.meaning && <span className="text-ink-soft">{part.meaning}</span>}
+                  </dd>
+                </Reveal>
+              ))}
+            </dl>
+            <p className="mt-8">
               <Wordmark className="wordmark-xl" />
             </p>
           </div>

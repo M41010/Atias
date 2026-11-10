@@ -141,8 +141,14 @@ export const en: Dictionary = {
         body: "Weekly use in several greenhouses, measuring accuracy against the scales.",
       },
     ],
-    nameTitle: "Why “Atias”",
-    nameBody: "The name does not come from anywhere, but in Spanish it sounds like atisbar: to glimpse what is coming. That is what Atias does with the harvest.",
+    nameTitle: "What ATIAS stands for",
+    nameBody: "Four Spanish words that sum up what we do: bringing technology and artificial intelligence to agriculture to deliver solutions that can be checked.",
+    nameParts: [
+      { letter: "A", word: "Agricultura", meaning: "Agriculture" },
+      { letter: "T", word: "Tecnología", meaning: "Technology" },
+      { letter: "IA", word: "Inteligencia Artificial", meaning: "Artificial Intelligence" },
+      { letter: "S", word: "Soluciones", meaning: "Solutions" },
+    ],
     logoTitle: "The symbol, piece by piece",
     logo: [
       {

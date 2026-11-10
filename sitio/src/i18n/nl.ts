@@ -141,8 +141,14 @@ export const nl: Dictionary = {
         body: "Wekelijks gebruik in meerdere kassen, met de nauwkeurigheid gemeten tegen de weegschaal.",
       },
     ],
-    nameTitle: "Waarom ‘Atias’",
-    nameBody: "De naam komt nergens vandaan, maar in het Spaans klinkt hij als atisbar: zien wat eraan komt. Dat is wat Atias met de oogst doet.",
+    nameTitle: "Waar ATIAS voor staat",
+    nameBody: "Vier Spaanse woorden die samenvatten wat we doen: technologie en kunstmatige intelligentie naar de landbouw brengen voor oplossingen die je kunt controleren.",
+    nameParts: [
+      { letter: "A", word: "Agricultura", meaning: "Landbouw" },
+      { letter: "T", word: "Tecnología", meaning: "Technologie" },
+      { letter: "IA", word: "Inteligencia Artificial", meaning: "Kunstmatige Intelligentie" },
+      { letter: "S", word: "Soluciones", meaning: "Oplossingen" },
+    ],
     logoTitle: "Het symbool, stuk voor stuk",
     logo: [
       {

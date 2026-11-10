@@ -141,8 +141,14 @@ export const pt: Dictionary = {
         body: "Utilização semanal em várias estufas, medindo a precisão face à balança.",
       },
     ],
-    nameTitle: "Porquê «Atias»",
-    nameBody: "O nome não vem de lado nenhum, mas em espanhol soa a atisbar: vislumbrar o que aí vem. É o que a Atias faz com a colheita.",
+    nameTitle: "O que significa ATIAS",
+    nameBody: "Quatro palavras espanholas que resumem o que fazemos: levar a tecnologia e a inteligência artificial à agricultura para oferecer soluções que se podem comprovar.",
+    nameParts: [
+      { letter: "A", word: "Agricultura", meaning: "Agricultura" },
+      { letter: "T", word: "Tecnología", meaning: "Tecnologia" },
+      { letter: "IA", word: "Inteligencia Artificial", meaning: "Inteligência Artificial" },
+      { letter: "S", word: "Soluciones", meaning: "Soluções" },
+    ],
     logoTitle: "O símbolo, peça a peça",
     logo: [
       {

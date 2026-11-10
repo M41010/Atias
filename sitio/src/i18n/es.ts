@@ -146,8 +146,14 @@ export const es = {
         body: "Uso semanal en varios invernaderos, midiendo la precisión frente a la báscula.",
       },
     ],
-    nameTitle: "Por qué «Atias»",
-    nameBody: "El nombre no viene de ningún sitio, pero nos gusta que suene a atisbar: ver antes lo que viene. Es lo que Atias hace con la cosecha.",
+    nameTitle: "Qué significa ATIAS",
+    nameBody: "Cuatro palabras que resumen lo que hacemos: llevar la tecnología y la inteligencia artificial a la agricultura para dar soluciones que se pueden comprobar.",
+    nameParts: [
+      { letter: "A", word: "Agricultura", meaning: "" },
+      { letter: "T", word: "Tecnología", meaning: "" },
+      { letter: "IA", word: "Inteligencia Artificial", meaning: "" },
+      { letter: "S", word: "Soluciones", meaning: "" },
+    ],
     logoTitle: "El símbolo, pieza a pieza",
     logo: [
       {
