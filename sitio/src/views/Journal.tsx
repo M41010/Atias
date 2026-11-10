@@ -31,7 +31,7 @@ export function Journal({ lang }: { lang: Locale }) {
 
       <section className="bg-trap">
         <div className="mx-auto max-w-[1100px] px-4 py-20 sm:px-8 lg:py-28">
-          <JournalList lang={lang} />
+          <JournalList lang={lang} headingLevel={2} />
         </div>
       </section>
 
