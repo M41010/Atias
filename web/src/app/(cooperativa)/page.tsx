@@ -2,6 +2,7 @@
 
 import { AlertTriangle, ChevronRight, FileText } from "lucide-react";
 import Link from "next/link";
+import { ExcelButton } from "@/components/ExcelButton";
 import { GreenhouseTable } from "@/components/GreenhouseTable";
 import {
   EmptyState,
@@ -16,6 +17,7 @@ import {
   SummaryPanel,
   WarningList,
 } from "@/components/ui";
+import { excelFileName, summarySheets } from "@/lib/excelExport";
 import { fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
 import { useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
 
@@ -35,6 +37,9 @@ export default function ResumenPage() {
               <FileText size={16} aria-hidden />
               Informe PDF
             </Link>
+          )}
+          {report && !report.empty && (
+            <ExcelButton build={() => summarySheets(report)} fileName={excelFileName("resumen", report)} />
           )}
           <HarvestPicker selected={harvestId} />
         </div>
