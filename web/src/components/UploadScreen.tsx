@@ -376,7 +376,7 @@ export function UploadScreen({ token, link }: { token: string; link: LinkInfo })
   return (
     <div className="grid gap-4">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Vídeos de la semana</h1>
+        <h1 className="display text-[2.25rem]">Vídeos de la semana</h1>
         <p className="mt-1 text-sm text-muted">
           {link.invernadero.nombre} · {CROPS[link.invernadero.cultivo]?.name ?? link.invernadero.cultivo} · {link.recoleccion.etiqueta}
         </p>

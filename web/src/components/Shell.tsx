@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthGate } from "@/components/AuthGate";
+import { Wordmark } from "@/components/Wordmark";
 import { fmtDate } from "@/lib/format";
 import { useOnline } from "@/lib/hooks";
 import { setDataMode, useDataMode } from "@/lib/mode";
@@ -77,7 +78,7 @@ function NavLinks() {
               aria-current={active ? "page" : undefined}
               className={`flex min-h-10 items-center gap-2.5 whitespace-nowrap rounded-md px-3 text-sm transition-colors duration-150 ${
                 active
-                  ? "bg-brand-soft font-semibold text-brand-ink"
+                  ? "bg-ink font-semibold text-canvas"
                   : "text-muted hover:bg-sunken hover:text-ink"
               }`}
             >
@@ -197,7 +198,9 @@ export function FarmerShell({ children }: { children: ReactNode }) {
           Prototipo en pruebas: vídeos y datos se envían a un servidor de prueba.
         </p>
       </div>
-      <p className="mx-auto max-w-xl px-4 pt-4 text-lg font-semibold tracking-tight text-brand-ink">Atias</p>
+      <p className="mx-auto max-w-xl px-4 pt-4 text-xl">
+        <Wordmark />
+      </p>
       <main className="mx-auto max-w-xl px-4 pt-2 pb-8">
         <Suspense fallback={null}>{children}</Suspense>
       </main>
@@ -210,8 +213,8 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="min-h-dvh md:grid md:grid-cols-[224px_minmax(0,1fr)]">
       <nav aria-label="Principal" className="border-b border-line bg-surface md:border-r md:border-b-0">
         <div className="flex items-center gap-4 overflow-x-auto px-4 py-2.5 md:sticky md:top-0 md:block md:px-3 md:py-5">
-          <Link href="/" className="shrink-0 px-1 text-lg font-semibold tracking-tight text-brand-ink md:mb-6 md:block md:px-3">
-            Atias
+          <Link href="/" className="shrink-0 px-1 text-xl md:mb-6 md:block md:px-3">
+            <Wordmark />
           </Link>
           <Suspense fallback={null}>
             <NavLinks />

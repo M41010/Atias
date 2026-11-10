@@ -184,7 +184,7 @@ export default function ParametrosPage() {
                 </p>
               ) : report.data ? (
                 <>
-                  <p className="mt-2 text-3xl font-semibold tracking-tight tabular-nums">
+                  <p className="mt-2 text-3xl numeral">
                     <AnimatedNumber value={report.data.forecast.kg} /> <span className="text-lg font-medium text-muted">kg</span>
                   </p>
                   <p className="mt-1 text-sm text-muted">{fmtBetween(report.data.forecast)}</p>

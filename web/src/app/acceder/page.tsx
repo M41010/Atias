@@ -3,6 +3,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, Suspense, useEffect, useState } from "react";
+import { Wordmark } from "@/components/Wordmark";
 import { useDocumentTitle } from "@/lib/hooks";
 import { clearOfflineCopy } from "@/lib/offlineCopy";
 import { safeRedirect } from "@/lib/safeRedirect";
@@ -42,8 +43,10 @@ function AccessForm() {
   return (
     <main className="flex min-h-dvh items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
-        <p className="text-lg font-semibold tracking-tight text-brand-ink">Atias</p>
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight">Acceso de la cooperativa</h1>
+        <p className="text-xl">
+          <Wordmark />
+        </p>
+        <h1 className="display mt-4 text-[2.25rem]">Acceso de la cooperativa</h1>
         <p className="mt-1 text-sm text-muted">Si eres agricultor, usa el enlace personal que te ha enviado la cooperativa.</p>
         <form onSubmit={onSubmit} className="mt-6 grid gap-4 rounded-lg border border-line bg-surface p-5">
           <div>
