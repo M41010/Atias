@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { MonitorPlay } from "lucide-react";
 import Link from "next/link";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
 import { type HarvestReport, listReports } from "@/lib/api";
@@ -279,6 +280,12 @@ export default function PrecisionPage() {
     <PageHeader
       title="Precisión"
       description="Cuánto acierta Atias frente a lo recogido de verdad, junto a las previsiones del agricultor y del técnico, y en qué eslabón se pierde."
+      actions={
+        <Link href="/presentacion" className="btn-secondary">
+          <MonitorPlay size={16} aria-hidden />
+          Presentar
+        </Link>
+      }
     />
   );
   if (reports.isPending) return <>{header}<Skeleton /></>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ChevronRight } from "lucide-react";
+import { AlertTriangle, ChevronRight, FileText } from "lucide-react";
 import Link from "next/link";
 import { GreenhouseTable } from "@/components/GreenhouseTable";
 import {
@@ -28,7 +28,17 @@ export default function ResumenPage() {
     <PageHeader
       title={report?.label ?? "Resumen semanal"}
       description={report ? `Semana ${report.isoWeek}. Lo observado es la fruta madura vista en la captura, no lo que se recogerá.` : undefined}
-      actions={<HarvestPicker selected={harvestId} />}
+      actions={
+        <div className="flex flex-wrap items-center gap-3">
+          {report && !report.empty && (
+            <Link href={`/informe?recoleccion=${encodeURIComponent(harvestId)}`} className="btn-secondary">
+              <FileText size={16} aria-hidden />
+              Informe PDF
+            </Link>
+          )}
+          <HarvestPicker selected={harvestId} />
+        </div>
+      }
     />
   );
 

@@ -17,6 +17,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <nav aria-label={dict.footer.notice} className="flex flex-wrap gap-x-6 gap-y-2 text-[0.95rem] font-semibold">
           <Link href={pathFor(locale, "empresa")}>{dict.nav.company}</Link>
           <Link href={pathFor(locale, "producto")}>{dict.nav.product}</Link>
+          <Link href={pathFor(locale, "vision")}>{links.vision}</Link>
           <Link href={pathFor(locale, "cultivos")}>{links.crops}</Link>
           <Link href={pathFor(locale, "aforo-de-cosecha")}>{links.guide}</Link>
           <Link href={pathFor(locale, "preguntas-frecuentes")}>{links.faq}</Link>
