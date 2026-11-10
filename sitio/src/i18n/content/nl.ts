@@ -229,4 +229,29 @@ export const contentNl: Content = {
       testing: "In de pilot controleren we de detector met video's uit echte kassen en het gemiddelde vruchtgewicht.",
     },
   },
+  results: {
+    "eyebrow": "Resultaten van de pilot",
+    "title": "Wat we tegen de weegschaal hebben gemeten",
+    "lead": "Gemeten in {greenhouses} en {weeks}, waarbij elke prognose is vergeleken met de geplukte kilo's.",
+    "greenhouse": {
+      "one": "1 kas",
+      "other": "{n} kassen"
+    },
+    "week": {
+      "one": "1 week",
+      "other": "{n} weken"
+    },
+    "asOf": "Gegevens per {date}",
+    "source": "Prognose",
+    "error": "Fout in de weekkilo's",
+    "bias": "Afwijking",
+    "sources": {
+      "atias": "Atias",
+      "agricultor": "Teler",
+      "tecnico": "Teeltadviseur"
+    },
+    "control": "Telling van de camera tegen de handtelling in de controlesecties: {value} verschil.",
+    "method": "Fout: verschil tussen prognose en oogst, als percentage van de geplukte kilo's. Positieve afwijking: overschatting.",
+    "caution": "Met minder dan 8 gemeten weken geeft het resultaat een richting, geen bewijs."
+  },
 };

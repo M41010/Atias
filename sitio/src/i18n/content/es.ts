@@ -232,6 +232,31 @@ export const contentEs = {
       testing: "En el piloto estamos comprobando el detector con vídeos de invernaderos reales y el peso medio por fruto.",
     },
   },
+  results: {
+    "eyebrow": "Resultados del piloto",
+    "title": "Lo que hemos medido frente a la báscula",
+    "lead": "Medido en {greenhouses} y {weeks}, comparando cada previsión con los kilos recogidos.",
+    "greenhouse": {
+      "one": "1 invernadero",
+      "other": "{n} invernaderos"
+    },
+    "week": {
+      "one": "1 semana",
+      "other": "{n} semanas"
+    },
+    "asOf": "Datos a {date}",
+    "source": "Previsión",
+    "error": "Error en kilos de la semana",
+    "bias": "Sesgo",
+    "sources": {
+      "atias": "Atias",
+      "agricultor": "Agricultor",
+      "tecnico": "Técnico"
+    },
+    "control": "Conteo de la cámara frente al conteo a mano en los tramos de control: {value} de diferencia.",
+    "method": "Error: diferencia entre lo previsto y lo recogido, en porcentaje de los kilos recogidos. Sesgo positivo: se estima de más.",
+    "caution": "Con menos de 8 semanas medidas, el resultado orienta pero no demuestra."
+  },
 };
 
 export type Content = typeof contentEs;
