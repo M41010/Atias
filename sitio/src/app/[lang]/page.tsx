@@ -6,8 +6,9 @@ import { Counter } from "@/components/Counter";
 import { NaveMark } from "@/components/Mark";
 import { PilotResults } from "@/components/PilotResults";
 import { PresentationVideo } from "@/components/PresentationVideo";
+import { RowTour } from "@/components/RowTour";
 import { JsonLd } from "@/components/JsonLd";
-import { isLocale, pathFor } from "@/i18n/config";
+import { isLocale, NUMBER_LOCALE, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { getContent } from "@/i18n/content";
 import { pageMetadata } from "@/seo/metadata";
@@ -54,6 +55,13 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           <Counter locale={lang} t={dict.counter} />
         </div>
       </section>
+
+      {/* El recorrido con scroll por el invernadero: lo primero que se ve al bajar, en todos los idiomas. */}
+      <RowTour
+        t={content.tour}
+        numberLocale={NUMBER_LOCALE[lang]}
+        how={{ label: cta.how, href: pathFor(lang, "producto") }}
+      />
 
       {/* El vídeo de presentación: de momento solo en español. */}
       {lang === "es" && <PresentationVideo />}

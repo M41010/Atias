@@ -234,6 +234,40 @@ export const contentPt: Content = {
       testing: "No piloto estamos a verificar o detetor com vídeos de estufas reais e o peso médio por fruto.",
     },
   },
+  tour: {
+    "eyebrow": "O percurso",
+    "title": "Desça e percorra a linha com a Atias",
+    "hint": "Desloque para avançar pela estufa",
+    "tag": "Recriação animada",
+    "counted": "frutos maduros contados",
+    "steps": [
+      {
+        "label": "Tomate-cereja",
+        "title": "Fruto a fruto, cacho a cacho",
+        "body": "A câmara percorre a linha e marca cada tomate maduro pela cor. Os verdes ainda não contam."
+      },
+      {
+        "label": "Pepino",
+        "title": "Escondido entre folhas grandes",
+        "body": "Distingue o pepino da planta e decide pelo calibre se já está pronto."
+      },
+      {
+        "label": "Pimento",
+        "title": "Na mata baixa e densa",
+        "body": "Conta cada pimento maduro, vermelho ou amarelo, troço a troço da linha."
+      },
+      {
+        "label": "A cooperativa",
+        "title": "Da linha aos quilos",
+        "body": "O que se conta em cada troço transforma-se em quilos de segunda a sexta, com a sua margem, e nos apanhadores necessários."
+      },
+      {
+        "label": "Toda a estufa",
+        "title": "E depois, cuidar da planta",
+        "body": "A mesma câmara poderá ver pragas, doenças e o estado de cada planta. A Atias recomenda; o técnico decide."
+      }
+    ]
+  },
   results: {
     "eyebrow": "Resultados do piloto",
     "title": "O que medimos face à balança",

@@ -237,6 +237,40 @@ export const contentEs = {
       testing: "En el piloto estamos comprobando el detector con vídeos de invernaderos reales y el peso medio por fruto.",
     },
   },
+  tour: {
+    "eyebrow": "El recorrido",
+    "title": "Baja y recorre la hilera con Atias",
+    "hint": "Desplázate para avanzar por el invernadero",
+    "tag": "Recreación animada",
+    "counted": "frutos maduros contados",
+    "steps": [
+      {
+        "label": "Tomate cherry",
+        "title": "Fruto a fruto, racimo a racimo",
+        "body": "La cámara recorre la hilera y marca cada tomate maduro por su color. Los verdes no cuentan todavía."
+      },
+      {
+        "label": "Pepino",
+        "title": "Escondido entre hojas grandes",
+        "body": "Distingue el pepino de la planta y decide si ya está listo por su calibre."
+      },
+      {
+        "label": "Pimiento",
+        "title": "En la mata baja y tupida",
+        "body": "Cuenta cada pimiento maduro, rojo o amarillo, tramo a tramo de la hilera."
+      },
+      {
+        "label": "La cooperativa",
+        "title": "De la hilera a los kilos",
+        "body": "Lo contado en cada tramo se convierte en kilos de lunes a viernes, con su margen, y en los temporeros necesarios."
+      },
+      {
+        "label": "Todo el invernadero",
+        "title": "Y después, cuidar la planta",
+        "body": "La misma cámara podrá ver plagas, enfermedades y cómo está cada planta. Atias recomienda; el técnico decide."
+      }
+    ]
+  },
   results: {
     "eyebrow": "Resultados del piloto",
     "title": "Lo que hemos medido frente a la báscula",
