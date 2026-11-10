@@ -2,7 +2,7 @@
 
 import { AlertTriangle, ArrowRight, CheckCircle2, Info, LoaderCircle } from "lucide-react";
 import Link from "next/link";
-import { type FormEvent, useEffect, useId, useState } from "react";
+import { type FormEvent, useId, useState, useSyncExternalStore } from "react";
 import { type Locale, pathFor } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/es";
 import { type ContactValues, validateContact } from "./contactValidation";
@@ -20,14 +20,19 @@ export type Interest = "piloto" | "demo" | "otro";
 const INTERESTS: Interest[] = ["piloto", "demo", "otro"];
 type InterestTexts = { interestLabel: string; interests: Record<Interest, string> };
 
+const noSubscription = () => () => {};
+function readAskedInterest(): Interest | null {
+  const asked = new URLSearchParams(window.location.search).get("interes");
+  return asked && (INTERESTS as string[]).includes(asked) ? (asked as Interest) : null;
+}
+
 export function ContactForm({ locale, t, offer }: { locale: Locale; t: Dictionary["contact"]; offer: InterestTexts }) {
   const id = useId();
-  const [interest, setInterest] = useState<Interest>("demo");
-  // Quien llega desde «Quiero un piloto» (?interes=piloto) lo encuentra ya elegido.
-  useEffect(() => {
-    const asked = new URLSearchParams(window.location.search).get("interes");
-    if (asked && (INTERESTS as string[]).includes(asked)) setInterest(asked as Interest);
-  }, []);
+  // Quien llega desde «Quiero un piloto» (?interes=piloto) lo encuentra ya elegido. Se lee de la
+  // dirección sin efecto: en la compilación estática no hay dirección y vale «demo».
+  const asked = useSyncExternalStore(noSubscription, readAskedInterest, () => null);
+  const [chosen, setInterest] = useState<Interest | null>(null);
+  const interest: Interest = chosen ?? asked ?? "demo";
   const [values, setValues] = useState<ContactValues>({
     name: "",
     organization: "",
