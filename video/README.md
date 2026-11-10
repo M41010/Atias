@@ -12,7 +12,7 @@ Vídeo de unos 60 segundos (1920×1080, 30 fps) en los seis idiomas de la web, p
 
 ## Estado
 
-De momento solo se ha generado la versión en español. Los otros cinco idiomas se generarán más
+De momento solo se ha generado la versión en español (horizontal y vertical). Los otros cinco idiomas se generarán más
 adelante, cuando el proyecto esté más avanzado (los rótulos ya están en `src/texts.ts`).
 
 ## Uso
@@ -21,7 +21,13 @@ adelante, cuando el proyecto esté más avanzado (los rótulos ya están en `src
 npm install
 npm run estudio          # vista previa interactiva en el navegador
 node render.mjs es       # genera out/atias-es.mp4 (sin argumentos, los seis idiomas)
+node render.mjs --vertical es   # versión vertical 9:16 para móvil: out/atias-es-vertical.mp4
 ```
+
+La versión vertical (composiciones `AtiasVertical-<idioma>`, 1080×1920) usa las mismas escenas:
+cada parte lee el tamaño de la composición y adapta la cámara (más abierta), los rótulos (más
+grandes y más arriba), el móvil (de pie) y las capturas de la app (más cerca). La web en español la
+enseña en móvil.
 
 `render.mjs` usa el Chrome instalado (variable `CHROME` para otra ruta), porque la descarga del
 navegador de Remotion puede quedarse colgada.

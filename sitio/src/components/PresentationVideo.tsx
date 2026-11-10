@@ -1,7 +1,8 @@
 /**
  * Vídeo de presentación (60 s). De momento solo existe en español, así que solo lo muestra la web
  * en español; los otros idiomas lo tendrán cuando se generen sus versiones (ver video/README.md).
- * Se descarga al pulsar reproducir: el cartel es una imagen ligera.
+ * Se descarga al pulsar reproducir: el cartel es una imagen ligera. Hay dos vídeos (vertical en
+ * móvil, horizontal en pantallas anchas) y solo se ve uno; ninguno se descarga hasta pulsarlo.
  */
 export function PresentationVideo() {
   return (
@@ -16,7 +17,20 @@ export function PresentationVideo() {
             datos a la cooperativa. Las pantallas de la aplicación usan datos de ejemplo.
           </p>
         </div>
-        <div className="mt-10 border-[3px] border-ink bg-ink">
+        {/* En móvil, la versión vertical 9:16 con rótulos grandes; en pantallas anchas, la horizontal. */}
+        <div className="mx-auto mt-10 max-w-[420px] border-[3px] border-ink bg-ink md:hidden">
+          <video
+            className="block aspect-[9/16] w-full"
+            controls
+            playsInline
+            preload="none"
+            poster="/video/atias-es-vertical-poster.jpg"
+            aria-label="Vídeo de presentación de Atias en vertical, sin sonido, con rótulos en pantalla"
+          >
+            <source src="/video/atias-es-vertical.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="mt-10 hidden border-[3px] border-ink bg-ink md:block">
           <video
             className="block aspect-video w-full"
             controls

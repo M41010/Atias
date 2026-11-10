@@ -1,5 +1,5 @@
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { type Crop, countedUntil, cropAt, LENGTH, poseAt, projector, railZ, T, WORLD } from "./scene";
+import { type Crop, countedUntil, cropAt, focalFor, LENGTH, poseAt, projector, railZ, T, WORLD } from "./scene";
 import type { Texts } from "./texts";
 import { C, FONT } from "./theme";
 
@@ -11,17 +11,19 @@ const fmt = (n: number, locale: string) => new Intl.NumberFormat(locale).format(
  */
 export function Detections() {
   const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
   if (frame < T.enter - 10 || frame >= T.rail) return null;
-  const project = projector(frame);
+  const project = projector(frame, width, height);
+  const focal = focalFor(frame, width, height);
   const camZ = poseAt(frame).pos[2];
   const boxes = WORLD.fruits.flatMap((f) => {
     if (!f.ripe) return [];
     const ahead = camZ - f.pos[2];
     if (ahead < -0.6 || ahead > 6) return [];
     const p = project(f.pos);
-    if (!p || p.x < -40 || p.x > 1960 || p.y < -40 || p.y > 1120) return [];
+    if (!p || p.x < -40 || p.x > width + 40 || p.y < -40 || p.y > height + 40) return [];
     const half = f.crop === "cucumber" ? f.size * 0.6 : f.size * 1.4;
-    const size = Math.max(10, (half / p.depth) * 1100);
+    const size = Math.max(10, (half / p.depth) * focal);
     const tall = f.crop === "cucumber" ? 2.2 : 1;
     const appear = interpolate(ahead, [4.5, 6], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
     const counted = ahead < 1.6;
@@ -29,7 +31,7 @@ export function Detections() {
   });
   return (
     <AbsoluteFill>
-      <svg width="1920" height="1080" style={{ position: "absolute", inset: 0 }}>
+      <svg width={width} height={height} style={{ position: "absolute", inset: 0 }}>
         {boxes.map((b) => (
           <g key={b.id} opacity={b.appear}>
             <rect
@@ -98,15 +100,15 @@ export function RecreationTag({ t }: { t: Texts }) {
 /** La vista se encoge dentro de un móvil: hoy se graba con el móvil del agricultor. */
 export function PhoneFrame({ t }: { t: Texts }) {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
   if (frame < T.phone - 5 || frame >= T.rail) return null;
   const s = spring({ frame: frame - T.phone, fps, config: { damping: 18, stiffness: 90 } });
-  // Del borde de la pantalla al tamaño de un móvil apaisado, centrado.
-  const w = interpolate(s, [0, 1], [1920, 1180]);
-  const h = interpolate(s, [0, 1], [1080, 620]);
+  // Del borde de la pantalla al tamaño de un móvil (apaisado en horizontal, de pie en vertical), centrado.
+  const w = interpolate(s, [0, 1], [width, width * 0.615]);
+  const h = interpolate(s, [0, 1], [height, height * 0.574]);
   const r = interpolate(s, [0, 1], [0, 64]);
-  const x = (1920 - w) / 2;
-  const y = (1080 - h) / 2 - interpolate(s, [0, 1], [0, 40]);
+  const x = (width - w) / 2;
+  const y = (height - h) / 2 - interpolate(s, [0, 1], [0, height * 0.037]);
   const blink = Math.floor(frame / 15) % 2 === 0;
   return (
     <AbsoluteFill>
@@ -132,9 +134,9 @@ export function PhoneFrame({ t }: { t: Texts }) {
 /** Con el raíl, cada tramo de la hilera recorrido muestra lo que se ha leído en él. */
 export function RailLabels({ t, locale }: { t: Texts; locale: string }) {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
   if (frame < T.rail || frame >= T.railEnd) return null;
-  const project = projector(frame);
+  const project = projector(frame, width, height);
   const z = railZ(frame);
   const stretch = LENGTH / 8;
   const labels = Array.from({ length: 8 }, (_, i) => i).flatMap((i) => {

@@ -1,11 +1,11 @@
 import { ThreeCanvas } from "@remotion/three";
-import { AbsoluteFill, interpolate, Sequence, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 import { Greenhouse } from "./Greenhouse";
 import { CounterHud, Detections, PhoneFrame, RailLabels, RecreationTag } from "./Overlays";
 import { AppShowcase, Caption, LogoEnd, type Screen, ToApp } from "./Parts";
 import { T } from "./scene";
 import { type Locale, TEXTS } from "./texts";
-import { HEIGHT, loadFonts, WIDTH } from "./theme";
+import { loadFonts } from "./theme";
 
 loadFonts();
 
@@ -21,6 +21,7 @@ const NUMBER_LOCALE: Record<Locale, string> = { es: "es-ES", en: "en-GB", fr: "f
 export function AtiasVideo({ locale }: { locale: Locale }) {
   const t = TEXTS[locale];
   const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
   const numbers = NUMBER_LOCALE[locale];
   const screens: Screen[] = [
     { file: "resumen.png", caption: t.app.resumen, focus: [{ x: 0, y: 0, zoom: 1.02 }, { x: 8, y: 3, zoom: 1.16 }] },
@@ -35,7 +36,7 @@ export function AtiasVideo({ locale }: { locale: Locale }) {
   );
   return (
     <AbsoluteFill style={{ background: "#000" }}>
-      <ThreeCanvas width={WIDTH} height={HEIGHT} durationInFrames={TO_APP} shadows gl={{ antialias: true, preserveDrawingBuffer: true }}>
+      <ThreeCanvas width={width} height={height} durationInFrames={TO_APP} shadows gl={{ antialias: true, preserveDrawingBuffer: true }}>
         <Greenhouse />
       </ThreeCanvas>
       <Sequence durationInFrames={TO_APP} layout="none">
