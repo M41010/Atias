@@ -41,6 +41,10 @@ export const contentEs = {
       description:
         "Aforo de tomate cherry, pimiento y pepino en invernadero con visión artificial: qué cuenta Atias en cada cultivo y qué está aún en pruebas.",
     },
+    vision: {
+      "title": "Visión: de contar fruta a cuidar el invernadero | Atias",
+      "description": "Hacia dónde va Atias: de la previsión de cosecha a la sanidad vegetal y el estado de la planta, versión a versión. Atias recomienda y el técnico decide."
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal de la web de Atias." },
     privacy: { title: "Política de privacidad | Atias", description: "Política de privacidad de la web de Atias." },
   },
@@ -52,6 +56,7 @@ export const contentEs = {
     guideTeaser: "Cómo se hace hoy el aforo de cosecha y por qué falla",
     faqTeaser: "Resolvemos las dudas más habituales",
     cropTeaser: "Ver la página del cultivo",
+    vision: "Visión",
     breadcrumb: "Ruta de navegación",
   },
   guide: {
@@ -231,6 +236,85 @@ export const contentEs = {
       ],
       testing: "En el piloto estamos comprobando el detector con vídeos de invernaderos reales y el peso medio por fruto.",
     },
+  },
+  vision: {
+    "eyebrow": "Visión",
+    "title": "De contar fruta a cuidar todo el invernadero",
+    "lead": "La misma cámara que cuenta la fruta madura puede ver plagas, enfermedades y cómo está cada planta. Empezamos por la cosecha porque se puede comprobar con la báscula; lo demás llega versión a versión.",
+    "roadmapTitle": "Hoja de ruta",
+    "roadmapLead": "Cada versión se apoya en la anterior y solo empieza cuando la anterior ha demostrado que funciona.",
+    "versions": [
+      {
+        "version": "0.9",
+        "name": "Piloto",
+        "when": "Ahora",
+        "line": "Medir la previsión de cosecha en invernaderos reales frente a lo recogido.",
+        "items": [
+          "Un vídeo por hilera grabado con el móvil",
+          "Conteo de fruta madura por tramo de hilera",
+          "Comparación con la previsión del agricultor y del técnico"
+        ]
+      },
+      {
+        "version": "1.0",
+        "name": "Primera temporada",
+        "when": "Siguiente",
+        "line": "La cooperativa usa Atias cada semana para decidir qué vender y a quién contratar.",
+        "items": [
+          "Funcionamiento en la nube",
+          "Conexión con el sistema de gestión de la cooperativa",
+          "Precisión medida semana a semana"
+        ]
+      },
+      {
+        "version": "1.x",
+        "name": "Mejora continua",
+        "when": "Durante la temporada",
+        "line": "Afinar la previsión con lo que se aprende cada semana.",
+        "items": [
+          "Sensores dentro del invernadero",
+          "Avisos cuando falta una hilera o un vídeo sale mal",
+          "Informes semanales"
+        ]
+      },
+      {
+        "version": "2.0",
+        "name": "Sin grabar a mano",
+        "when": "Más adelante",
+        "line": "Que nadie tenga que grabar y saber lo recogido antes de pesarlo.",
+        "items": [
+          "Cámara que recorre la hilera sobre un raíl",
+          "Kilos de cada caja de los temporeros"
+        ]
+      },
+      {
+        "version": "3.0",
+        "name": "Sanidad vegetal",
+        "when": "Más adelante",
+        "line": "Encontrar plagas y enfermedades antes de que se extiendan.",
+        "items": [
+          "Detección en la planta y en las trampas cromáticas",
+          "Mapa de focos por hilera",
+          "Aviso de riesgo según el clima y qué hacer en cada zona"
+        ]
+      },
+      {
+        "version": "4.0",
+        "name": "Estado de la planta",
+        "when": "Más adelante",
+        "line": "Saber cómo está cada zona del cultivo y cómo manejarla.",
+        "items": [
+          "Estrés hídrico y riego",
+          "Nutrición",
+          "Crecimiento, floración y cuajado",
+          "Clima del invernadero"
+        ]
+      }
+    ],
+    "principleEyebrow": "Nuestro principio",
+    "principleTitle": "Atias recomienda, el técnico decide",
+    "principleBody": "Atias no sustituye a nadie: da ojos en cada hilera a quien conoce el cultivo. Las decisiones de venta, de tratamiento y de manejo siguen siendo de las personas.",
+    "closeTitle": "¿Quieres ver el piloto?"
   },
 };
 

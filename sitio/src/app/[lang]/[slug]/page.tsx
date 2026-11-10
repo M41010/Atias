@@ -12,6 +12,7 @@ import { Guide } from "@/views/Guide";
 import { Notice } from "@/views/Notice";
 import { Privacy } from "@/views/Privacy";
 import { Product } from "@/views/Product";
+import { Vision } from "@/views/Vision";
 
 export const dynamicParams = false;
 
@@ -30,6 +31,7 @@ const SEO_KEY: Record<SubPage, keyof ReturnType<typeof getContent>["seo"]> = {
   "aforo-de-cosecha": "guide",
   "preguntas-frecuentes": "faq",
   cultivos: "crops",
+  vision: "vision",
 };
 
 const VIEWS: Record<SubPage, (props: { lang: Locale }) => ReactNode> = {
@@ -41,6 +43,7 @@ const VIEWS: Record<SubPage, (props: { lang: Locale }) => ReactNode> = {
   "aforo-de-cosecha": Guide,
   "preguntas-frecuentes": Faq,
   cultivos: CropsHub,
+  vision: Vision,
 };
 
 async function resolve(params: PageProps<"/[lang]/[slug]">["params"]) {

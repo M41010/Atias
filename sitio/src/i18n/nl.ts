@@ -11,6 +11,7 @@ export const nl: Dictionary = {
     company: "Over ons",
     product: "Product",
     contact: "Contact",
+    vision: "Visie",
     pilot: "Pilot loopt",
     language: "Taal",
     menu: "Menu",
