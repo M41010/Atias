@@ -229,4 +229,38 @@ export const contentIt: Content = {
       testing: "Nel pilota stiamo verificando il rilevatore con video di serre reali e il peso medio per frutto.",
     },
   },
+  tour: {
+    "eyebrow": "Il percorso",
+    "title": "Scorri e percorri la fila con Atias",
+    "hint": "Scorri per avanzare nella serra",
+    "tag": "Ricostruzione animata",
+    "counted": "frutti maturi contati",
+    "steps": [
+      {
+        "label": "Pomodoro ciliegino",
+        "title": "Frutto per frutto, grappolo per grappolo",
+        "body": "La telecamera percorre la fila e segna ogni pomodoro maturo dal colore. Quelli verdi non contano ancora."
+      },
+      {
+        "label": "Cetriolo",
+        "title": "Nascosto tra foglie grandi",
+        "body": "Distingue il cetriolo dalla pianta e decide dal calibro se è pronto."
+      },
+      {
+        "label": "Peperone",
+        "title": "Nel cespuglio basso e fitto",
+        "body": "Conta ogni peperone maturo, rosso o giallo, tratto per tratto della fila."
+      },
+      {
+        "label": "La cooperativa",
+        "title": "Dalla fila ai chili",
+        "body": "Quanto contato in ogni tratto diventa chili dal lunedì al venerdì, con il suo margine, e i raccoglitori necessari."
+      },
+      {
+        "label": "Tutta la serra",
+        "title": "E poi, curare la pianta",
+        "body": "La stessa telecamera potrà vedere parassiti, malattie e lo stato di ogni pianta. Atias consiglia; il tecnico decide."
+      }
+    ]
+  },
 };

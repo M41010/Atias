@@ -229,4 +229,38 @@ export const contentFr: Content = {
       testing: "Dans le pilote, nous vérifions le détecteur sur des vidéos de serres réelles et le poids moyen par fruit.",
     },
   },
+  tour: {
+    "eyebrow": "Le parcours",
+    "title": "Descendez et parcourez le rang avec Atias",
+    "hint": "Faites défiler pour avancer dans la serre",
+    "tag": "Reconstitution animée",
+    "counted": "fruits mûrs comptés",
+    "steps": [
+      {
+        "label": "Tomate cerise",
+        "title": "Fruit par fruit, grappe par grappe",
+        "body": "La caméra parcourt le rang et marque chaque tomate mûre à sa couleur. Les vertes ne comptent pas encore."
+      },
+      {
+        "label": "Concombre",
+        "title": "Caché sous les grandes feuilles",
+        "body": "Elle distingue le concombre de la plante et juge s'il est prêt à son calibre."
+      },
+      {
+        "label": "Poivron",
+        "title": "Dans le buisson bas et dense",
+        "body": "Elle compte chaque poivron mûr, rouge ou jaune, tronçon par tronçon."
+      },
+      {
+        "label": "La coopérative",
+        "title": "Du rang aux kilos",
+        "body": "Ce qui est compté dans chaque tronçon devient des kilos du lundi au vendredi, avec leur marge, et les cueilleurs nécessaires."
+      },
+      {
+        "label": "Toute la serre",
+        "title": "Et ensuite, soigner la plante",
+        "body": "La même caméra pourra voir ravageurs, maladies et l'état de chaque plante. Atias recommande ; le technicien décide."
+      }
+    ]
+  },
 };

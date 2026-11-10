@@ -229,4 +229,38 @@ export const contentEn: Content = {
       testing: "In the pilot we are checking the detector on videos from real greenhouses and the average weight per fruit.",
     },
   },
+  tour: {
+    "eyebrow": "The walkthrough",
+    "title": "Scroll down and walk the row with Atias",
+    "hint": "Scroll to move through the greenhouse",
+    "tag": "Animated recreation",
+    "counted": "ripe fruits counted",
+    "steps": [
+      {
+        "label": "Cherry tomato",
+        "title": "Fruit by fruit, truss by truss",
+        "body": "The camera runs along the row and marks every ripe tomato by its colour. Green ones don't count yet."
+      },
+      {
+        "label": "Cucumber",
+        "title": "Hidden among large leaves",
+        "body": "It tells the cucumber apart from the plant and decides whether it is ready by its size."
+      },
+      {
+        "label": "Pepper",
+        "title": "In the low, dense bush",
+        "body": "It counts every ripe pepper, red or yellow, section by section along the row."
+      },
+      {
+        "label": "The cooperative",
+        "title": "From the row to kilos",
+        "body": "What is counted in each section becomes kilos from Monday to Friday, with a margin, and the pickers needed."
+      },
+      {
+        "label": "The whole greenhouse",
+        "title": "And then, caring for the plant",
+        "body": "The same camera will be able to spot pests, diseases and how each plant is doing. Atias recommends; the agronomist decides."
+      }
+    ]
+  },
 };

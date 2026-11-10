@@ -229,4 +229,38 @@ export const contentNl: Content = {
       testing: "In de pilot controleren we de detector met video's uit echte kassen en het gemiddelde vruchtgewicht.",
     },
   },
+  tour: {
+    "eyebrow": "De rondgang",
+    "title": "Scroll en loop met Atias langs de rij",
+    "hint": "Scroll om door de kas te lopen",
+    "tag": "Geanimeerde reconstructie",
+    "counted": "rijpe vruchten geteld",
+    "steps": [
+      {
+        "label": "Cherrytomaat",
+        "title": "Vrucht voor vrucht, tros voor tros",
+        "body": "De camera loopt langs de rij en markeert elke rijpe tomaat aan haar kleur. Groene tellen nog niet mee."
+      },
+      {
+        "label": "Komkommer",
+        "title": "Verstopt tussen grote bladeren",
+        "body": "Hij onderscheidt de komkommer van de plant en beslist aan de maat of hij klaar is."
+      },
+      {
+        "label": "Paprika",
+        "title": "In de lage, dichte struik",
+        "body": "Hij telt elke rijpe paprika, rood of geel, sectie voor sectie."
+      },
+      {
+        "label": "De coöperatie",
+        "title": "Van de rij naar kilo's",
+        "body": "Wat in elke sectie is geteld, wordt kilo's van maandag tot vrijdag, met marge, en het aantal plukkers dat nodig is."
+      },
+      {
+        "label": "De hele kas",
+        "title": "En daarna: de plant verzorgen",
+        "body": "Dezelfde camera zal plagen, ziekten en de conditie van elke plant kunnen zien. Atias adviseert; de teeltadviseur beslist."
+      }
+    ]
+  },
 };
