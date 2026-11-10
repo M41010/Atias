@@ -32,6 +32,7 @@ import {
   uploadKey,
   type Uploads,
   validateVideo,
+  videoMimeType,
 } from "./upload";
 
 const CHUNK_BYTES = 8 * 1024 * 1024;
@@ -81,7 +82,7 @@ export function useUploadSession(token: string, link: LinkInfo) {
       headers: { [LINK_HEADER]: token },
       metadata: {
         filename: file.name,
-        filetype: file.type,
+        filetype: videoMimeType(file) ?? file.type,
         hilera: String(target.hilera),
         lado: target.lado,
       },
