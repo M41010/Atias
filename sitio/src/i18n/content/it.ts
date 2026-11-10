@@ -503,7 +503,7 @@ export const contentIt: Content = {
     "title": "Cosa vede la cooperativa ogni lunedì",
     "lead": "Schermate reali dell’app, con dati di esempio. Ognuna risponde a una decisione della settimana.",
     "sample": "Dati di esempio",
-    "blurred": "I nomi delle varietà sono sfocati.",
+    "blurred": "I nomi delle varietà sono generici.",
     "uiLanguage": "L’app è mostrata in spagnolo.",
     "tabsLabel": "Schermate dell’app",
     "screens": [

@@ -503,7 +503,7 @@ export const contentPt: Content = {
     "title": "O que a cooperativa vê todas as segundas-feiras",
     "lead": "Ecrãs reais da aplicação, com dados de exemplo. Cada um responde a uma decisão da semana.",
     "sample": "Dados de exemplo",
-    "blurred": "Os nomes das variedades aparecem desfocados.",
+    "blurred": "Os nomes das variedades são genéricos.",
     "uiLanguage": "A aplicação é mostrada em espanhol.",
     "tabsLabel": "Ecrãs da aplicação",
     "screens": [

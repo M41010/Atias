@@ -503,7 +503,7 @@ export const contentNl: Content = {
     "title": "Wat de coöperatie elke maandag ziet",
     "lead": "Echte schermen van de app, met voorbeeldgegevens. Elk scherm beantwoordt een beslissing voor de week.",
     "sample": "Voorbeeldgegevens",
-    "blurred": "Rasnamen zijn vervaagd.",
+    "blurred": "Rasnamen zijn generiek.",
     "uiLanguage": "De app wordt in het Spaans getoond.",
     "tabsLabel": "Schermen van de app",
     "screens": [

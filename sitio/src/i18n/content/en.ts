@@ -503,7 +503,7 @@ export const contentEn: Content = {
     "title": "What the cooperative sees every Monday",
     "lead": "Real screens from the app, with sample data. Each one answers a decision for the week.",
     "sample": "Sample data",
-    "blurred": "Variety names are blurred.",
+    "blurred": "Variety names are generic.",
     "uiLanguage": "The app is shown in Spanish.",
     "tabsLabel": "App screens",
     "screens": [

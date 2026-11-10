@@ -503,7 +503,7 @@ export const contentFr: Content = {
     "title": "Ce que voit la coopérative chaque lundi",
     "lead": "De vrais écrans de l’application, avec des données d’exemple. Chacun répond à une décision de la semaine.",
     "sample": "Données d’exemple",
-    "blurred": "Les noms des variétés sont floutés.",
+    "blurred": "Les noms des variétés sont génériques.",
     "uiLanguage": "L’application est présentée en espagnol.",
     "tabsLabel": "Écrans de l’application",
     "screens": [

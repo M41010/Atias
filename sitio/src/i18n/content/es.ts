@@ -506,7 +506,7 @@ export const contentEs = {
     "title": "Así lo ve la cooperativa cada lunes",
     "lead": "Pantallas reales de la aplicación, con datos de ejemplo. Cada una responde a una decisión de la semana.",
     "sample": "Datos de ejemplo",
-    "blurred": "Los nombres de las variedades aparecen difuminados.",
+    "blurred": "Los nombres de las variedades son genéricos.",
     "uiLanguage": "",
     "tabsLabel": "Pantallas de la aplicación",
     "screens": [

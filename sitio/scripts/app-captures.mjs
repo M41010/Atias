@@ -20,14 +20,14 @@ const out = path.resolve(import.meta.dirname, "..", "public", "capturas", "app")
 mkdirSync(out, { recursive: true });
 
 /**
- * Zonas que se desenfocan, en píxeles de la captura original: los nombres de familia (variedades)
- * de la cooperativa del piloto, que la web pública no debe mostrar.
+ * Zonas que se desenfocan, en píxeles de la captura original. Vacías: las capturas ya llevan nombres
+ * genéricos de familia (Tomate cherry A, Pimiento B…), no los de la cooperativa del piloto.
  */
 const HIDE = {
   resumen: [],
-  prevision: [{ left: 430, top: 262, width: 210, height: 574 }],
-  invernadero: [{ left: 420, top: 160, width: 645, height: 34 }],
-  temporeros: [{ left: 445, top: 600, width: 235, height: 236 }],
+  prevision: [],
+  invernadero: [],
+  temporeros: [],
   precision: [],
 };
 
