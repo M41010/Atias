@@ -488,4 +488,45 @@ export const contentIt: Content = {
       otro: "Altro",
     },
   },
+  appTour: {
+    "eyebrow": "L’app dall’interno",
+    "title": "Cosa vede la cooperativa ogni lunedì",
+    "lead": "Schermate reali dell’app, con dati di esempio. Ognuna risponde a una decisione della settimana.",
+    "sample": "Dati di esempio",
+    "blurred": "I nomi delle varietà sono sfocati.",
+    "uiLanguage": "L’app è mostrata in spagnolo.",
+    "tabsLabel": "Schermate dell’app",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Riepilogo",
+        "decision": "Quanti chili vendere questa settimana, e con quale margine.",
+        "alt": "Riepilogo settimanale: previsione di vendita, braccianti necessari e frutta matura osservata, con avvisi per fila."
+      },
+      {
+        "id": "prevision",
+        "name": "Previsione giornaliera",
+        "decision": "Quanto si raccoglie ogni giorno, accanto alla previsione del tecnico.",
+        "alt": "Chili al giorno dal lunedì al venerdì: reale, previsione del tecnico e previsione di Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Serra",
+        "decision": "Dov’è la frutta: ogni serra, fila e tratto.",
+        "alt": "Dettaglio di una serra: frutta matura osservata, previsione e chili per giorno di raccolta."
+      },
+      {
+        "id": "temporeros",
+        "name": "Braccianti",
+        "decision": "Quante persone chiamare per raccogliere dal lunedì al venerdì.",
+        "alt": "Braccianti necessari per la settimana, con l’intervallo secondo la previsione e i chili per giornata."
+      },
+      {
+        "id": "precision",
+        "name": "Precisione",
+        "decision": "Quanto ci prende Atias rispetto alla bilancia, accanto all’agricoltore e al tecnico.",
+        "alt": "Schermata di precisione: errore di Atias, dell’agricoltore e del tecnico rispetto al raccolto."
+      }
+    ]
+  },
 };

@@ -488,4 +488,45 @@ export const contentPt: Content = {
       otro: "Outra coisa",
     },
   },
+  appTour: {
+    "eyebrow": "A aplicação por dentro",
+    "title": "O que a cooperativa vê todas as segundas-feiras",
+    "lead": "Ecrãs reais da aplicação, com dados de exemplo. Cada um responde a uma decisão da semana.",
+    "sample": "Dados de exemplo",
+    "blurred": "Os nomes das variedades aparecem desfocados.",
+    "uiLanguage": "A aplicação é mostrada em espanhol.",
+    "tabsLabel": "Ecrãs da aplicação",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Resumo",
+        "decision": "Quantos quilos vender esta semana, e com que margem.",
+        "alt": "Resumo semanal: previsão de venda, trabalhadores necessários e fruta madura observada, com avisos por linha."
+      },
+      {
+        "id": "prevision",
+        "name": "Previsão diária",
+        "decision": "Quanto se colhe cada dia, ao lado da previsão do técnico.",
+        "alt": "Quilos por dia de segunda a sexta: real, previsão do técnico e previsão da Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Estufa",
+        "decision": "Onde está a fruta: cada estufa, linha e troço.",
+        "alt": "Detalhe de uma estufa: fruta madura observada, previsão e quilos por dia de colheita."
+      },
+      {
+        "id": "temporeros",
+        "name": "Trabalhadores",
+        "decision": "Quantas pessoas chamar para colher de segunda a sexta.",
+        "alt": "Trabalhadores necessários para a semana, com o intervalo segundo a previsão e os quilos por jornada."
+      },
+      {
+        "id": "precision",
+        "name": "Precisão",
+        "decision": "Quanto acerta a Atias face à balança, ao lado do agricultor e do técnico.",
+        "alt": "Ecrã de precisão: erro da Atias, do agricultor e do técnico face ao que se colhe."
+      }
+    ]
+  },
 };

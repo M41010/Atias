@@ -488,4 +488,45 @@ export const contentFr: Content = {
       otro: "Autre chose",
     },
   },
+  appTour: {
+    "eyebrow": "L’application de l’intérieur",
+    "title": "Ce que voit la coopérative chaque lundi",
+    "lead": "De vrais écrans de l’application, avec des données d’exemple. Chacun répond à une décision de la semaine.",
+    "sample": "Données d’exemple",
+    "blurred": "Les noms des variétés sont floutés.",
+    "uiLanguage": "L’application est présentée en espagnol.",
+    "tabsLabel": "Écrans de l’application",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Résumé",
+        "decision": "Combien de kilos vendre cette semaine, et avec quelle marge.",
+        "alt": "Résumé hebdomadaire : prévision de vente, saisonniers nécessaires et fruits mûrs observés, avec alertes par rang."
+      },
+      {
+        "id": "prevision",
+        "name": "Prévision quotidienne",
+        "decision": "Ce qui se récolte chaque jour, à côté de la prévision du technicien.",
+        "alt": "Kilos par jour du lundi au vendredi : réel, prévision du technicien et prévision d’Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Serre",
+        "decision": "Où sont les fruits : chaque serre, rang et tronçon.",
+        "alt": "Détail d’une serre : fruits mûrs observés, prévision et kilos par jour de récolte."
+      },
+      {
+        "id": "temporeros",
+        "name": "Saisonniers",
+        "decision": "Combien de personnes appeler pour récolter du lundi au vendredi.",
+        "alt": "Saisonniers nécessaires pour la semaine, avec la fourchette selon la prévision et les kilos par journée."
+      },
+      {
+        "id": "precision",
+        "name": "Précision",
+        "decision": "À quel point Atias tombe juste face à la balance, à côté du producteur et du technicien.",
+        "alt": "Écran de précision : erreur d’Atias, du producteur et du technicien face à la récolte."
+      }
+    ]
+  },
 };

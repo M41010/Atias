@@ -491,6 +491,47 @@ export const contentEs = {
       otro: "Otra cosa",
     },
   },
+  appTour: {
+    "eyebrow": "La app por dentro",
+    "title": "Así lo ve la cooperativa cada lunes",
+    "lead": "Pantallas reales de la aplicación, con datos de ejemplo. Cada una responde a una decisión de la semana.",
+    "sample": "Datos de ejemplo",
+    "blurred": "Los nombres de las variedades aparecen difuminados.",
+    "uiLanguage": "",
+    "tabsLabel": "Pantallas de la aplicación",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Resumen",
+        "decision": "Cuántos kilos vender esta semana y con qué margen.",
+        "alt": "Resumen semanal: previsión para la venta, temporeros necesarios y fruta madura observada, con avisos por hilera."
+      },
+      {
+        "id": "prevision",
+        "name": "Previsión diaria",
+        "decision": "Cuánto se recoge cada día, al lado de la previsión del técnico.",
+        "alt": "Tabla de kilos por día de lunes a viernes: real, previsión del técnico y previsión de Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Invernadero",
+        "decision": "Dónde está la fruta: cada invernadero, hilera y tramo.",
+        "alt": "Detalle de un invernadero: fruta madura observada, previsión y kilos por día de recolección."
+      },
+      {
+        "id": "temporeros",
+        "name": "Temporeros",
+        "decision": "Cuántas personas llamar para recogerlo de lunes a viernes.",
+        "alt": "Temporeros necesarios para la semana, con el rango según la previsión y los kilos por jornal."
+      },
+      {
+        "id": "precision",
+        "name": "Precisión",
+        "decision": "Cuánto acierta Atias frente a la báscula, junto al agricultor y el técnico.",
+        "alt": "Pantalla de precisión: error de Atias, del agricultor y del técnico frente a lo recogido."
+      }
+    ]
+  },
 };
 
 export type Content = typeof contentEs;

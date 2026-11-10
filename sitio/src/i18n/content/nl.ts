@@ -488,4 +488,45 @@ export const contentNl: Content = {
       otro: "Iets anders",
     },
   },
+  appTour: {
+    "eyebrow": "De app van binnen",
+    "title": "Wat de coöperatie elke maandag ziet",
+    "lead": "Echte schermen van de app, met voorbeeldgegevens. Elk scherm beantwoordt een beslissing voor de week.",
+    "sample": "Voorbeeldgegevens",
+    "blurred": "Rasnamen zijn vervaagd.",
+    "uiLanguage": "De app wordt in het Spaans getoond.",
+    "tabsLabel": "Schermen van de app",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Overzicht",
+        "decision": "Hoeveel kilo deze week te verkopen, en met welke marge.",
+        "alt": "Weekoverzicht: verkoopprognose, benodigde plukkers en waargenomen rijp fruit, met waarschuwingen per rij."
+      },
+      {
+        "id": "prevision",
+        "name": "Dagprognose",
+        "decision": "Hoeveel er elke dag wordt geoogst, naast de prognose van de teeltadviseur.",
+        "alt": "Kilo’s per dag van maandag tot vrijdag: werkelijk, prognose van de adviseur en prognose van Atias."
+      },
+      {
+        "id": "invernadero",
+        "name": "Kas",
+        "decision": "Waar het fruit hangt: elke kas, rij en rijdeel.",
+        "alt": "Detail van een kas: waargenomen rijp fruit, prognose en kilo’s per oogstdag."
+      },
+      {
+        "id": "temporeros",
+        "name": "Plukkers",
+        "decision": "Hoeveel mensen op te roepen om van maandag tot vrijdag te oogsten.",
+        "alt": "Benodigde plukkers voor de week, met de bandbreedte uit de prognose en kilo’s per werkdag."
+      },
+      {
+        "id": "precision",
+        "name": "Nauwkeurigheid",
+        "decision": "Hoe dicht Atias bij de weegschaal komt, naast de teler en de adviseur.",
+        "alt": "Scherm nauwkeurigheid: fout van Atias, de teler en de adviseur tegen de oogst."
+      }
+    ]
+  },
 };
