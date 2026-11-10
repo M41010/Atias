@@ -234,6 +234,31 @@ export const contentFr: Content = {
       testing: "Dans le pilote, nous vérifions le détecteur sur des vidéos de serres réelles et le poids moyen par fruit.",
     },
   },
+  results: {
+    "eyebrow": "Résultats du pilote",
+    "title": "Ce que nous avons mesuré face à la balance",
+    "lead": "Mesuré sur {greenhouses} et {weeks}, en comparant chaque prévision aux kilos récoltés.",
+    "greenhouse": {
+      "one": "1 serre",
+      "other": "{n} serres"
+    },
+    "week": {
+      "one": "1 semaine",
+      "other": "{n} semaines"
+    },
+    "asOf": "Données au {date}",
+    "source": "Prévision",
+    "error": "Erreur sur les kilos de la semaine",
+    "bias": "Biais",
+    "sources": {
+      "atias": "Atias",
+      "agricultor": "Producteur",
+      "tecnico": "Technicien"
+    },
+    "control": "Comptage de la caméra face au comptage manuel dans les tronçons de contrôle : {value} d'écart.",
+    "method": "Erreur : écart entre la prévision et la récolte, en pourcentage des kilos récoltés. Biais positif : surestimation.",
+    "caution": "Avec moins de 8 semaines mesurées, le résultat oriente mais ne prouve pas."
+  },
   vision: {
     "eyebrow": "Vision",
     "title": "De compter les fruits à soigner toute la serre",

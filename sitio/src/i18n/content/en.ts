@@ -234,6 +234,31 @@ export const contentEn: Content = {
       testing: "In the pilot we are checking the detector on videos from real greenhouses and the average weight per fruit.",
     },
   },
+  results: {
+    "eyebrow": "Pilot results",
+    "title": "What we measured against the scale",
+    "lead": "Measured over {greenhouses} and {weeks}, comparing each forecast with the kilos picked.",
+    "greenhouse": {
+      "one": "1 greenhouse",
+      "other": "{n} greenhouses"
+    },
+    "week": {
+      "one": "1 week",
+      "other": "{n} weeks"
+    },
+    "asOf": "Data as of {date}",
+    "source": "Forecast",
+    "error": "Error in weekly kilos",
+    "bias": "Bias",
+    "sources": {
+      "atias": "Atias",
+      "agricultor": "Grower",
+      "tecnico": "Agronomist"
+    },
+    "control": "Camera count against the hand count in the control sections: {value} difference.",
+    "method": "Error: difference between forecast and harvest, as a percentage of the kilos picked. Positive bias: overestimating.",
+    "caution": "With fewer than 8 weeks measured, the result is a pointer, not proof."
+  },
   vision: {
     "eyebrow": "Vision",
     "title": "From counting fruit to caring for the whole greenhouse",

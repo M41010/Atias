@@ -234,6 +234,31 @@ export const contentIt: Content = {
       testing: "Nel pilota stiamo verificando il rilevatore con video di serre reali e il peso medio per frutto.",
     },
   },
+  results: {
+    "eyebrow": "Risultati del pilota",
+    "title": "Quello che abbiamo misurato sulla bilancia",
+    "lead": "Misurato su {greenhouses} e {weeks}, confrontando ogni previsione con i chili raccolti.",
+    "greenhouse": {
+      "one": "1 serra",
+      "other": "{n} serre"
+    },
+    "week": {
+      "one": "1 settimana",
+      "other": "{n} settimane"
+    },
+    "asOf": "Dati al {date}",
+    "source": "Previsione",
+    "error": "Errore sui chili della settimana",
+    "bias": "Distorsione",
+    "sources": {
+      "atias": "Atias",
+      "agricultor": "Agricoltore",
+      "tecnico": "Tecnico"
+    },
+    "control": "Conteggio della telecamera rispetto al conteggio manuale nei tratti di controllo: {value} di differenza.",
+    "method": "Errore: differenza tra previsione e raccolto, in percentuale dei chili raccolti. Distorsione positiva: sovrastima.",
+    "caution": "Con meno di 8 settimane misurate, il risultato orienta ma non dimostra."
+  },
   vision: {
     "eyebrow": "Visione",
     "title": "Dal contare i frutti al curare tutta la serra",

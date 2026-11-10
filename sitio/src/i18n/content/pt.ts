@@ -234,6 +234,31 @@ export const contentPt: Content = {
       testing: "No piloto estamos a verificar o detetor com vídeos de estufas reais e o peso médio por fruto.",
     },
   },
+  results: {
+    "eyebrow": "Resultados do piloto",
+    "title": "O que medimos face à balança",
+    "lead": "Medido em {greenhouses} e {weeks}, comparando cada previsão com os quilos colhidos.",
+    "greenhouse": {
+      "one": "1 estufa",
+      "other": "{n} estufas"
+    },
+    "week": {
+      "one": "1 semana",
+      "other": "{n} semanas"
+    },
+    "asOf": "Dados a {date}",
+    "source": "Previsão",
+    "error": "Erro nos quilos da semana",
+    "bias": "Enviesamento",
+    "sources": {
+      "atias": "Atias",
+      "agricultor": "Agricultor",
+      "tecnico": "Técnico"
+    },
+    "control": "Contagem da câmara face à contagem manual nos troços de controlo: {value} de diferença.",
+    "method": "Erro: diferença entre a previsão e a colheita, em percentagem dos quilos colhidos. Enviesamento positivo: sobrestimar.",
+    "caution": "Com menos de 8 semanas medidas, o resultado orienta mas não demonstra."
+  },
   vision: {
     "eyebrow": "Visão",
     "title": "De contar fruta a cuidar de toda a estufa",

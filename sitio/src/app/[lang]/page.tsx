@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Counter } from "@/components/Counter";
 import { NaveMark } from "@/components/Mark";
+import { PilotResults } from "@/components/PilotResults";
 import { PresentationVideo } from "@/components/PresentationVideo";
 import { JsonLd } from "@/components/JsonLd";
 import { isLocale, pathFor } from "@/i18n/config";
@@ -125,6 +126,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </dl>
         </div>
       </section>
+
+      {/* Resultados medidos del piloto: no aparece hasta que haya cifras reales en content/resultados.ts. */}
+      <PilotResults lang={lang} />
 
       {/* El piloto: lo que funciona y lo que se está comprobando, sin prometer cifras. */}
       <section className="on-ink bg-ink text-trap" aria-labelledby="piloto">
