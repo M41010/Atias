@@ -234,3 +234,17 @@ body {
   margin-right: 0.06em;
   flex: none;
 }
+
+/* Informe semanal: hoja A4 al imprimir o guardar en PDF, con los fondos de color. */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  body {
+    background: #ffffff;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
