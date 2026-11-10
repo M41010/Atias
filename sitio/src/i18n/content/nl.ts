@@ -564,4 +564,65 @@ export const contentNl: Content = {
     "pending": "De bewaartermijn van actuele video’s ligt nog niet vast.",
     "more": "Meer over beveiliging en gegevens"
   },
+  compare: {
+    "eyebrow": "Vergelijking",
+    "title": "Zo wordt de oogst vandaag voorspeld, en zo doet Atias het",
+    "lead": "Zonder overdrijven: wat elke manier van voorspellen oplevert, en wat niet.",
+    "methods": [
+      "Op het oog",
+      "Handmatig tellen",
+      "Atias"
+    ],
+    "rows": [
+      {
+        "criterion": "Wat wordt bekeken",
+        "values": [
+          "Een paar planten in het voorbijgaan",
+          "Een paar steekproefplanten",
+          "De hele rij, deel voor deel"
+        ]
+      },
+      {
+        "criterion": "Inspanning",
+        "values": [
+          "Eén bezoek per kas",
+          "Uren met de hand tellen",
+          "Een paar minuten video per rij"
+        ]
+      },
+      {
+        "criterion": "Welk cijfer",
+        "values": [
+          "Kilo’s voor de week",
+          "Vruchten per plant, te extrapoleren",
+          "Kilo’s per dag, maandag tot vrijdag"
+        ]
+      },
+      {
+        "criterion": "Foutmarge",
+        "values": [
+          "Niet vermeld",
+          "Niet vermeld",
+          "Altijd, naast het cijfer"
+        ]
+      },
+      {
+        "criterion": "Controleerbaar",
+        "values": [
+          "Nauwelijks",
+          "Alleen op de getelde planten",
+          "Ja: elk deel, en tegen de weegschaal"
+        ]
+      },
+      {
+        "criterion": "Gepubliceerde nauwkeurigheid",
+        "values": [
+          "Nee",
+          "Nee",
+          "Wordt gepubliceerd volgens de methode ‘Hoe we meten’"
+        ]
+      }
+    ],
+    "note": "Atias vervangt de teeltadviseur niet: het geeft een geteld cijfer om het zijne naast te leggen."
+  },
 };

@@ -564,4 +564,65 @@ export const contentFr: Content = {
     "pending": "La durée de conservation des vidéos en cours n’est pas encore fixée.",
     "more": "En savoir plus sur la sécurité et les données"
   },
+  compare: {
+    "eyebrow": "Comparatif",
+    "title": "Comment on prévoit la récolte aujourd’hui, et comment le fait Atias",
+    "lead": "Sans exagérer : ce qu’apporte chaque façon de prévoir, et ce qu’elle n’apporte pas.",
+    "methods": [
+      "À l’œil",
+      "Comptage manuel",
+      "Atias"
+    ],
+    "rows": [
+      {
+        "criterion": "Ce qui est observé",
+        "values": [
+          "Quelques plantes en passant",
+          "Quelques plantes témoins",
+          "Tout le rang, tronçon par tronçon"
+        ]
+      },
+      {
+        "criterion": "Effort",
+        "values": [
+          "Une visite par serre",
+          "Des heures de comptage",
+          "Quelques minutes de vidéo par rang"
+        ]
+      },
+      {
+        "criterion": "Quel chiffre",
+        "values": [
+          "Les kilos de la semaine",
+          "Des fruits par plante, à extrapoler",
+          "Des kilos par jour, du lundi au vendredi"
+        ]
+      },
+      {
+        "criterion": "Marge d’erreur",
+        "values": [
+          "Non indiquée",
+          "Non indiquée",
+          "Toujours, à côté du chiffre"
+        ]
+      },
+      {
+        "criterion": "Vérifiable",
+        "values": [
+          "Difficilement",
+          "Seulement sur les plantes comptées",
+          "Oui : chaque tronçon, et face à la balance"
+        ]
+      },
+      {
+        "criterion": "Précision publiée",
+        "values": [
+          "Non",
+          "Non",
+          "Sera publiée selon la méthode « Comment nous mesurons »"
+        ]
+      }
+    ],
+    "note": "Atias ne remplace pas le technicien : il lui donne un chiffre compté pour confronter le sien."
+  },
 };

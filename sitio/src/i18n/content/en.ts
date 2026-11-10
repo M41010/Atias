@@ -564,4 +564,65 @@ export const contentEn: Content = {
     "pending": "The retention period for current videos has not been set yet.",
     "more": "More on security and data"
   },
+  compare: {
+    "eyebrow": "Comparison",
+    "title": "How harvests are forecast today, and how Atias does it",
+    "lead": "No exaggeration: what each way of forecasting brings, and what it does not.",
+    "methods": [
+      "By eye",
+      "Hand count",
+      "Atias"
+    ],
+    "rows": [
+      {
+        "criterion": "What is looked at",
+        "values": [
+          "A few plants in passing",
+          "A few sample plants",
+          "The whole row, section by section"
+        ]
+      },
+      {
+        "criterion": "Effort",
+        "values": [
+          "One visit per greenhouse",
+          "Hours of counting by hand",
+          "A few minutes of video per row"
+        ]
+      },
+      {
+        "criterion": "What figure it gives",
+        "values": [
+          "Kilos for the week",
+          "Fruit per plant, to be extrapolated",
+          "Kilos per day, Monday to Friday"
+        ]
+      },
+      {
+        "criterion": "Margin of error",
+        "values": [
+          "Not stated",
+          "Not stated",
+          "Always, next to the figure"
+        ]
+      },
+      {
+        "criterion": "Can it be checked",
+        "values": [
+          "Hardly",
+          "Only on the plants counted",
+          "Yes: each section, and against the scales"
+        ]
+      },
+      {
+        "criterion": "Published accuracy",
+        "values": [
+          "No",
+          "No",
+          "Will be published using the “How we measure” method"
+        ]
+      }
+    ],
+    "note": "Atias does not replace the agronomist: it gives them a counted figure to check theirs against."
+  },
 };

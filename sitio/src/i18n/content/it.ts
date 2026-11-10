@@ -564,4 +564,65 @@ export const contentIt: Content = {
     "pending": "Il periodo di conservazione dei video in uso non è ancora stabilito.",
     "more": "Di più su sicurezza e dati"
   },
+  compare: {
+    "eyebrow": "Confronto",
+    "title": "Come si prevede oggi il raccolto, e come lo fa Atias",
+    "lead": "Senza esagerare: cosa offre ogni modo di prevedere, e cosa no.",
+    "methods": [
+      "A occhio",
+      "Conteggio a mano",
+      "Atias"
+    ],
+    "rows": [
+      {
+        "criterion": "Cosa si osserva",
+        "values": [
+          "Qualche pianta passando",
+          "Qualche pianta campione",
+          "Tutta la fila, tratto per tratto"
+        ]
+      },
+      {
+        "criterion": "Impegno",
+        "values": [
+          "Una visita per serra",
+          "Ore di conteggio a mano",
+          "Pochi minuti di video per fila"
+        ]
+      },
+      {
+        "criterion": "Che cifra dà",
+        "values": [
+          "I chili della settimana",
+          "Frutti per pianta, da estrapolare",
+          "Chili al giorno, dal lunedì al venerdì"
+        ]
+      },
+      {
+        "criterion": "Margine di errore",
+        "values": [
+          "Non indicato",
+          "Non indicato",
+          "Sempre, accanto alla cifra"
+        ]
+      },
+      {
+        "criterion": "Verificabile",
+        "values": [
+          "Difficilmente",
+          "Solo sulle piante contate",
+          "Sì: ogni tratto, e rispetto alla bilancia"
+        ]
+      },
+      {
+        "criterion": "Precisione pubblicata",
+        "values": [
+          "No",
+          "No",
+          "Sarà pubblicata con il metodo «Come misuriamo»"
+        ]
+      }
+    ],
+    "note": "Atias non sostituisce il tecnico: gli dà una cifra contata per confrontare la sua."
+  },
 };

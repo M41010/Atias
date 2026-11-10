@@ -567,6 +567,67 @@ export const contentEs = {
     "pending": "El plazo para borrar los vídeos vigentes aún no está fijado.",
     "more": "Más sobre seguridad y datos"
   },
+  compare: {
+    "eyebrow": "Comparativa",
+    "title": "Así se prevé hoy la cosecha, y así lo hace Atias",
+    "lead": "Sin exagerar: lo que aporta cada forma de prever, y lo que no.",
+    "methods": [
+      "A ojo",
+      "Conteo a mano",
+      "Atias"
+    ],
+    "rows": [
+      {
+        "criterion": "Qué se mira",
+        "values": [
+          "Unas plantas al pasar",
+          "Unas plantas de muestra",
+          "Toda la hilera, tramo a tramo"
+        ]
+      },
+      {
+        "criterion": "Esfuerzo",
+        "values": [
+          "Una visita por invernadero",
+          "Horas contando a mano",
+          "Unos minutos de vídeo por hilera"
+        ]
+      },
+      {
+        "criterion": "Qué cifra da",
+        "values": [
+          "Kilos de la semana",
+          "Frutos por planta, que hay que extrapolar",
+          "Kilos por día, de lunes a viernes"
+        ]
+      },
+      {
+        "criterion": "Margen de error",
+        "values": [
+          "No se indica",
+          "No se indica",
+          "Siempre, junto a la cifra"
+        ]
+      },
+      {
+        "criterion": "Se puede comprobar",
+        "values": [
+          "Difícilmente",
+          "Solo en las plantas contadas",
+          "Sí: cada tramo, y frente a la báscula"
+        ]
+      },
+      {
+        "criterion": "Precisión publicada",
+        "values": [
+          "No",
+          "No",
+          "Se publicará con el método de «Cómo medimos»"
+        ]
+      }
+    ],
+    "note": "Atias no sustituye al técnico: le da una cifra contada para contrastar la suya."
+  },
 };
 
 export type Content = typeof contentEs;

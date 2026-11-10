@@ -564,4 +564,65 @@ export const contentPt: Content = {
     "pending": "O prazo para apagar os vídeos em uso ainda não está fixado.",
     "more": "Mais sobre segurança e dados"
   },
+  compare: {
+    "eyebrow": "Comparação",
+    "title": "Como se prevê hoje a colheita, e como o faz a Atias",
+    "lead": "Sem exagerar: o que cada forma de prever traz, e o que não traz.",
+    "methods": [
+      "A olho",
+      "Contagem manual",
+      "Atias"
+    ],
+    "rows": [
+      {
+        "criterion": "O que se observa",
+        "values": [
+          "Algumas plantas de passagem",
+          "Algumas plantas de amostra",
+          "Toda a linha, troço a troço"
+        ]
+      },
+      {
+        "criterion": "Esforço",
+        "values": [
+          "Uma visita por estufa",
+          "Horas a contar à mão",
+          "Alguns minutos de vídeo por linha"
+        ]
+      },
+      {
+        "criterion": "Que número dá",
+        "values": [
+          "Quilos da semana",
+          "Frutos por planta, a extrapolar",
+          "Quilos por dia, de segunda a sexta"
+        ]
+      },
+      {
+        "criterion": "Margem de erro",
+        "values": [
+          "Não indicada",
+          "Não indicada",
+          "Sempre, junto ao número"
+        ]
+      },
+      {
+        "criterion": "Pode comprovar-se",
+        "values": [
+          "Dificilmente",
+          "Só nas plantas contadas",
+          "Sim: cada troço, e face à balança"
+        ]
+      },
+      {
+        "criterion": "Precisão publicada",
+        "values": [
+          "Não",
+          "Não",
+          "Será publicada com o método «Como medimos»"
+        ]
+      }
+    ],
+    "note": "A Atias não substitui o técnico: dá-lhe um número contado para confrontar o seu."
+  },
 };
