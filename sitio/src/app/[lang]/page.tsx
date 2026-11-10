@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Counter } from "@/components/Counter";
 import { NaveMark } from "@/components/Mark";
+import { AppTour } from "@/components/AppTour";
 import { PilotResults } from "@/components/PilotResults";
 import { PresentationVideo } from "@/components/PresentationVideo";
 import { RowTour } from "@/components/RowTour";
@@ -110,6 +111,20 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             {home.howLink}
             <ArrowRight size={18} aria-hidden />
           </Link>
+        </div>
+      </section>
+
+      {/* La app por dentro: justo después de los tres pasos, las pantallas donde acaban. */}
+      <section className="plate border-t-[3px] border-ink" aria-labelledby="app-por-dentro">
+        <div className="mx-auto max-w-[1320px] px-4 py-20 sm:px-8 lg:py-28">
+          <p className="font-bold uppercase tracking-[0.08em] text-ink-soft">{content.appTour.eyebrow}</p>
+          <h2 id="app-por-dentro" className="display mt-4 max-w-[20ch] text-[clamp(2.25rem,4.4vw,3.75rem)]">
+            {content.appTour.title}
+          </h2>
+          <p className="lead mt-5 text-[1.125rem] text-ink-soft">{content.appTour.lead}</p>
+          <div className="mt-12">
+            <AppTour tour={content.appTour} />
+          </div>
         </div>
       </section>
 

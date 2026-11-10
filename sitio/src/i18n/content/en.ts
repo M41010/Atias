@@ -372,4 +372,45 @@ export const contentEn: Content = {
     "principleBody": "Atias replaces nobody: it gives the people who know the crop eyes on every row. Decisions on sales, treatments and crop management stay with people.",
     "closeTitle": "Want to see the pilot?"
   },
+  appTour: {
+    "eyebrow": "Inside the app",
+    "title": "What the cooperative sees every Monday",
+    "lead": "Real screens from the app, with sample data. Each one answers a decision for the week.",
+    "sample": "Sample data",
+    "blurred": "Variety names are blurred.",
+    "uiLanguage": "The app is shown in Spanish.",
+    "tabsLabel": "App screens",
+    "screens": [
+      {
+        "id": "resumen",
+        "name": "Summary",
+        "decision": "How many kilos to sell this week, and with what margin.",
+        "alt": "Weekly summary: sales forecast, pickers needed and ripe fruit observed, with warnings per row."
+      },
+      {
+        "id": "prevision",
+        "name": "Daily forecast",
+        "decision": "How much is picked each day, next to the agronomist's forecast.",
+        "alt": "Kilos per day from Monday to Friday: actual, agronomist's forecast and Atias forecast."
+      },
+      {
+        "id": "invernadero",
+        "name": "Greenhouse",
+        "decision": "Where the fruit is: each greenhouse, row and section.",
+        "alt": "Greenhouse detail: ripe fruit observed, forecast and kilos per harvest day."
+      },
+      {
+        "id": "temporeros",
+        "name": "Pickers",
+        "decision": "How many people to call in to pick it from Monday to Friday.",
+        "alt": "Pickers needed for the week, with the range from the forecast and kilos per working day."
+      },
+      {
+        "id": "precision",
+        "name": "Accuracy",
+        "decision": "How close Atias gets to the scales, next to the grower and the agronomist.",
+        "alt": "Accuracy screen: error of Atias, the grower and the agronomist against the harvest."
+      }
+    ]
+  },
 };
