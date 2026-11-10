@@ -46,6 +46,10 @@ export const contentPt: Content = {
       title: "Como medimos a precisão da previsão de colheita | Atias",
       description: "Comparamos cada previsão com os quilos pesados na balança, junto com a do agricultor e a do técnico. Método, critério dos 10 % e o que ainda está em teste.",
     },
+    investors: {
+      title: "Investidores e parceiros: investir na Atias | Atias",
+      description: "A Atias conta a fruta de cada linha para prever a colheita em estufa. Procuramos investidores e parceiros que nos ajudem a levá-la à primeira campanha.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal do site da Atias." },
     privacy: { title: "Política de privacidade | Atias", description: "Política de privacidade do site da Atias." },
   },
@@ -59,6 +63,7 @@ export const contentPt: Content = {
     cropTeaser: "Ver a página da cultura",
     vision: "Visão",
     measure: "Como medimos",
+    investors: "Investidores",
     breadcrumb: "Percurso de navegação",
   },
   guide: {

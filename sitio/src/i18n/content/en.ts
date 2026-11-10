@@ -46,6 +46,10 @@ export const contentEn: Content = {
       title: "How we measure harvest forecast accuracy | Atias",
       description: "We compare every forecast with the kilos weighed on the scales, alongside the grower's and the agronomist's. Method, the 10 % criterion and what is still being tested.",
     },
+    investors: {
+      title: "Investors and partners: invest in Atias | Atias",
+      description: "Atias counts the fruit in every row to forecast greenhouse harvests. We are looking for investors and partners to help take it to its first season.",
+    },
     notice: { title: "Legal notice | Atias", description: "Legal notice for the Atias website." },
     privacy: { title: "Privacy policy | Atias", description: "Privacy policy for the Atias website." },
   },
@@ -59,6 +63,7 @@ export const contentEn: Content = {
     cropTeaser: "See the crop page",
     vision: "Vision",
     measure: "How we measure",
+    investors: "Investors",
     breadcrumb: "Breadcrumb",
   },
   guide: {

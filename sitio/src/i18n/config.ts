@@ -50,6 +50,7 @@ export const PAGES = [
   "cultivos",
   "vision",
   "como-medimos",
+  "inversores",
 ] as const;
 export type Page = (typeof PAGES)[number];
 export type SubPage = Exclude<Page, "">;
@@ -73,6 +74,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     cultivos: "cultivos",
     vision: "vision",
     "como-medimos": "como-medimos",
+    inversores: "inversores",
   },
   en: {
     empresa: "about",
@@ -85,6 +87,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     cultivos: "crops",
     vision: "vision",
     "como-medimos": "how-we-measure",
+    inversores: "investors",
   },
   fr: {
     empresa: "a-propos",
@@ -97,6 +100,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     cultivos: "cultures",
     vision: "vision",
     "como-medimos": "comment-nous-mesurons",
+    inversores: "investisseurs",
   },
   nl: {
     empresa: "over-ons",
@@ -109,6 +113,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     cultivos: "gewassen",
     vision: "visie",
     "como-medimos": "hoe-we-meten",
+    inversores: "investeerders",
   },
   it: {
     empresa: "chi-siamo",
@@ -121,6 +126,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     cultivos: "colture",
     vision: "visione",
     "como-medimos": "come-misuriamo",
+    inversores: "investitori",
   },
   pt: {
     empresa: "quem-somos",
@@ -133,6 +139,7 @@ export const SLUGS: Record<Locale, Record<SubPage, string>> = {
     cultivos: "culturas",
     vision: "visao",
     "como-medimos": "como-medimos",
+    inversores: "investidores",
   },
 };
 

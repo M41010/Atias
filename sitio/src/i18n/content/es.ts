@@ -49,6 +49,10 @@ export const contentEs = {
       title: "Cómo medimos la precisión de la previsión de cosecha | Atias",
       description: "Comparamos cada previsión con los kilos pesados en la báscula, junto a la del agricultor y la del técnico. Método, criterio del 10 % y lo que aún está en pruebas.",
     },
+    investors: {
+      title: "Inversores y socios: invertir en Atias | Atias",
+      description: "Atias cuenta la fruta de cada hilera para prever la cosecha en invernadero. Buscamos inversores y socios que nos ayuden a llevarlo a su primera temporada.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal de la web de Atias." },
     privacy: { title: "Política de privacidad | Atias", description: "Política de privacidad de la web de Atias." },
   },
@@ -62,6 +66,7 @@ export const contentEs = {
     cropTeaser: "Ver la página del cultivo",
     vision: "Visión",
     measure: "Cómo medimos",
+    investors: "Inversores",
     breadcrumb: "Ruta de navegación",
   },
   guide: {

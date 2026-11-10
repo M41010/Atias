@@ -46,6 +46,10 @@ export const contentNl: Content = {
       title: "Hoe we de nauwkeurigheid van de oogstprognose meten | Atias",
       description: "We vergelijken elke prognose met de kilo’s op de weegschaal, naast die van de teler en de teeltadviseur. Methode, het 10 %-criterium en wat nog getest wordt.",
     },
+    investors: {
+      title: "Investeerders en partners: investeren in Atias | Atias",
+      description: "Atias telt het fruit in elke rij om de oogst in de kas te voorspellen. We zoeken investeerders en partners om het naar het eerste seizoen te brengen.",
+    },
     notice: { title: "Juridische informatie | Atias", description: "Juridische informatie over de website van Atias." },
     privacy: { title: "Privacybeleid | Atias", description: "Privacybeleid van de website van Atias." },
   },
@@ -59,6 +63,7 @@ export const contentNl: Content = {
     cropTeaser: "Bekijk de gewaspagina",
     vision: "Visie",
     measure: "Hoe we meten",
+    investors: "Investeerders",
     breadcrumb: "Kruimelpad",
   },
   guide: {

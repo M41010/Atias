@@ -46,6 +46,10 @@ export const contentIt: Content = {
       title: "Come misuriamo la precisione delle previsioni | Atias",
       description: "Confrontiamo ogni previsione con i chili pesati sulla bilancia, insieme a quella dell’agricoltore e del tecnico. Metodo, criterio del 10 % e cosa è ancora in prova.",
     },
+    investors: {
+      title: "Investitori e partner: investire in Atias | Atias",
+      description: "Atias conta i frutti di ogni fila per prevedere il raccolto in serra. Cerchiamo investitori e partner che ci aiutino a portarlo alla prima stagione.",
+    },
     notice: { title: "Note legali | Atias", description: "Note legali del sito di Atias." },
     privacy: { title: "Informativa sulla privacy | Atias", description: "Informativa sulla privacy del sito di Atias." },
   },
@@ -59,6 +63,7 @@ export const contentIt: Content = {
     cropTeaser: "Vedi la pagina della coltura",
     vision: "Visione",
     measure: "Come misuriamo",
+    investors: "Investitori",
     breadcrumb: "Percorso di navigazione",
   },
   guide: {
