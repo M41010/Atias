@@ -274,6 +274,7 @@ export const contentEs = {
     "title": "Baja y recorre la hilera con Atias",
     "hint": "Desplázate para avanzar por el invernadero",
     "tag": "Recreación animada",
+    "loading": "Preparando el invernadero…",
     "counted": "frutos maduros contados",
     "steps": [
       {

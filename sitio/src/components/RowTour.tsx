@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { NaveMark } from "@/components/Mark";
 import type { Content } from "@/i18n/content";
 import type { Tour } from "@/tour/engine";
 
@@ -167,6 +168,20 @@ export function RowTour({ t, numberLocale, how }: Props) {
             className={`absolute inset-0 h-full w-full transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}
           />
           <canvas ref={overlay} aria-hidden className="pointer-events-none absolute inset-0 h-full w-full" />
+          {/* Mientras llega el 3D: el símbolo se dibuja una y otra vez sobre la imagen fija. */}
+          <div
+            aria-hidden={ready}
+            className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700 ${
+              ready ? "opacity-0" : "opacity-100"
+            }`}
+          >
+            <div className="flex flex-col items-center gap-3 bg-ink/75 px-8 py-6 backdrop-blur-sm">
+              <NaveMark size={88} className="nave-loading text-trap" />
+              <p role="status" className="text-sm font-bold uppercase tracking-[0.08em]">
+                {ready ? "" : t.loading}
+              </p>
+            </div>
+          </div>
           {/* Viñeta de lente y fundido inferior para que el texto se lea sobre la escena. */}
           <div
             aria-hidden

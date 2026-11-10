@@ -271,6 +271,7 @@ export const contentFr: Content = {
     "title": "Descendez et parcourez le rang avec Atias",
     "hint": "Faites défiler pour avancer dans la serre",
     "tag": "Reconstitution animée",
+    "loading": "Préparation de la serre…",
     "counted": "fruits mûrs comptés",
     "steps": [
       {

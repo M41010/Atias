@@ -271,6 +271,7 @@ export const contentNl: Content = {
     "title": "Scroll en loop met Atias langs de rij",
     "hint": "Scroll om door de kas te lopen",
     "tag": "Geanimeerde reconstructie",
+    "loading": "De kas wordt voorbereid…",
     "counted": "rijpe vruchten geteld",
     "steps": [
       {

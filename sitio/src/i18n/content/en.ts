@@ -271,6 +271,7 @@ export const contentEn: Content = {
     "title": "Scroll down and walk the row with Atias",
     "hint": "Scroll to move through the greenhouse",
     "tag": "Animated recreation",
+    "loading": "Preparing the greenhouse…",
     "counted": "ripe fruits counted",
     "steps": [
       {
