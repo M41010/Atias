@@ -40,9 +40,38 @@ export const MAX_VIDEO_BYTES = 8 * 1024 ** 3;
 
 export const uploadKey = (hilera: number, lado: Side) => `${hilera}-${lado}`;
 
+/** Formatos que admite el servidor (api/src/uploads.ts, VIDEO_TYPES). */
+const VIDEO_TYPES = new Set(["video/mp4", "video/quicktime", "video/webm", "video/3gpp", "video/x-matroska"]);
+const BY_EXTENSION: Record<string, string> = {
+  mp4: "video/mp4",
+  m4v: "video/mp4",
+  mov: "video/quicktime",
+  qt: "video/quicktime",
+  webm: "video/webm",
+  "3gp": "video/3gpp",
+  mkv: "video/x-matroska",
+};
+const ALIASES: Record<string, string> = { "video/x-m4v": "video/mp4", "video/3gp": "video/3gpp" };
+
+/**
+ * Tipo del vídeo tal como lo espera el servidor. Algunas galerías de Android entregan el archivo
+ * sin tipo o con uno poco común (`video/x-m4v`): entonces se deduce de la extensión.
+ */
+export function videoMimeType(file: { name?: string; type: string }): string | null {
+  const type = file.type.trim().toLowerCase();
+  const known = ALIASES[type] ?? type;
+  if (VIDEO_TYPES.has(known)) return known;
+  const extension = file.name?.split(".").pop()?.toLowerCase() ?? "";
+  return BY_EXTENSION[extension] ?? null;
+}
+
 /** Devuelve el problema del archivo elegido, o null si se puede subir. */
-export function validateVideo(file: { type: string; size: number }): string | null {
-  if (!file.type.startsWith("video/")) return "Ese archivo no es un vídeo. Elige otro.";
+export function validateVideo(file: { name?: string; type: string; size: number }): string | null {
+  if (!videoMimeType(file)) {
+    return file.type.startsWith("video/") || file.type === ""
+      ? "Ese formato de vídeo no se admite. Usa MP4, MOV o WebM."
+      : "Ese archivo no es un vídeo. Elige otro.";
+  }
   if (file.size === 0) return "El vídeo está vacío. Vuelve a grabarlo.";
   if (file.size > MAX_VIDEO_BYTES) return "El vídeo supera los 8 GB. Graba la hilera con menos calidad.";
   return null;

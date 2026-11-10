@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { AlertTriangle, Camera, CheckCircle2, ChevronDown, FolderOpen, Info, RefreshCw, Trash2, Undo2, WifiOff, X } from "lucide-react";
 import { type ChangeEvent, useId, useState } from "react";
 import { Panel, Pill } from "@/components/ui";
-import { useDocumentTitle } from "@/lib/hooks";
+import { useCellular, useDocumentTitle, useWakeLock } from "@/lib/hooks";
 import { qualityMessages } from "@/lib/quality";
 import type { LinkInfo } from "@/lib/serverApi";
 import { CROPS } from "@/lib/simulated";
@@ -372,6 +372,9 @@ export function UploadScreen({ token, link }: { token: string; link: LinkInfo })
   const pendingData = missing + invalid;
   const next = nextPending(uploads, hilerasCount);
   const interrupted = Object.values(uploads).some((u) => u.status === "interrumpido");
+  const cellular = useCellular();
+  // Con la pantalla apagada, el móvil congela la página y corta la subida.
+  useWakeLock(summary.active > 0);
 
   return (
     <div className="grid gap-4">
@@ -403,6 +406,12 @@ export function UploadScreen({ token, link }: { token: string; link: LinkInfo })
             <p className="mt-3 flex gap-2 text-sm text-muted">
               <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
               Graba el sábado un vídeo por cada lado. Recorre toda la hilera a paso lento, sin volver atrás.
+            </p>
+          )}
+          {cellular && !summary.complete && (
+            <p className="mt-3 flex gap-2 rounded-md bg-warn-soft p-3 text-sm text-warn-ink">
+              <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
+              Estás con datos móviles. Cada vídeo puede ocupar cientos de MB: si puedes, súbelos con wifi.
             </p>
           )}
           {interrupted && (
@@ -455,7 +464,7 @@ export function UploadScreen({ token, link }: { token: string; link: LinkInfo })
       {(summary.active > 0 || !online) && (
         <p role="status" className="sticky bottom-3 flex items-center gap-2 rounded-md border border-line-strong bg-sunken px-4 py-3 text-sm font-medium shadow-[0_2px_8px_rgb(20_30_24/0.12)]">
           {online ? (
-            "Subiendo. No cierres esta página."
+            "Subiendo. No cierres esta página ni cambies de aplicación."
           ) : (
             <>
               <WifiOff size={16} className="shrink-0" aria-hidden />
