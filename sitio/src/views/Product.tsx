@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CROPS, type Locale, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { getContent } from "@/i18n/content";
+import { Comparison } from "@/components/Comparison";
 import { JsonLd } from "@/components/JsonLd";
 import { software } from "@/seo/schema";
 import panel from "../../public/capturas/panel-resumen.png";
@@ -58,6 +59,9 @@ export function Product({ lang }: { lang: Locale }) {
           </div>
         </div>
       </section>
+
+      {/* Comparativa honesta con las formas de prever de hoy. */}
+      <Comparison compare={content.compare} />
 
       <section className="bg-trap">
         <div className="mx-auto grid max-w-[1320px] gap-12 px-4 py-16 sm:px-8 lg:grid-cols-2 lg:py-24">
