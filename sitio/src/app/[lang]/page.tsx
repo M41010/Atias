@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Counter } from "@/components/Counter";
 import { NaveMark } from "@/components/Mark";
+import { PresentationVideo } from "@/components/PresentationVideo";
 import { JsonLd } from "@/components/JsonLd";
 import { isLocale, pathFor } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -52,6 +53,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           <Counter locale={lang} t={dict.counter} />
         </div>
       </section>
+
+      {/* El vídeo de presentación: de momento solo en español. */}
+      {lang === "es" && <PresentationVideo />}
 
       {/* El problema: una sola frase grande y su explicación en etiqueta. */}
       <section className="plate border-b-[3px] border-ink">
