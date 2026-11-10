@@ -42,6 +42,10 @@ export const contentEn: Content = {
       "title": "Vision: from counting fruit to caring for the greenhouse | Atias",
       "description": "Where Atias is heading: from harvest forecasting to plant health and crop condition, one version at a time. Atias recommends, the agronomist decides."
     },
+    investors: {
+      title: "Investors and partners: invest in Atias | Atias",
+      description: "Atias counts the fruit in every row to forecast greenhouse harvests. We are looking for investors and partners to help take it to its first season.",
+    },
     notice: { title: "Legal notice | Atias", description: "Legal notice for the Atias website." },
     privacy: { title: "Privacy policy | Atias", description: "Privacy policy for the Atias website." },
   },
@@ -54,6 +58,7 @@ export const contentEn: Content = {
     faqTeaser: "Answers to the most common questions",
     cropTeaser: "See the crop page",
     vision: "Vision",
+    investors: "Investors",
     breadcrumb: "Breadcrumb",
   },
   guide: {

@@ -42,6 +42,10 @@ export const contentIt: Content = {
       "title": "Visione: dal contare i frutti al curare la serra | Atias",
       "description": "Dove va Atias: dalla previsione del raccolto alla difesa delle piante e allo stato della coltura, versione dopo versione. Atias consiglia, il tecnico decide."
     },
+    investors: {
+      title: "Investitori e partner: investire in Atias | Atias",
+      description: "Atias conta i frutti di ogni fila per prevedere il raccolto in serra. Cerchiamo investitori e partner che ci aiutino a portarlo alla prima stagione.",
+    },
     notice: { title: "Note legali | Atias", description: "Note legali del sito di Atias." },
     privacy: { title: "Informativa sulla privacy | Atias", description: "Informativa sulla privacy del sito di Atias." },
   },
@@ -54,6 +58,7 @@ export const contentIt: Content = {
     faqTeaser: "Le risposte alle domande più comuni",
     cropTeaser: "Vedi la pagina della coltura",
     vision: "Visione",
+    investors: "Investitori",
     breadcrumb: "Percorso di navigazione",
   },
   guide: {

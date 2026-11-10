@@ -45,6 +45,10 @@ export const contentEs = {
       "title": "Visión: de contar fruta a cuidar el invernadero | Atias",
       "description": "Hacia dónde va Atias: de la previsión de cosecha a la sanidad vegetal y el estado de la planta, versión a versión. Atias recomienda y el técnico decide."
     },
+    investors: {
+      title: "Inversores y socios: invertir en Atias | Atias",
+      description: "Atias cuenta la fruta de cada hilera para prever la cosecha en invernadero. Buscamos inversores y socios que nos ayuden a llevarlo a su primera temporada.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal de la web de Atias." },
     privacy: { title: "Política de privacidad | Atias", description: "Política de privacidad de la web de Atias." },
   },
@@ -57,6 +61,7 @@ export const contentEs = {
     faqTeaser: "Resolvemos las dudas más habituales",
     cropTeaser: "Ver la página del cultivo",
     vision: "Visión",
+    investors: "Inversores",
     breadcrumb: "Ruta de navegación",
   },
   guide: {

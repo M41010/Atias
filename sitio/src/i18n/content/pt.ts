@@ -42,6 +42,10 @@ export const contentPt: Content = {
       "title": "Visão: de contar fruta a cuidar da estufa | Atias",
       "description": "Para onde vai a Atias: da previsão de colheita à sanidade vegetal e ao estado da planta, versão a versão. A Atias recomenda, o técnico decide."
     },
+    investors: {
+      title: "Investidores e parceiros: investir na Atias | Atias",
+      description: "A Atias conta a fruta de cada linha para prever a colheita em estufa. Procuramos investidores e parceiros que nos ajudem a levá-la à primeira campanha.",
+    },
     notice: { title: "Aviso legal | Atias", description: "Aviso legal do site da Atias." },
     privacy: { title: "Política de privacidade | Atias", description: "Política de privacidade do site da Atias." },
   },
@@ -54,6 +58,7 @@ export const contentPt: Content = {
     faqTeaser: "Respostas às dúvidas mais comuns",
     cropTeaser: "Ver a página da cultura",
     vision: "Visão",
+    investors: "Investidores",
     breadcrumb: "Percurso de navegação",
   },
   guide: {

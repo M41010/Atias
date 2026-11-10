@@ -42,6 +42,10 @@ export const contentFr: Content = {
       "title": "Vision : de compter les fruits à soigner la serre | Atias",
       "description": "Où va Atias : de la prévision de récolte à la santé des plantes et à l'état des cultures, version après version. Atias recommande, le technicien décide."
     },
+    investors: {
+      title: "Investisseurs et partenaires : investir dans Atias | Atias",
+      description: "Atias compte les fruits de chaque rang pour prévoir la récolte en serre. Nous cherchons des investisseurs et des partenaires pour l’amener à sa première saison.",
+    },
     notice: { title: "Mentions légales | Atias", description: "Mentions légales du site d'Atias." },
     privacy: { title: "Politique de confidentialité | Atias", description: "Politique de confidentialité du site d'Atias." },
   },
@@ -54,6 +58,7 @@ export const contentFr: Content = {
     faqTeaser: "Réponses aux questions les plus courantes",
     cropTeaser: "Voir la page de la culture",
     vision: "Vision",
+    investors: "Investisseurs",
     breadcrumb: "Fil d'Ariane",
   },
   guide: {

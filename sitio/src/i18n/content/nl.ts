@@ -42,6 +42,10 @@ export const contentNl: Content = {
       "title": "Visie: van vruchten tellen naar de hele kas verzorgen | Atias",
       "description": "Waar Atias naartoe gaat: van oogstprognose naar gewasbescherming en gewasconditie, versie na versie. Atias adviseert, de teeltadviseur beslist."
     },
+    investors: {
+      title: "Investeerders en partners: investeren in Atias | Atias",
+      description: "Atias telt het fruit in elke rij om de oogst in de kas te voorspellen. We zoeken investeerders en partners om het naar het eerste seizoen te brengen.",
+    },
     notice: { title: "Juridische informatie | Atias", description: "Juridische informatie over de website van Atias." },
     privacy: { title: "Privacybeleid | Atias", description: "Privacybeleid van de website van Atias." },
   },
@@ -54,6 +58,7 @@ export const contentNl: Content = {
     faqTeaser: "Antwoorden op de meest gestelde vragen",
     cropTeaser: "Bekijk de gewaspagina",
     vision: "Visie",
+    investors: "Investeerders",
     breadcrumb: "Kruimelpad",
   },
   guide: {
