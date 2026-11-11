@@ -16,6 +16,7 @@ import {
 import {
   addUpload,
   cancelUpload,
+  CHUNK_BYTES,
   type FarmerData,
   fromServer,
   markError,
@@ -35,7 +36,6 @@ import {
   videoMimeType,
 } from "./upload";
 
-const CHUNK_BYTES = 8 * 1024 * 1024;
 const RETRY_DELAYS_MS = [0, 1000, 3000, 5000, 10_000, 20_000, 30_000, 60_000];
 const SAVE_DEBOUNCE_MS = 700;
 const QUALITY_POLL_MS = 5000;

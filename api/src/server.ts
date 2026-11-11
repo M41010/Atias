@@ -1,4 +1,4 @@
-import { createApp } from "./app.js";
+import { createApp, parseTrustedProxy } from "./app.js";
 import { purgeExpiredSessions } from "./auth.js";
 import { createPool, migrate, removeDemoLinks, seedDemo } from "./db.js";
 import { createCountRunner } from "./counting.js";
@@ -45,8 +45,9 @@ const server = createApp({
   // En la nube, con HTTPS, debe activarse: la cookie de sesión solo viajará cifrada.
   secureCookies: process.env.ATIAS_COOKIE_SEGURA === "1",
   uploadLimits: { minFreeBytes: minFreeGb * 1024 ** 3 },
-  // Solo con un proxy delante (HTTPS en la nube) que escriba él mismo X-Forwarded-For.
-  trustedProxy: process.env.ATIAS_PROXY_DE_CONFIANZA === "1",
+  // Solo con un proxy delante que escriba él mismo la dirección real: "1" (X-Forwarded-For,
+  // HTTPS en la nube) o "cloudflare" (túnel de Cloudflare, CF-Connecting-IP).
+  trustedProxy: parseTrustedProxy(process.env.ATIAS_PROXY_DE_CONFIANZA),
 }).listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
 });

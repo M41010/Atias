@@ -1,0 +1,29 @@
+# Publica la web con HTTPS mediante un túnel con nombre de Cloudflare (ver "Publicar con HTTPS"
+# en docs/DOCKER.md). Necesita CLOUDFLARE_TUNNEL_TOKEN en .env:
+#   docker compose -f compose.yaml -f compose.tunel.yaml up -d --build
+# El túnel sale desde este equipo hacia Cloudflare: no abre puertos en el router. Solo llega a la
+# web (que reenvía /api); la API, la base de datos y el análisis siguen sin salida a internet.
+services:
+  api:
+    environment:
+      # Fijos al publicar, digan lo que digan .env: sin enlaces de prueba públicos,
+      # cookie solo por HTTPS y dirección real del cliente desde CF-Connecting-IP.
+      ATIAS_DATOS_DEMO: "0"
+      ATIAS_COOKIE_SEGURA: "1"
+      ATIAS_PROXY_DE_CONFIANZA: cloudflare
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.7
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      # Sin token no arranca: así nunca se publica por error con una dirección aleatoria.
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?Falta CLOUDFLARE_TUNNEL_TOKEN en .env (ver docs/DOCKER.md)}
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    depends_on:
+      web:
+        condition: service_healthy

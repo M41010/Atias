@@ -10,7 +10,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, before, beforeEach, describe, it } from "node:test";
 import type { FileStore } from "@tus/file-store";
-import { createApp } from "./app.js";
+import { createApp, parseTrustedProxy } from "./app.js";
 import { disableUser, LoginLimiter, setUserPassword } from "./auth.js";
 import { createPool, hashToken, migrate, type Pool, removeDemoLinks, seedDemo } from "./db.js";
 import { harvestWeek, upcomingHarvests } from "./harvests.js";
@@ -544,6 +544,65 @@ describe("API", () => {
         for (let i = 0; i < 5; i++) await attempt("mal-mal-mal-mal", `203.0.113.${i}`);
         // Cambiar la dirección inventada no salta el bloqueo.
         assert.equal((await attempt(PASSWORD, "198.51.100.10")).status, 429);
+      } finally {
+        await close(server);
+      }
+    });
+
+    it("lee ATIAS_PROXY_DE_CONFIANZA", () => {
+      assert.equal(parseTrustedProxy("1"), true);
+      assert.equal(parseTrustedProxy("cloudflare"), "cloudflare");
+      assert.equal(parseTrustedProxy(" Cloudflare "), "cloudflare");
+      assert.equal(parseTrustedProxy("0"), false);
+      assert.equal(parseTrustedProxy(undefined), false);
+      assert.equal(parseTrustedProxy("si"), false);
+    });
+
+    it("tras el túnel de Cloudflare usa CF-Connecting-IP y no lo que diga X-Forwarded-For", async () => {
+      const server = createServer(createApp({
+        analysisUrl, pool, store, limiter: new LoginLimiter(() => now), trustedProxy: "cloudflare",
+      }));
+      const url = await listen(server);
+      try {
+        const attempt = (contrasena: string, headers: Record<string, string>) =>
+          fetch(`${url}/api/auth/entrar`, {
+            method: "POST",
+            headers: { "content-type": "application/json", ...headers },
+            body: JSON.stringify({ correo: EMAIL, contrasena }),
+          });
+        // El atacante cambia X-Forwarded-For en cada intento, pero Cloudflare da su dirección real.
+        for (let i = 0; i < 5; i++) {
+          await attempt("mal-mal-mal-mal", { "cf-connecting-ip": "203.0.113.50", "x-forwarded-for": `198.51.100.${i}` });
+        }
+        assert.equal((await attempt(PASSWORD, { "cf-connecting-ip": "203.0.113.50" })).status, 429);
+        // La persona de la cooperativa, desde su propio equipo, sigue entrando.
+        assert.equal((await attempt(PASSWORD, { "cf-connecting-ip": "198.51.100.20" })).status, 200);
+      } finally {
+        await close(server);
+      }
+    });
+
+    it("tras el túnel acepta el origen del dominio público que pidió el navegador", async () => {
+      const server = createServer(createApp({
+        analysisUrl, pool, store, limiter: new LoginLimiter(() => now), trustedProxy: "cloudflare", secureCookies: true,
+      }));
+      const url = await listen(server);
+      try {
+        // Así llega desde la web: Host es el de la API y X-Forwarded-Host el dominio público.
+        const response = await fetch(`${url}/api/auth/entrar`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            origin: "https://atias.ejemplo.test",
+            "x-forwarded-host": "atias.ejemplo.test",
+            "sec-fetch-site": "same-origin",
+            "cf-connecting-ip": "198.51.100.21",
+          },
+          body: JSON.stringify({ correo: EMAIL, contrasena: PASSWORD }),
+        });
+        assert.equal(response.status, 200);
+        // Con HTTPS la cookie de sesión solo viaja cifrada.
+        assert.match(response.headers.get("set-cookie") ?? "", /;\s*Secure/i);
       } finally {
         await close(server);
       }
