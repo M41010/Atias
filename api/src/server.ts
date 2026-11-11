@@ -1,4 +1,4 @@
-import { createApp } from "./app.js";
+import { createApp, keepConnectionsOpen } from "./app.js";
 import { purgeExpiredSessions } from "./auth.js";
 import { createPool, migrate, removeDemoLinks, seedDemo } from "./db.js";
 import { createCountRunner } from "./counting.js";
@@ -38,7 +38,7 @@ const qualityTimer = setInterval(createQualityRunner(pool, analysisUrl), QUALITY
 // Aparte de la calidad: un conteo puede tardar mucho y no debe retrasar los avisos de calidad.
 const countTimer = setInterval(createCountRunner(pool, analysisUrl), COUNT_INTERVAL_MS);
 
-const server = createApp({
+const server = keepConnectionsOpen(createApp({
   analysisUrl,
   pool,
   store,
@@ -49,7 +49,7 @@ const server = createApp({
   trustedProxy: process.env.ATIAS_PROXY_DE_CONFIANZA === "1",
 }).listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
-});
+}));
 
 for (const signal of ["SIGTERM", "SIGINT"] as const) {
   process.on(signal, () => {

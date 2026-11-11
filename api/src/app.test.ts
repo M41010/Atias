@@ -4,13 +4,13 @@
  */
 import assert from "node:assert/strict";
 import { mkdtemp, readdir, rm } from "node:fs/promises";
-import { createServer, type Server } from "node:http";
+import { Agent, createServer, request, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, before, beforeEach, describe, it } from "node:test";
 import type { FileStore } from "@tus/file-store";
-import { createApp } from "./app.js";
+import { createApp, keepConnectionsOpen } from "./app.js";
 import { disableUser, LoginLimiter, setUserPassword } from "./auth.js";
 import { createPool, hashToken, migrate, type Pool, removeDemoLinks, seedDemo } from "./db.js";
 import { harvestWeek, upcomingHarvests } from "./harvests.js";
@@ -1535,5 +1535,32 @@ describe("API", () => {
       assert.ok(list.recolecciones.some((h) => h.id === HARVEST));
       assert.equal((await coop("/recolecciones/nada")).status, 404);
     });
+  });
+});
+
+describe("Conexiones que reutiliza la web", () => {
+  // La web reenvía /api por conexiones abiertas. Si la API las cerraba a los 5 s, la consulta
+  // cada 5 s de la pantalla de subida chocaba con el cierre y fallaba (ECONNRESET, error 500).
+  it("siguen abiertas tras más de 5 s sin uso", async () => {
+    const server = keepConnectionsOpen(createServer((_req, res) => res.end("ok")));
+    const url = await listen(server);
+    const agent = new Agent({ keepAlive: true, maxSockets: 1 });
+    const get = () => new Promise<boolean>((resolve, reject) => {
+      const req = request(url, { agent }, (res) => {
+        res.resume();
+        res.on("end", () => resolve(req.reusedSocket));
+      });
+      req.on("error", reject);
+      req.end();
+    });
+    try {
+      assert.equal(await get(), false);
+      await new Promise((resolve) => setTimeout(resolve, 5500));
+      assert.equal(await get(), true, "debe reutilizar la misma conexión");
+    } finally {
+      agent.destroy();
+      server.closeAllConnections();
+      await close(server);
+    }
   });
 });
