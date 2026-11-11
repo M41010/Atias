@@ -51,6 +51,30 @@ Pruebas de la API, con una PostgreSQL desechable: `docker compose -f compose.tes
 
 Para ver el estado: `docker compose ps`, `http://localhost:4000/salud` y `http://localhost:4000/listo`.
 
+## Ensayo del agricultor
+
+Repite de forma automática el envío de vídeos y mide cuánto tarda cada paso. Son dos pruebas:
+
+- **Agricultor con el móvil** (Android simulado, 8 Mbit/s de subida), en `/subir/demo-invernadero-1`: a la hilera 1 lado A le corta la conexión a mitad; en el lado B cierra la página a mitad y vuelve a elegir el archivo; en la hilera 2 lado A la red falla sin que el móvil lo note. En los tres casos comprueba que la subida sigue por donde iba.
+- **El dueño desde su ordenador** (Chrome de escritorio, 20 Mbit/s), en `/subir/demo-invernadero-2`: elige con «Elegir» cuatro vídeos seguidos sin recargar, dos de ellos en baja resolución como los que llegan por WhatsApp, y comprueba que se suben uno tras otro y que la revisión avisa de la baja resolución.
+
+Al final entra como cooperativa y espera a que todos los vídeos estén revisados y contados.
+
+Usa una pila aparte (proyecto `atias-ensayo`, puertos 3100 y 4100, con sus propias imágenes y volúmenes): la pila real y sus datos no se tocan. Al terminar la borra con `down -v`.
+
+```powershell
+cd scripts/ensayo-agricultor
+npm install
+npm run navegador        # solo la primera vez: descarga Chromium para Playwright
+npm run ensayo           # unos 10 minutos
+```
+
+- Con un vídeo de verdad, grabado con el móvil en el invernadero: `$env:ENSAYO_VIDEO="D:\ruta\hilera.mp4"; npm run ensayo`. Es lo que conviene hacer antes del 14 de noviembre.
+- Otra velocidad de subida: `$env:ENSAYO_SUBIDA_MBPS="3"` para el móvil y `$env:ENSAYO_SUBIDA_ESCRITORIO_MBPS="10"` para el ordenador.
+- Para mirar la pila al terminar: `npm run ensayo -- --mantener` y abre `http://localhost:3100`.
+
+Los tiempos quedan en `scripts/ensayo-agricultor/resultados/tiempos.json` y la pantalla de Resumen en `resultados/resumen.png`. Sin vídeo propio usa el de presentación de la web, que no es un invernadero. Como aún no hay detector entrenado, el ensayo cuenta con el detector de referencia por color: el recorrido y los tiempos sirven, los frutos contados no.
+
 ## Probar desde el móvil
 
 1. Arranca con `compose.red-local.yaml`.
