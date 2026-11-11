@@ -3,7 +3,7 @@ import { statfs } from "node:fs/promises";
 import { FileStore } from "@tus/file-store";
 import { Server } from "@tus/server";
 import { sessionUserFromCookie } from "./auth.js";
-import type { Pool } from "./db.js";
+import { hashToken, type Pool } from "./db.js";
 import { cooperativeTarget, currentHileras, type Link, LINK_HEADER, resolveLink } from "./links.js";
 
 // Un vídeo de 10 minutos grabado en 4K con el móvil ocupa unos 4-6 GB.
@@ -53,14 +53,20 @@ export function createVideoStore(directory: string): FileStore {
  * Quién sube: el agricultor con su enlace o, si la petición no trae enlace, la cooperativa con su
  * sesión. Un enlace no válido nunca pasa a comprobarse como sesión.
  */
-async function resolveUploader(pool: Pool, req: Request): Promise<{ link: Link | null } | null> {
+async function resolveUploader(pool: Pool, req: Request): Promise<Uploader | null> {
   const token = req.headers.get(LINK_HEADER);
   if (token !== null) {
     const link = await resolveLink(pool, token);
-    return link ? { link } : null;
+    return link ? { link, linkSha256: hashToken(token), userId: null } : null;
   }
-  return (await sessionUserFromCookie(pool, req.headers.get("cookie"))) ? { link: null } : null;
+  const user = await sessionUserFromCookie(pool, req.headers.get("cookie"));
+  return user ? { link: null, linkSha256: null, userId: user.id } : null;
 }
+
+/** Con enlace se guarda de qué enlace (su hash); con sesión, qué persona de la cooperativa. */
+type Uploader =
+  | { link: Link; linkSha256: string; userId: null }
+  | { link: null; linkSha256: null; userId: string };
 
 /**
  * Servidor de subidas reanudables (protocolo tus). Cada petición se valida contra el enlace, y una
@@ -150,10 +156,10 @@ export function createUploadServer(
       );
       await pool.query(
         `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status,
-           file_modified_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'subiendo', $9)`,
+           file_modified_at, uploaded_via, uploaded_link_sha256, uploaded_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'subiendo', $9, $10, $11, $12)`,
         [upload.id, link.greenhouseId, link.harvestId, hilera, lado, fileName, mimeType, upload.size,
-          fileModifiedAt(lastmodified)],
+          fileModifiedAt(lastmodified), uploader.link ? "enlace" : "cooperativa", uploader.linkSha256, uploader.userId],
       );
       return {};
     },

@@ -1,7 +1,7 @@
 import express, { type Router } from "express";
 import type { SessionUser } from "./auth.js";
 import type { Pool } from "./db.js";
-import { videoDto } from "./dto.js";
+import { RECEIVED_VIDEOS_SQL, videoDto } from "./dto.js";
 
 /**
  * Datos de campo de una recolección: lo que hace falta para medir cuánto acierta Atias.
@@ -117,7 +117,7 @@ export function createFieldRouter(pool: Pool): Router {
          ORDER BY g.name`,
         [req.params.id],
       ),
-      pool.query("SELECT * FROM videos WHERE harvest_id = $1 AND status = 'recibido' ORDER BY hilera, lado", [req.params.id]),
+      pool.query(RECEIVED_VIDEOS_SQL, [req.params.id]),
       pool.query("SELECT greenhouse_id, day, source, kg FROM daily_forecasts WHERE day = ANY($1::date[])", [days]),
       pool.query("SELECT greenhouse_id, day, kg, source FROM daily_harvests WHERE day = ANY($1::date[])", [days]),
       pool.query("SELECT greenhouse_id, scope, kg FROM harvest_records WHERE harvest_id = $1", [req.params.id]),

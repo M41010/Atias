@@ -37,9 +37,24 @@ export type ServerVideo = {
   calidad: VideoQuality;
   /** Frutos contados por el detector. */
   conteo?: VideoCount;
+  /** Quién lo subió. Falta en respuestas de una API anterior: entonces, el agricultor. */
+  origen?: "agricultor" | "cooperativa";
+  /** Subido por la cooperativa: cuenta en los cálculos, pero se marca como prueba. */
+  dePrueba?: boolean;
+  /** Persona de la cooperativa que lo subió (solo en las consultas de la cooperativa). */
+  subidoPor?: string | null;
 };
 
+/** Texto de quién subió el vídeo, para la cooperativa. */
+export function uploaderLabel(video: Pick<ServerVideo, "origen" | "subidoPor">): string {
+  if (video.origen !== "cooperativa") return "Subido por el agricultor";
+  return video.subidoPor ? `Subido por la cooperativa (${video.subidoPor})` : "Subido por la cooperativa";
+}
+
 export const MAX_VIDEO_BYTES = 8 * 1024 ** 3;
+
+/** Plazo de envío que se pide al agricultor (docs/ENVIO_VIDEOS.md). */
+export const SEND_DEADLINE = "Envía los vídeos antes del sábado a las 18:00.";
 
 /** Límite del cuerpo de cada petición en Cloudflare (túnel o proxy), plan gratuito. */
 export const CLOUDFLARE_MAX_BODY_BYTES = 100 * 1000 * 1000;

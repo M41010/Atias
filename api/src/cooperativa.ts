@@ -5,7 +5,7 @@ import { requireSession, type SessionUser } from "./auth.js";
 import { createFieldRouter } from "./campo.js";
 import { hashToken, type Pool } from "./db.js";
 import { harvestWeek, isValidMonday, proposedUploadHarvest, upcomingHarvests, uploadableHarvests } from "./harvests.js";
-import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
+import { RECEIVED_VIDEOS_SQL, videoDto, weeklyColumns, weeklyData } from "./dto.js";
 import { recordingOf } from "./recording.js";
 import { VIDEO_TYPES } from "./uploads.js";
 import { WeatherUnavailable, type WeatherService } from "./weather.js";
@@ -45,7 +45,7 @@ export function createCooperativeRouter(pool: Pool, videoDir: string, weather: W
       [req.params.id],
     );
     const videos = await pool.query(
-      "SELECT * FROM videos WHERE harvest_id = $1 AND status = 'recibido' ORDER BY hilera, lado",
+      RECEIVED_VIDEOS_SQL,
       [req.params.id],
     );
     res.json({
@@ -296,7 +296,7 @@ export function createCooperativeRouter(pool: Pool, videoDir: string, weather: W
       [req.params.recoleccion],
     );
     const videos = await pool.query(
-      "SELECT * FROM videos WHERE harvest_id = $1 AND status = 'recibido' ORDER BY hilera, lado",
+      RECEIVED_VIDEOS_SQL,
       [req.params.recoleccion],
     );
     res.json({

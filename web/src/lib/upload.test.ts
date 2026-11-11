@@ -21,6 +21,7 @@ import {
   setProgress,
   summarize,
   uploadKey,
+  uploaderLabel,
   validateVideo,
   videoMimeType,
 } from "./upload";
@@ -264,5 +265,15 @@ describe("formatSize", () => {
     expect(formatSize(1.5 * 1024 ** 3)).toBe("1,5 GB");
     expect(formatSize(250 * MB)).toBe("250 MB");
     expect(formatSize(26_000)).toBe("menos de 1 MB");
+  });
+});
+
+describe("uploaderLabel", () => {
+  it("dice quién subió el vídeo", () => {
+    expect(uploaderLabel({ origen: "agricultor", subidoPor: null })).toBe("Subido por el agricultor");
+    // Una API anterior no lo dice: entonces solo podía subirlo el agricultor.
+    expect(uploaderLabel({})).toBe("Subido por el agricultor");
+    expect(uploaderLabel({ origen: "cooperativa", subidoPor: "Ana" })).toBe("Subido por la cooperativa (Ana)");
+    expect(uploaderLabel({ origen: "cooperativa", subidoPor: null })).toBe("Subido por la cooperativa");
   });
 });

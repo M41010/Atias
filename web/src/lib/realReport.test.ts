@@ -67,6 +67,14 @@ describe("kilos a partir del conteo real", () => {
     ]);
   });
 
+  it("lo subido por la cooperativa cuenta igual, pero queda marcado como prueba", () => {
+    const base = greenhouse();
+    const trial = greenhouse({ videos: [{ ...base.videos[0], origen: "cooperativa", dePrueba: true }, base.videos[1]] });
+    const { hileras, videos } = realHileras(trial, 10);
+    expect(hileras).toEqual(realHileras(base, 10).hileras);
+    expect(videos.map((v) => [v.lado, v.dePrueba ?? false])).toEqual([["A", true], ["B", false]]);
+  });
+
   it("sin vídeo la hilera queda pendiente y se avisa una vez si faltan los dos lados", () => {
     const { hileras, warnings } = realHileras(greenhouse(), 10);
     expect(hileras[1].tramos).toBeNull();

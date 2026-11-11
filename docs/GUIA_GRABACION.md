@@ -87,13 +87,13 @@ Todo esto, y lo de la hoja de campo, se apunta en la app de la cooperativa, en *
 
 ## 8. Enviar los vídeos
 
-En esta primera prueba el agricultor no sube los vídeos: los envía y se suben a Atias desde el ordenador
-con el enlace de su invernadero. Cómo enviarlos sin que pierdan calidad, y antes de cuándo, está en la
+En esta primera prueba el agricultor no sube los vídeos: los envía y la cooperativa los sube a Atias
+desde el ordenador, en **Subir vídeos**. Cómo enviarlos sin que pierdan calidad, y antes de cuándo, está en la
 hoja **Cómo enviar los vídeos** (`docs/ENVIO_VIDEOS.pdf`). Lo más importante:
 
 - **No mandarlos como vídeo normal por WhatsApp**, porque los comprime. Mejor en mano, por Google Drive o
   por WhatsApp como documento.
-- **Como muy tarde el domingo a las 20:00:** el enlace caduca el lunes a las 00:00.
+- **Antes del sábado a las 18:00, sí o sí:** así da tiempo a subirlos y analizarlos antes del lunes.
 - No borrarlos del móvil hasta confirmar que han llegado.
 
 ---
