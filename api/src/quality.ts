@@ -1,4 +1,5 @@
 import type { Pool } from "./db.js";
+import { readRecordingDates } from "./recording.js";
 
 const REVIEW_TIMEOUT_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 3;
@@ -50,13 +51,17 @@ export async function reviewPendingVideos(pool: Pool, analysisUrl: string): Prom
   }
 }
 
-/** Ejecuta la revisión sin solapes: si ya hay una en curso, esta llamada no hace nada. */
+/**
+ * Ejecuta la revisión sin solapes: si ya hay una en curso, esta llamada no hace nada. Antes lee la
+ * fecha de grabación, que es rápida y no debe esperar a que se revise la imagen.
+ */
 export function createQualityRunner(pool: Pool, analysisUrl: string): () => Promise<void> {
   let running = false;
   return async () => {
     if (running) return;
     running = true;
     try {
+      await readRecordingDates(pool, analysisUrl);
       await reviewPendingVideos(pool, analysisUrl);
     } catch (error) {
       console.error("Fallo al revisar la calidad de los vídeos", error);

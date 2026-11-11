@@ -143,6 +143,32 @@ describe("kilos a partir del conteo real", () => {
   });
 });
 
+describe("captura en el informe real", () => {
+  it("es cuándo se grabó y avisa de un vídeo de otra semana", () => {
+    const [a, b] = greenhouse().videos;
+    const g = greenhouse({
+      videos: [
+        { ...a, grabacion: { fecha: "2026-11-14T08:00:00Z", fuente: "metadatos" } },
+        { ...b, grabacion: { fecha: "2026-11-07T08:00:00Z", fuente: "archivo" } },
+      ],
+    });
+    const report = buildRealReport(field(g), DEFAULT_PARAMS, new Map(), true);
+    const row = report.greenhouses[0];
+    expect(row.capturedAt).toBe("2026-11-07T08:00:00Z");
+    expect(row.captureFromRecording).toBe(true);
+    expect(report.captureDates).toEqual(["2026-11-07T08:00:00Z", "2026-11-14T08:00:00Z"]);
+    expect(row.warnings.filter((w) => w.message.startsWith("Grabado el")).map((w) => w.scope)).toEqual([
+      "Invernadero 1 · Hilera 1 · Lado B",
+    ]);
+  });
+
+  it("sin fecha de grabación usa la de llegada y lo marca", () => {
+    const row = buildRealReport(field(greenhouse()), DEFAULT_PARAMS, new Map(), true).greenhouses[0];
+    expect(row.capturedAt).toBe("2026-11-14T10:00:00Z");
+    expect(row.captureFromRecording).toBe(false);
+  });
+});
+
 describe("precisión", () => {
   const control = (visibles: number, total: number | null, atias: number | null) => ({
     etiqueta: `T${visibles}`, hilera: 1, lado: "A" as const, inicioM: 0, finM: 5, visibles, total,

@@ -85,6 +85,8 @@ export function useUploadSession(token: string, link: LinkInfo) {
         filetype: videoMimeType(file) ?? file.type,
         hilera: String(target.hilera),
         lado: target.lado,
+        // Fecha del archivo en el dispositivo: la API la usa como fecha de grabación si el vídeo no trae la suya.
+        lastmodified: String(file.lastModified),
       },
       // Identifica el mismo archivo en el mismo lado: volver a elegirlo continúa por donde iba.
       fingerprint: async (f: File) => ["atias", token, key, f.name, f.size, f.lastModified].join("|"),

@@ -1,6 +1,7 @@
 /** Llamadas reales a la API de Express. Pasan por la propia web, en el mismo origen. */
 
 import type { CropId } from "./simulated";
+import type { VideoRecording } from "./recording";
 import type { FarmerData, ServerVideo } from "./upload";
 
 export const LINK_HEADER = "x-atias-enlace";
@@ -69,6 +70,10 @@ export type HarvestOverview = {
 
 export const fetchHarvestList = async (): Promise<{ id: string; etiqueta: string }[]> =>
   ((await (await request("/api/cooperativa/recolecciones")).json()) as { recolecciones: { id: string; etiqueta: string }[] }).recolecciones;
+
+/** Corrige cuándo se grabó un vídeo: AAAA-MM-DDTHH:MM en hora de España, o null para volver a la del vídeo. */
+export const saveRecordingDate = async (videoId: string, fecha: string | null): Promise<VideoRecording> =>
+  (await request(`/api/cooperativa/videos/${encodeURIComponent(videoId)}/grabacion`, { method: "PUT", body: JSON.stringify({ fecha }) })).json();
 
 export const fetchHarvestOverview = async (id: string): Promise<HarvestOverview> =>
   (await request(`/api/cooperativa/recolecciones/${encodeURIComponent(id)}`)).json();

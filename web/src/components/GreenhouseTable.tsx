@@ -40,7 +40,10 @@ export function GreenhouseTable({ rows, harvestId }: { rows: GreenhouseRow[]; ha
                   {g.isNew && <Pill tone="brand">Nuevo</Pill>}
                 </span>
               </th>
-              <td className="hidden whitespace-nowrap text-muted lg:table-cell">{fmtDate(g.capturedAt)}</td>
+              <td className="hidden whitespace-nowrap text-muted lg:table-cell">
+                {fmtDate(g.capturedAt)}
+                {!g.captureFromRecording && <span className="block text-xs">Llegada: sin fecha de grabación</span>}
+              </td>
               <td className="num">
                 {fmtKg(g.observed.kg)}
                 {g.partial && <span className="block text-xs text-warn-ink">parcial</span>}

@@ -16,6 +16,7 @@ import { createPool, hashToken, migrate, type Pool, removeDemoLinks, seedDemo } 
 import { harvestWeek, upcomingHarvests } from "./harvests.js";
 import { countPendingVideos } from "./counting.js";
 import { createQualityRunner, reviewPendingVideos } from "./quality.js";
+import { readRecordingDates } from "./recording.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
 import { localDateHour, localMidnight } from "./weather.js";
 
@@ -44,6 +45,9 @@ describe("API", () => {
   let analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
   let analysisCalls: string[] = [];
   let analysisUrl = "";
+  let recordingStatus = 200;
+  let recordingBody = JSON.stringify({ fecha: null, fuente: null });
+  let recordingCalls: string[] = [];
   // Open-Meteo falso: el histórico da la hora del día como temperatura; la previsión, 20 °C y 0,1 mm/h.
   let meteoDown = false;
   let meteoCalls: string[] = [];
@@ -89,6 +93,12 @@ describe("API", () => {
         res.end(JSON.stringify(reply.body));
         return;
       }
+      if (req.url === "/grabacion") {
+        recordingCalls.push(JSON.parse(body).video);
+        res.statusCode = recordingStatus;
+        res.end(recordingBody);
+        return;
+      }
       if (req.url === "/calidad") analysisCalls.push(JSON.parse(body).video);
       res.statusCode = analysisStatus;
       res.end(analysisBody);
@@ -129,14 +139,18 @@ describe("API", () => {
   }
 
   async function createUpload(
-    { hilera = 1, lado = "A", size = 10, filetype = "video/mp4", filename = "a.mp4", token = TOKEN } = {},
+    {
+      hilera = 1, lado = "A", size = 10, filetype = "video/mp4", filename = "a.mp4", token = TOKEN,
+      lastmodified = undefined as string | undefined,
+    } = {},
   ) {
+    const extra = lastmodified === undefined ? "" : `,lastmodified ${b64(lastmodified)}`;
     return fetch(`${api}/api/subidas`, {
       method: "POST",
       headers: {
         ...tusHeaders(token),
         "upload-length": String(size),
-        "upload-metadata": `filename ${b64(filename)},filetype ${b64(filetype)},hilera ${b64(String(hilera))},lado ${b64(lado)}`,
+        "upload-metadata": `filename ${b64(filename)},filetype ${b64(filetype)},hilera ${b64(String(hilera))},lado ${b64(lado)}${extra}`,
       },
     });
   }
@@ -188,6 +202,9 @@ describe("API", () => {
     analysisStatus = 200;
     analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
     analysisCalls = [];
+    recordingStatus = 200;
+    recordingBody = JSON.stringify({ fecha: null, fuente: null });
+    recordingCalls = [];
     freeSpace = Number.MAX_SAFE_INTEGER;
     await pool.query("DELETE FROM videos; DELETE FROM weekly_data; DELETE FROM harvest_records; DELETE FROM control_counts;");
     await pool.query("DELETE FROM daily_forecasts; DELETE FROM daily_harvests;");
@@ -609,6 +626,7 @@ describe("API", () => {
         ["POST", "/enlaces"], ["POST", "/enlaces/x/revocar"],
         ["GET", "/videos/00000000-0000-0000-0000-000000000000/contenido"],
         ["GET", `/recolecciones/${HARVEST}/cosecha`], ["PUT", `/recolecciones/${HARVEST}/cosecha/inv-1/lunes_viernes`],
+        ["PUT", "/videos/00000000-0000-0000-0000-000000000000/grabacion"],
       ]) {
         const response = await fetch(`${api}/api/cooperativa${path}`, { method });
         assert.equal(response.status, 401, `${method} ${path}`);
@@ -782,6 +800,94 @@ describe("API", () => {
       const run = createQualityRunner(pool, analysisUrl);
       await Promise.all([run(), run(), run()]);
       assert.equal(analysisCalls.length, 1);
+    });
+  });
+
+  describe("fecha de grabación", () => {
+    type Recording = { fecha: string | null; fuente: string | null };
+    const recording = async () =>
+      ((await (await coop(`/recolecciones/${HARVEST}`)).json()) as {
+        invernaderos: { id: string; videos: { grabacion: Recording }[] }[];
+      }).invernaderos.find((g) => g.id === "inv-1")?.videos[0].grabacion;
+    const correct = (id: string, fecha: string | null) =>
+      coop(`/videos/${id}/grabacion`, { method: "PUT", body: JSON.stringify({ fecha }) });
+    const saturday = Date.parse("2026-11-07T08:30:00Z");
+
+    it("sin metadatos usa la fecha del archivo que manda el navegador", async () => {
+      await uploadComplete({ lastmodified: String(saturday) });
+      assert.deepEqual(await recording(), { fecha: "2026-11-07T08:30:00.000Z", fuente: "archivo" });
+    });
+
+    it("descarta fechas del archivo que no son creíbles", async () => {
+      await uploadComplete({ lastmodified: "0" });
+      await uploadComplete({ lado: "B", lastmodified: "no-es-fecha" });
+      const { rows } = await pool.query("SELECT file_modified_at FROM videos");
+      assert.ok(rows.every((r) => r.file_modified_at === null));
+      assert.deepEqual(await recording(), { fecha: null, fuente: null });
+    });
+
+    it("la de los metadatos del vídeo manda sobre la del archivo, una sola vez por vídeo", async () => {
+      const id = await uploadComplete({ lastmodified: String(Date.parse("2026-11-08T21:00:00Z")) });
+      recordingBody = JSON.stringify({ fecha: "2026-11-07T08:12:33Z", fuente: "metadatos" });
+      assert.equal(await readRecordingDates(pool, analysisUrl), 1);
+      assert.deepEqual(recordingCalls, [id]);
+      assert.deepEqual(await recording(), { fecha: "2026-11-07T08:12:33.000Z", fuente: "metadatos" });
+      assert.equal(await readRecordingDates(pool, analysisUrl), 0);
+    });
+
+    it("con el servicio caído o sin la ruta, se vuelve a intentar", async () => {
+      await uploadComplete();
+      assert.equal(await readRecordingDates(pool, "http://127.0.0.1:1"), 0);
+      recordingStatus = 404;
+      recordingBody = JSON.stringify({ error: "Ruta no encontrada" });
+      assert.equal(await readRecordingDates(pool, analysisUrl), 0);
+      recordingStatus = 500;
+      assert.equal(await readRecordingDates(pool, analysisUrl), 0);
+      const { rows } = await pool.query("SELECT recording_checked_at FROM videos");
+      assert.equal(rows[0].recording_checked_at, null);
+    });
+
+    it("un vídeo sin fecha legible queda leído y sin fecha", async () => {
+      await uploadComplete();
+      recordingStatus = 404;
+      recordingBody = JSON.stringify({ error: "Vídeo no encontrado" });
+      assert.equal(await readRecordingDates(pool, analysisUrl), 1);
+      assert.equal(await readRecordingDates(pool, analysisUrl), 0);
+    });
+
+    it("la revisión periódica también lee la fecha", async () => {
+      await uploadComplete();
+      await createQualityRunner(pool, analysisUrl)();
+      assert.equal(recordingCalls.length, 1);
+    });
+
+    it("la cooperativa la corrige en hora de España y puede volver a la del vídeo", async () => {
+      const id = await uploadComplete({ lastmodified: String(saturday) });
+      const response = await correct(id, "2026-11-07T10:15");
+      assert.equal(response.status, 200);
+      assert.deepEqual(await response.json(), { fecha: "2026-11-07T09:15:00.000Z", fuente: "manual" });
+      assert.deepEqual(await recording(), { fecha: "2026-11-07T09:15:00.000Z", fuente: "manual" });
+      assert.equal((await correct(id, null)).status, 200);
+      assert.equal((await recording())?.fuente, "archivo");
+    });
+
+    it("rechaza fechas no válidas y vídeos que no existen", async () => {
+      const id = await uploadComplete();
+      for (const fecha of ["2026-02-30T10:00", "2026-13-01T10:00", "ayer", "2026-11-07", 5]) {
+        assert.equal((await correct(id, fecha as string)).status, 400, String(fecha));
+      }
+      assert.equal((await correct("00000000-0000-4000-8000-000000000000", "2026-11-07T10:00")).status, 404);
+      assert.equal((await correct("x", "2026-11-07T10:00")).status, 404);
+    });
+
+    it("el agricultor ve la fecha pero no puede corregirla", async () => {
+      const id = await uploadComplete({ lastmodified: String(saturday) });
+      assert.equal(((await received())[0] as unknown as { grabacion: Recording }).grabacion.fuente, "archivo");
+      const response = await fetch(`${api}/api/cooperativa/videos/${id}/grabacion`, {
+        method: "PUT", headers: { "x-atias-enlace": TOKEN, "content-type": "application/json" },
+        body: JSON.stringify({ fecha: "2026-11-07T10:00" }),
+      });
+      assert.equal(response.status, 401);
     });
   });
 
