@@ -12,7 +12,7 @@ import { harvestListQuery, harvestOverviewQuery } from "@/lib/offlineCopy";
 import { madridInputValue, mondayOfIsoWeek, recordingProblem, SOURCE_LABELS } from "@/lib/recording";
 import { type HarvestOverview, saveRecordingDate } from "@/lib/serverApi";
 import { CROPS } from "@/lib/simulated";
-import { formatSize, missingData, type ServerVideo, type Side } from "@/lib/upload";
+import { formatSize, missingData, type ServerVideo, type Side, uploaderLabel } from "@/lib/upload";
 
 const REFRESH_MS = 15_000;
 const SIDES: Side[] = ["A", "B"];
@@ -126,10 +126,12 @@ function SideCell({ video, siblings, harvestId, onPlay }: {
       <span className="flex items-center gap-1.5 font-medium text-ok-ink">
         <CheckCircle2 size={15} className="shrink-0" aria-hidden />
         Recibido
+        {video.dePrueba && <Pill tone="warn">Prueba</Pill>}
       </span>
       <span className="block max-w-56 truncate text-xs text-muted">
         {video.fileName} · {formatSize(video.sizeBytes)}
       </span>
+      <span className="block text-xs text-muted">{uploaderLabel(video)}</span>
       <RecordingLine video={video} siblings={siblings} harvestId={harvestId} />
       {video.receivedAt && <span className="block text-xs text-muted">Recibido: {fmtDate(video.receivedAt)}</span>}
       {video.calidad.estado === "pendiente" && <span className="block text-xs text-muted">Revisando la imagen…</span>}

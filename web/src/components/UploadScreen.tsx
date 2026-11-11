@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertTriangle, Camera, CheckCircle2, ChevronDown, FolderOpen, Info, RefreshCw, Trash2, Undo2, WifiOff, X } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, ChevronDown, Clock, FolderOpen, Info, RefreshCw, Trash2, Undo2, WifiOff, X } from "lucide-react";
 import { type ChangeEvent, useId, useState } from "react";
 import { Panel, Pill } from "@/components/ui";
 import { useCellular, useDocumentTitle, useWakeLock } from "@/lib/hooks";
@@ -14,6 +14,7 @@ import {
   highestHileraWithVideo,
   missingData,
   nextPending,
+  SEND_DEADLINE,
   type Side,
   type Upload,
   uploadKey,
@@ -403,10 +404,16 @@ export function UploadScreen({ token, link }: { token: string; link: LinkInfo })
               Vídeos recibidos. Queda{pendingData === 1 ? "" : "n"} {pendingData} {pendingData === 1 ? "dato" : "datos"} de la semana por completar o corregir.
             </p>
           ) : (
-            <p className="mt-3 flex gap-2 text-sm text-muted">
-              <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
-              Graba el sábado un vídeo por cada lado. Recorre toda la hilera a paso lento, sin volver atrás.
-            </p>
+            <>
+              <p className="mt-3 flex gap-2 text-sm font-medium">
+                <Clock size={16} className="mt-0.5 shrink-0" aria-hidden />
+                {SEND_DEADLINE}
+              </p>
+              <p className="mt-2 flex gap-2 text-sm text-muted">
+                <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
+                Graba el sábado un vídeo por cada lado. Recorre toda la hilera a paso lento, sin volver atrás.
+              </p>
+            </>
           )}
           {cellular && !summary.complete && (
             <p className="mt-3 flex gap-2 rounded-md bg-warn-soft p-3 text-sm text-warn-ink">

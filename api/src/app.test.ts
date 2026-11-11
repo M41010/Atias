@@ -328,8 +328,8 @@ describe("API", () => {
     it("limita cuántas versiones se guardan por invernadero y recolección", async () => {
       // El invernadero de prueba tiene 4 hileras: 4 x 2 lados x 4 versiones.
       await pool.query(
-        `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status)
-         SELECT gen_random_uuid(), 'inv-1', $1, 1, 'A', 'v.mp4', 'video/mp4', 10, 'sustituido'
+        `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status, uploaded_via)
+         SELECT gen_random_uuid(), 'inv-1', $1, 1, 'A', 'v.mp4', 'video/mp4', 10, 'sustituido', 'enlace'
          FROM generate_series(1, 32)`,
         [HARVEST],
       );
@@ -474,6 +474,36 @@ describe("API", () => {
       assert.deepEqual(seen.videos.map((v) => v.id), [id]);
     });
 
+    it("guarda quién subió cada vídeo y marca como de prueba lo de la cooperativa", async () => {
+      const farmer = await uploadComplete({ hilera: 1, lado: "A" });
+      const coopVideo = await coopComplete({ hilera: 2, lado: "B" });
+      const { rows } = await pool.query(
+        "SELECT id, uploaded_via, uploaded_link_sha256, uploaded_by FROM videos ORDER BY hilera",
+      );
+      assert.deepEqual(rows.map((r) => [r.id, r.uploaded_via]), [[farmer, "enlace"], [coopVideo, "cooperativa"]]);
+      assert.equal(rows[0].uploaded_link_sha256, hashToken(TOKEN));
+      assert.equal(rows[0].uploaded_by, null);
+      assert.equal(rows[1].uploaded_link_sha256, null);
+      const user = await pool.query("SELECT id FROM users WHERE email = $1", [EMAIL]);
+      assert.equal(rows[1].uploaded_by, user.rows[0].id);
+
+      type Seen = { id: string; origen: string; dePrueba: boolean; subidoPor: string | null };
+      const videos = ((await overview()).invernaderos.find((g) => g.id === "inv-1")?.videos ?? []) as unknown as Seen[];
+      assert.deepEqual(
+        videos.map((v) => [v.id, v.origen, v.dePrueba, v.subidoPor]),
+        [[farmer, "agricultor", false, null], [coopVideo, "cooperativa", true, "Ana"]],
+      );
+      // También llega a los datos de campo con los que se calcula: no se aparta, solo se marca.
+      const field = await (await coop(`/recolecciones/${HARVEST}/campo`)).json() as { invernaderos: { id: string; videos: Seen[] }[] };
+      assert.deepEqual(
+        field.invernaderos.find((g) => g.id === "inv-1")?.videos.map((v) => [v.id, v.dePrueba]),
+        [[farmer, false], [coopVideo, true]],
+      );
+      // El agricultor ve de dónde viene, pero no el nombre de quien lo subió.
+      const seen = await (await link("")).json() as { videos: Seen[] };
+      assert.deepEqual(seen.videos.map((v) => [v.origen, v.subidoPor]), [["agricultor", null], ["cooperativa", null]]);
+    });
+
     it("no depende de ningún enlace: funciona con los enlaces caducados o revocados", async () => {
       await pool.query("UPDATE upload_links SET expires_at = now() - interval '1 minute', revoked_at = now()");
       try {
@@ -554,8 +584,8 @@ describe("API", () => {
 
     it("limita las versiones guardadas igual que con enlace", async () => {
       await pool.query(
-        `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status)
-         SELECT gen_random_uuid(), 'inv-1', $1, 1, 'A', 'v.mp4', 'video/mp4', 10, 'sustituido'
+        `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status, uploaded_via)
+         SELECT gen_random_uuid(), 'inv-1', $1, 1, 'A', 'v.mp4', 'video/mp4', 10, 'sustituido', 'enlace'
          FROM generate_series(1, 32)`,
         [HARVEST],
       );

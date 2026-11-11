@@ -45,7 +45,15 @@ function countDto(row: Record<string, unknown>) {
   };
 }
 
+/** Vídeos vigentes de una recolección, con el nombre de quien los subió desde la cooperativa. */
+export const RECEIVED_VIDEOS_SQL = `
+  SELECT v.*, u.name AS uploaded_by_name FROM videos v
+  LEFT JOIN users u ON u.id = v.uploaded_by
+  WHERE v.harvest_id = $1 AND v.status = 'recibido'
+  ORDER BY v.hilera, v.lado`;
+
 export function videoDto(row: Record<string, unknown>) {
+  const origen = row.uploaded_via === "cooperativa" ? "cooperativa" : "agricultor";
   return {
     id: row.id,
     hilera: row.hilera,
@@ -55,6 +63,12 @@ export function videoDto(row: Record<string, unknown>) {
     status: row.status,
     receivedAt: row.received_at ?? null,
     grabacion: recordingOf(row),
+    // Quién lo subió. Lo subido por la cooperativa es de prueba: entra en los cálculos, pero
+    // queda marcado para poder apartarlo más adelante.
+    origen,
+    dePrueba: origen === "cooperativa",
+    // Nombre de la persona de la cooperativa; solo en las consultas que lo cruzan con users.
+    subidoPor: (row.uploaded_by_name as string | null | undefined) ?? null,
     calidad: {
       estado: row.quality_status,
       avisos: (row.quality as { avisos?: string[] } | null)?.avisos ?? [],

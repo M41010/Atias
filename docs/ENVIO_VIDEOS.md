@@ -24,8 +24,8 @@ De mejor a peor:
 
 ## 3. Cuándo
 
-- **El mismo sábado**, o como muy tarde el **domingo a las 20:00**. El lunes a las 00:00 se cierra la
-  semana en Atias y ya no puedo añadir vídeos.
+- **Antes del sábado a las 18:00, sí o sí.** Así da tiempo a subirlos y a que Atias los analice antes
+  del lunes. Si algo sale mal, avísame antes de esa hora.
 - **No borres los vídeos del móvil** hasta que te confirme que me han llegado bien.
 
 ## 4. Mándame también un mensaje con

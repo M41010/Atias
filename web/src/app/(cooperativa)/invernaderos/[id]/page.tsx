@@ -312,6 +312,7 @@ export default function GreenhousePage() {
   const g = greenhouse;
   const scale = g.forecast.max * 1.04;
   const done = g.videos.filter((v) => v.status !== "analizando").length;
+  const trials = g.videos.filter((v) => v.dePrueba).length;
   const number = "mt-2 text-3xl numeral";
   const partial = <PartialNote missing={g.missingHileras} total={g.hileras.length} />;
 
@@ -324,6 +325,11 @@ export default function GreenhousePage() {
           <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
             {g.familyName} · {g.growerName} · Técnico: {g.technicianName} · Captura: {fmtCaptureSpan(g.captureDates)}{!g.captureFromRecording && " (cuando llegaron: no se sabe cuándo se grabaron)"}
             <StatusPill status={g.status} />
+            {trials > 0 && (
+              <span title="Vídeos subidos por la cooperativa: cuentan en la previsión, pero son de prueba.">
+                <Pill tone="warn">Prueba: {trials} de {g.videos.length} vídeos</Pill>
+              </span>
+            )}
           </span>
         }
         actions={<HarvestPicker selected={harvestId} />}
@@ -415,7 +421,8 @@ export default function GreenhousePage() {
                       <tr key={`${v.hilera}${v.lado}`}>
                         <th scope="row" className="font-normal!">
                           Hilera {v.hilera} · Lado {v.lado}
-                          {v.note && <span className="block text-xs text-muted">{v.note}</span>}
+                          {v.dePrueba && <> <Pill tone="warn">Prueba</Pill></>}
+                          {v.note &&<span className="block text-xs text-muted">{v.note}</span>}
                         </th>
                         <td><StatusPill status={v.status} /></td>
                       </tr>

@@ -564,14 +564,15 @@ export function realHileras(g: FieldGreenhouse, grams: number): { hileras: Hiler
         continue;
       }
       if (!video) continue;
+      const trial = video.dePrueba ? { dePrueba: true } : {};
       const state = video.conteo?.estado ?? "pendiente";
       if (state === "ok") {
-        videos.push({ hilera: n, lado, status: "analizado" });
+        videos.push({ hilera: n, lado, status: "analizado", ...trial });
         for (const message of countMessages(video.conteo)) {
           warnings.push({ severity: "media", message, scope, greenhouseId: g.id, hilera: n, action: "Revisa el vídeo y, si hace falta, pide repetirlo." });
         }
       } else if (state === "error") {
-        videos.push({ hilera: n, lado, status: "problema", note: "No se han podido contar los frutos" });
+        videos.push({ hilera: n, lado, status: "problema", note: "No se han podido contar los frutos", ...trial });
         warnings.push({
           severity: "alta",
           message: "No se han podido contar los frutos de este vídeo.",
@@ -581,7 +582,7 @@ export function realHileras(g: FieldGreenhouse, grams: number): { hileras: Hiler
           action: "Pide al agricultor que repita la grabación de este lado.",
         });
       } else {
-        videos.push({ hilera: n, lado, status: "analizando" });
+        videos.push({ hilera: n, lado, status: "analizando", ...trial });
       }
     }
     const counted = sides.map(({ video }) => sideCount(video, g.tramos)).filter((c): c is SideCount => c !== null);

@@ -316,6 +316,20 @@ const MIGRATIONS: { id: string; sql: string }[] = [
         ADD COLUMN manual_recorded_by uuid REFERENCES users(id);
     `,
   },
+  {
+    id: "010_quien_sube",
+    sql: `
+      -- Quién subió cada vídeo: el agricultor con su enlace o la cooperativa con su sesión.
+      -- Lo que sube la cooperativa cuenta como de prueba: entra en los cálculos, pero se puede apartar.
+      -- Antes de esta migración solo había subidas con enlace en la pila del piloto.
+      ALTER TABLE videos
+        ADD COLUMN uploaded_via text CHECK (uploaded_via IN ('enlace', 'cooperativa')),
+        ADD COLUMN uploaded_link_sha256 text,
+        ADD COLUMN uploaded_by uuid REFERENCES users(id) ON DELETE SET NULL;
+      UPDATE videos SET uploaded_via = 'enlace' WHERE uploaded_via IS NULL;
+      ALTER TABLE videos ALTER COLUMN uploaded_via SET NOT NULL;
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */

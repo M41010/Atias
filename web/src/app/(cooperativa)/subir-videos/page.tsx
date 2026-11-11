@@ -5,7 +5,9 @@ import { AlertTriangle, CheckCircle2, RefreshCw, Upload as UploadIcon, WifiOff, 
 import { type DragEvent, useCallback, useMemo, useRef, useState } from "react";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
 import { type BatchRow, greenhouseNumber, problemText, type RowProblem, rowProblems, rowsFromFiles } from "@/lib/batchUpload";
-import { useDocumentTitle } from "@/lib/hooks";
+import { fmtDay, fmtKg } from "@/lib/format";
+import { useDocumentTitle, useReport } from "@/lib/hooks";
+import { harvestForecast } from "@/lib/uploadForecast";
 import { fetchUploadHarvests, fetchUploadTargets, type UploadTargets } from "@/lib/serverApi";
 import { CROPS } from "@/lib/simulated";
 import { formatSize, type Side, type Upload, uploadKey } from "@/lib/upload";
@@ -219,6 +221,37 @@ function UploadLine({ upload, target, onCancel, onRetry }: {
   );
 }
 
+/** Lo que ya prevé Atias para los días de la recolección elegida, con los vídeos analizados hasta ahora. */
+function HarvestForecastNote({ harvestId }: { harvestId: string }) {
+  const report = useReport(harvestId);
+  if (report.isPending) return <p className="text-xs text-muted sm:col-span-2">Cargando la previsión de esta recolección…</p>;
+  if (report.isError) return null;
+  const forecast = harvestForecast(report.data);
+  if (!forecast) {
+    return (
+      <p className="text-sm text-muted sm:col-span-2">
+        Previsión estimada: todavía no hay vídeos analizados de esta recolección.
+      </p>
+    );
+  }
+  return (
+    <div className="text-sm sm:col-span-2">
+      <p className="font-medium">
+        Previsión estimada de Atias: <span className="tabular-nums">{fmtKg(forecast.totalKg)} kg</span> de lunes a viernes
+      </p>
+      <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-muted tabular-nums">
+        {forecast.days.map((d) => (
+          <li key={d.date}><span className="capitalize">{fmtDay(d.date)}</span>: {fmtKg(d.kg)} kg</li>
+        ))}
+      </ul>
+      <p className="mt-1 text-xs text-muted">
+        Con los vídeos analizados hasta ahora ({forecast.greenhouses} {forecast.greenhouses === 1 ? "invernadero" : "invernaderos"})
+        {forecast.partial ? "; faltan hileras, así que cambiará al llegar más." : "."}
+      </p>
+    </div>
+  );
+}
+
 export default function SubirVideosPage() {
   useDocumentTitle("Subir vídeos");
   const client = useQueryClient();
@@ -322,6 +355,7 @@ export default function SubirVideosPage() {
                 ))}
               </select>
             </label>
+            {harvestId && <HarvestForecastNote harvestId={harvestId} />}
             {locked && (
               <p className="text-xs text-muted sm:col-span-2">
                 Para cambiar de recolección o invernadero, sube o quita antes los vídeos en revisión.

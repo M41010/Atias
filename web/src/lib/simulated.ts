@@ -287,6 +287,8 @@ export type Video = {
   lado: "A" | "B";
   status: VideoStatus;
   note?: string;
+  /** Subido por la cooperativa: cuenta, pero se marca como prueba. */
+  dePrueba?: boolean;
 };
 export type Hilera = { n: number; tramos: Tramo[] | null };
 export type AppWarning = {
