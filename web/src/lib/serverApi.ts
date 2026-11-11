@@ -202,6 +202,8 @@ export type FieldGreenhouse = {
   videos: ServerVideo[];
   previsiones: { agricultor: DayValues; tecnico: DayValues };
   real: DayValues;
+  /** De dónde viene cada día del recogido; lo del ERP no se cambia a mano. Falta en datos antiguos. */
+  realOrigen?: ("erp" | "manual" | null)[];
   cosecha: { lunesViernes: number | null; inmediata: number | null };
   controles: ControlWithAtias[];
 };

@@ -126,6 +126,8 @@ export function createFieldRouter(pool: Pool): Router {
 
     const byDay = (rows: { greenhouse_id: string; day: Date | string; kg: number }[], greenhouseId: string) =>
       days.map((day) => rows.find((r) => r.greenhouse_id === greenhouseId && isoDate(r.day) === day)?.kg ?? null);
+    const sourceByDay = (greenhouseId: string): ("erp" | "manual" | null)[] =>
+      days.map((day) => reals.rows.find((r) => r.greenhouse_id === greenhouseId && isoDate(r.day) === day)?.source ?? null);
 
     res.json({
       id: harvest.rows[0].id,
@@ -155,6 +157,8 @@ export function createFieldRouter(pool: Pool): Router {
             tecnico: byDay(forecasts.rows.filter((r) => r.source === "tecnico"), g.id),
           },
           real: byDay(reals.rows, g.id),
+          // De dónde viene cada día del recogido: lo que llegó del ERP no se cambia a mano.
+          realOrigen: sourceByDay(g.id),
           cosecha: {
             lunesViernes: records.rows.find((r) => r.greenhouse_id === g.id && r.scope === "lunes_viernes")?.kg ?? null,
             inmediata: records.rows.find((r) => r.greenhouse_id === g.id && r.scope === "cosecha_inmediata")?.kg ?? null,
