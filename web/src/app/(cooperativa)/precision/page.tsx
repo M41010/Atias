@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { MonitorPlay } from "lucide-react";
 import Link from "next/link";
+import { ErrorSemanalPanel } from "@/components/charts/ErrorSemanal";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
 import { type HarvestReport, listReports } from "@/lib/api";
 import { fmtDecimal, fmtInt, fmtKg, fmtPct } from "@/lib/format";
@@ -303,6 +304,7 @@ export default function PrecisionPage() {
           </p>
         )}
         <VerdictPanel reports={reports.data} />
+        <ErrorSemanalPanel reports={reports.data} />
         <WeeksPanel reports={reports.data} />
         <LinksPanels reports={reports.data} />
       </div>
