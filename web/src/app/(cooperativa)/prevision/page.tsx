@@ -15,7 +15,9 @@ import {
   type HarvestReport,
   listReports,
 } from "@/lib/api";
+import { ExcelButton } from "@/components/ExcelButton";
 import { errorPct } from "@/lib/calc";
+import { dailySheets, excelFileName } from "@/lib/excelExport";
 import { fmtDate, fmtDay, fmtKg, fmtPct } from "@/lib/format";
 import { queryKeys, useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
 import { useDataMode } from "@/lib/mode";
@@ -333,7 +335,15 @@ export default function PrevisionPage() {
           <Panel
             title="Kilos por día"
             description="R: real, del ERP. Téc.: previsión del técnico. Atias: previsión experimental, sin validar. Abre una familia para ver sus invernaderos."
-            actions={<Pill tone="warn">Simulado</Pill>}
+            actions={
+              <span className="flex flex-wrap items-center gap-3">
+                <Pill tone="warn">Simulado</Pill>
+                <ExcelButton
+                  build={() => dailySheets(data, rows, { families, technicians })}
+                  fileName={excelFileName("prevision-diaria", data)}
+                />
+              </span>
+            }
           >
             <DailyTable report={data} rows={rows} />
           </Panel>
