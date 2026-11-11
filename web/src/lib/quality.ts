@@ -1,6 +1,19 @@
 /** Textos de la revisión de calidad de un vídeo recibido. */
 
-export type VideoQuality = { estado: "pendiente" | "ok" | "avisos" | "error"; avisos: string[] };
+/** Medidas de la revisión. Solo llegan a la cooperativa; null si aún no hay o no se pudo leer. */
+export type QualityMeasures = {
+  duracionS: number | null;
+  anchura: number | null;
+  altura: number | null;
+  /** Brillo medio, de 0 a 255. */
+  brillo: number | null;
+  /** Parte de la imagen quemada, de 0 a 1. */
+  sobreexpuesto: number | null;
+  /** Varianza del laplaciano: más es más nítido. */
+  nitidez: number | null;
+};
+
+export type VideoQuality = { estado: "pendiente" | "ok" | "avisos" | "error"; avisos: string[]; medidas?: QualityMeasures | null };
 
 const MESSAGES: Record<string, string> = {
   POCA_LUZ: "Imagen muy oscura",
