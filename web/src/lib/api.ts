@@ -225,6 +225,34 @@ function buildHilera(h: Hilera, ripeningPct: number, factor: number): HileraRow 
   };
 }
 
+/**
+ * Kilos del invernadero en enteros, que es como se muestran. Cada hilera se redondea sin que cambie
+ * la suma: así las hileras suman el invernadero, los invernaderos la familia y el total, y los días
+ * la semana. Si no, se verían sumas que no cuadran por un kilo (11.974 arriba, 11.975 en la tabla).
+ */
+function wholeKg(hileras: HileraRow[]): { hileras: HileraRow[]; observed: KgRange; forecast: KgRange } {
+  const analyzed = hileras.filter((h) => h.observed && h.forecast);
+  const round = (pick: (h: HileraRow) => KgRange, field: keyof KgRange) =>
+    roundKeepingTotal(analyzed.map((h) => pick(h)[field]));
+  const observedOf = (h: HileraRow) => h.observed as KgRange;
+  const forecastOf = (h: HileraRow) => h.forecast as KgRange;
+  const rounded = {
+    observed: { kg: round(observedOf, "kg"), min: round(observedOf, "min"), max: round(observedOf, "max") },
+    forecast: { kg: round(forecastOf, "kg"), min: round(forecastOf, "min"), max: round(forecastOf, "max") },
+  };
+  const at = (r: { kg: number[]; min: number[]; max: number[] }, i: number): KgRange => ({ kg: r.kg[i], min: r.min[i], max: r.max[i] });
+  const out = hileras.map((h) => {
+    const i = analyzed.indexOf(h);
+    return i < 0 ? h : { ...h, observed: at(rounded.observed, i), forecast: at(rounded.forecast, i) };
+  });
+  const done = out.filter((h) => h.observed && h.forecast);
+  return {
+    hileras: out,
+    observed: sumRanges(done.map((h) => h.observed as KgRange)),
+    forecast: sumRanges(done.map((h) => h.forecast as KgRange)),
+  };
+}
+
 function classesOf(family: FamilyId, fruits: number) {
   const classes = FAMILIES[family].classes;
   const counted = classes.slice(0, -1).map((c) => ({ name: c.name, fruits: Math.round(fruits * c.share) }));
@@ -366,15 +394,16 @@ function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestR
     const technician = TECHNICIANS.find((t) => t.id === grower?.technicianId);
     const settings = used.families[info.family];
     const weather = demoWeatherOf(info, harvest.monday, real);
-    const hileras = capture.hileras.map((h) => buildHilera(h, settings.ripeningPct, weather.factor));
+    const { hileras, observed, forecast } = wholeKg(
+      capture.hileras.map((h) => buildHilera(h, settings.ripeningPct, weather.factor)),
+    );
     const analyzed = hileras.filter((h) => h.observed);
-    const observed = sumRanges(analyzed.map((h) => h.observed as KgRange));
-    const forecast = sumRanges(analyzed.map((h) => h.forecast as KgRange));
     const matureFruits = analyzed.reduce((total, h) => total + (h.matureFruits ?? 0), 0);
     const partial = analyzed.length < hileras.length;
     const atiasDays = roundKeepingTotal(splitByDay(observed, forecast, dayShares(weather)).map((d) => d.kg));
     const realKg = capture.realDailyKg ? fullWeek(capture.realDailyKg) : null;
     const technicianKg = sum(capture.technicianKg);
+    const farmerKg = sum(capture.farmerKg);
     return {
       info,
       familyName: family.name,
@@ -399,8 +428,8 @@ function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestR
       errorPct: realKg === null ? null : errorPct(forecast.kg, realKg),
       technicianKg,
       technicianErrorPct: realKg === null ? null : errorPct(technicianKg, realKg),
-      farmerKg: null,
-      farmerErrorPct: null,
+      farmerKg,
+      farmerErrorPct: realKg === null ? null : errorPct(farmerKg, realKg),
       immediateKg: null,
       gramsPerFruit: family.grams,
       gramsSource: "simulado",
@@ -411,7 +440,7 @@ function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestR
         date,
         real: capture.realDailyKg?.[i] ?? null,
         technician: capture.technicianKg[i],
-        farmer: null,
+        farmer: capture.farmerKg[i],
         atias: atiasDays[i],
       })),
     };
@@ -560,10 +589,10 @@ export function buildRealReport(
       ? summarizeWeather(found.days, { source: "open-meteo", normalsYears: found.normalsYears, stale: found.stale })
       : NO_WEATHER;
     const built = realHileras(g, grams);
-    const hileras = built.hileras.map((h) => buildHilera(h, settings.ripeningPct, summary.factor));
+    const { hileras, observed, forecast } = wholeKg(
+      built.hileras.map((h) => buildHilera(h, settings.ripeningPct, summary.factor)),
+    );
     const analyzed = hileras.filter((h) => h.observed);
-    const observed = sumRanges(analyzed.map((h) => h.observed as KgRange));
-    const forecast = sumRanges(analyzed.map((h) => h.forecast as KgRange));
     const matureFruits = analyzed.reduce((total, h) => total + (h.matureFruits ?? 0), 0);
     const partial = analyzed.length < hileras.length;
 

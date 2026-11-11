@@ -25,6 +25,8 @@ export type WeatherConfig = {
   /** Años completos anteriores que forman lo normal. */
   normalsYears?: number;
   now?: () => number;
+  /** Tras un fallo de Open-Meteo, cuánto esperar antes de volver a pedir lo mismo. */
+  retryAfterMs?: number;
 };
 
 export type WeatherDay = {
@@ -159,13 +161,31 @@ export function createWeatherService(pool: Pool, config: WeatherConfig = {}) {
   const archiveUrl = config.archiveUrl ?? "https://archive-api.open-meteo.com/v1/archive";
   const normalsYears = config.normalsYears ?? 10;
   const now = config.now ?? Date.now;
+  const retryAfterMs = config.retryAfterMs ?? 10 * 60_000;
   // Evita pedir lo mismo dos veces a la vez si llegan varias peticiones juntas.
   const inFlight = new Map<string, Promise<void>>();
+  // Si Open-Meteo falla (caído o sin conexión), cada petición esperaría hasta agotar el tiempo
+  // antes de servir lo guardado. Se recuerda el fallo y, durante un rato, se sirve lo guardado al
+  // momento sin volver a intentarlo.
+  const failedAt = new Map<string, number>();
 
   const once = (key: string, task: () => Promise<void>) => {
+    const failed = failedAt.get(key);
+    const since = failed === undefined ? Number.POSITIVE_INFINITY : now() - failed;
+    if (since >= 0 && since < retryAfterMs) {
+      return Promise.reject(new WeatherUnavailable("Open-Meteo falló hace poco: se sirve lo guardado"));
+    }
     const running = inFlight.get(key);
     if (running) return running;
-    const promise = task().finally(() => inFlight.delete(key));
+    const promise = task()
+      .then(() => {
+        failedAt.delete(key);
+      })
+      .catch((error: unknown) => {
+        failedAt.set(key, now());
+        throw error;
+      })
+      .finally(() => inFlight.delete(key));
     inFlight.set(key, promise);
     return promise;
   };
@@ -261,7 +281,10 @@ export function createWeatherService(pool: Pool, config: WeatherConfig = {}) {
       await Promise.all([ensureNormals(point), ensureWeek(point, saturday)]);
     } catch (error) {
       // Sin Open-Meteo se sirve lo guardado, avisando. Solo falla si no hay nada.
-      console.error("Open-Meteo no disponible", error);
+      // El fallo se anota una vez; mientras se espera para reintentar no se repite en el registro.
+      if (!(error instanceof WeatherUnavailable && error.message.startsWith("Open-Meteo falló hace poco"))) {
+        console.error("Open-Meteo no disponible", error);
+      }
       stale = true;
     }
 

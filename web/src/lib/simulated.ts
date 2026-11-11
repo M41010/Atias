@@ -306,6 +306,8 @@ export type Capture = {
   warnings: AppWarning[];
   /** Previsión del técnico para cada día, de lunes a viernes, como la mete en su aplicación. */
   technicianKg: number[];
+  /** Previsión del agricultor para cada día, de lunes a viernes, dada sin conocer la de Atias. */
+  farmerKg: number[];
   /** Kg reales de cada día, de lunes a viernes (vendrán del ERP). Null si aún no se ha recogido. */
   realDailyKg: (number | null)[] | null;
 };
@@ -361,6 +363,12 @@ function technicianForecast(total: number, random: () => number): number[] {
   // Los técnicos redondean a decenas y suelen desviarse más que una medida.
   const week = total * (0.82 + random() * 0.36);
   return TYPICAL.map((share) => Math.round((week * share * (0.9 + random() * 0.2)) / 10) * 10);
+}
+
+function farmerForecast(total: number, random: () => number): number[] {
+  // A ojo: redondea a cincuentenas y se desvía más que el técnico.
+  const week = total * (0.75 + random() * 0.55);
+  return TYPICAL.map((share) => Math.round((week * share * (0.85 + random() * 0.3)) / 50) * 50);
 }
 
 function realDays(total: number, random: () => number): number[] {
@@ -419,6 +427,8 @@ function buildCaptures(monday: string, seed: number, latest: boolean): Capture[]
       warnings,
       technicianKg: technicianForecast(week.total, random),
       realDailyKg: latest ? null : realDays(week.total, random),
+      // Semilla aparte: añadir al agricultor no cambia las demás cifras simuladas.
+      farmerKg: farmerForecast(week.total, seeded(seed * 53 + i + 7)),
     };
   });
 }
