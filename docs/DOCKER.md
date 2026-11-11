@@ -90,12 +90,13 @@ Lo que ya está protegido, con pruebas automáticas en `api/src/app.test.ts`:
 
 - **Vídeos:** solo se aceptan MP4, MOV, WebM, 3GP y MKV, y se sirven con su tipo exacto y con una política que impide ejecutar código. Así un archivo disfrazado de vídeo no puede actuar con la sesión de la cooperativa.
 - **Espacio:** como máximo 8 GB por vídeo (unos 10 minutos en 4K) y 4 versiones guardadas por lado de hilera, de media, en cada invernadero y recolección. Además, no se acepta un vídeo que deje el disco con menos de `ATIAS_ESPACIO_LIBRE_GB` libres (10 por defecto).
+- **Subir desde la cooperativa** (pantalla Subir vídeos): sin enlace del agricultor, la subida exige la sesión de la cooperativa y no caduca el lunes. Vale para cualquier invernadero y para una recolección ya registrada, la de la semana en curso o las cuatro próximas. Tiene los mismos límites de tipo, tamaño, versiones y espacio, y sustituye igual que el agricultor: el vídeo anterior sigue vigente hasta que llega el nuevo completo. Si la petición trae un enlace, manda el enlace y no se mira la sesión.
 - **Acceso:** sin proxy de confianza, 5 fallos bloquean la cuenta 15 minutos. Con `ATIAS_PROXY_DE_CONFIANZA=1` el bloqueo va por equipo: 5 fallos por cuenta y equipo, 20 por equipo y 50 por cuenta desde todos.
 - **Otras webs:** las peticiones que cambian algo se rechazan si llegan desde otra página, además de la protección de la cookie.
 - **Cabeceras:** la web no se puede mostrar dentro de otra, no carga nada de fuera y no envía la dirección `/subir/…`, que contiene el enlace privado, a otras webs.
 - **Contenedores:** sin privilegios ni capacidades especiales. El análisis, que abre vídeos que no son de confianza, tiene además límite de memoria (3 GB), de CPU (2) y de procesos, y no puede escribir fuera de `/tmp`.
 
-Lo que no cubre: todas las cuentas de la cooperativa pueden hacer lo mismo, y no queda registro de quién cambió cada cosa salvo en la cosecha real y los enlaces.
+Lo que no cubre: todas las cuentas de la cooperativa pueden hacer lo mismo, y no queda registro de quién cambió cada cosa salvo en la cosecha real y los enlaces. Tampoco de si un vídeo lo subió el agricultor o la cooperativa.
 
 ## Antes de pasar a la nube
 

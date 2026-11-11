@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ClipboardList, Crosshair, Home, Link2, LogOut, Presentation, Scale, SlidersHorizontal, Users, Video, Warehouse, WifiOff } from "lucide-react";
+import { CalendarDays, ClipboardList, Crosshair, Home, Link2, LogOut, Presentation, Scale, SlidersHorizontal, Upload, Users, Video, Warehouse, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
@@ -26,6 +26,7 @@ const NAV = [
   { href: "/prevision", label: "Previsión diaria", icon: CalendarDays },
   { href: "/invernaderos", label: "Invernaderos", icon: Warehouse },
   { href: "/videos", label: "Vídeos recibidos", icon: Video },
+  { href: "/subir-videos", label: "Subir vídeos", icon: Upload },
   { href: "/enlaces", label: "Enlaces", icon: Link2 },
   { href: "/cosecha", label: "Cosecha real", icon: Scale },
   { href: "/campo", label: "Datos de campo", icon: ClipboardList },
@@ -98,8 +99,8 @@ const REAL_NOTICE = "Datos reales del piloto. El peso por fruto y la fruta tapad
 function DataNotice() {
   const mode = useDataMode();
   const pathname = usePathname();
-  // Vídeos, enlaces, cosecha y datos de campo son siempre reales, también en la demostración.
-  const alwaysReal = ["/videos", "/enlaces", "/cosecha", "/campo"].some((path) => pathname.startsWith(path));
+  // Vídeos, subidas, enlaces, cosecha y datos de campo son siempre reales, también en la demostración.
+  const alwaysReal = ["/videos", "/subir-videos", "/enlaces", "/cosecha", "/campo"].some((path) => pathname.startsWith(path));
   return <>{mode === "demo" && !alwaysReal ? SIMULATED_NOTICE : REAL_NOTICE}</>;
 }
 

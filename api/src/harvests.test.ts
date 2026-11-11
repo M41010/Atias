@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { harvestWeek, isValidMonday, upcomingHarvests } from "./harvests.js";
+import { harvestWeek, isValidMonday, proposedUploadHarvest, upcomingHarvests, uploadableHarvests } from "./harvests.js";
 
 describe("recolecciones", () => {
   it("genera etiqueta e identificador de semana", () => {
@@ -39,5 +39,19 @@ describe("recolecciones", () => {
   it("calcula el día con la hora de España, no la UTC", () => {
     // 23:30 UTC del domingo ya es lunes en Madrid: ese lunes ha empezado.
     assert.equal(upcomingHarvests(new Date("2026-11-08T23:30:00Z"))[0].inicio, "2026-11-16");
+  });
+
+  it("la cooperativa puede subir a la recolección en curso y a las próximas", () => {
+    const fromTuesday = uploadableHarvests(new Date("2026-11-17T12:00:00Z")).map((h) => h.inicio);
+    assert.deepEqual(fromTuesday, ["2026-11-16", "2026-11-23", "2026-11-30", "2026-12-07", "2026-12-14"]);
+    // El lunes, la de ese mismo lunes ya cuenta como en curso.
+    assert.equal(uploadableHarvests(new Date("2026-11-16T08:00:00Z"))[0].inicio, "2026-11-16");
+  });
+
+  it("propone la del lunes siguiente en fin de semana y la de la semana entre semana", () => {
+    assert.equal(proposedUploadHarvest(new Date("2026-11-14T12:00:00Z")).inicio, "2026-11-16");
+    assert.equal(proposedUploadHarvest(new Date("2026-11-15T22:00:00Z")).inicio, "2026-11-16");
+    assert.equal(proposedUploadHarvest(new Date("2026-11-16T08:00:00Z")).inicio, "2026-11-16");
+    assert.equal(proposedUploadHarvest(new Date("2026-11-20T12:00:00Z")).inicio, "2026-11-16");
   });
 });

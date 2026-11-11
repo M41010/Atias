@@ -1,15 +1,16 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, Play, X } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
 import { countMessages, countSummary } from "@/lib/count";
 import { fmtDate } from "@/lib/format";
 import { qualityMessages } from "@/lib/quality";
 import { useDocumentTitle, useOnline } from "@/lib/hooks";
 import { harvestListQuery, harvestOverviewQuery } from "@/lib/offlineCopy";
-import type { HarvestOverview } from "@/lib/serverApi";
+import { madridInputValue, mondayOfIsoWeek, recordingProblem, SOURCE_LABELS } from "@/lib/recording";
+import { type HarvestOverview, saveRecordingDate } from "@/lib/serverApi";
 import { CROPS } from "@/lib/simulated";
 import { formatSize, missingData, type ServerVideo, type Side } from "@/lib/upload";
 
@@ -53,7 +54,72 @@ function VideoPlayer({ video, hilera, onClose }: { video: ServerVideo; hilera: n
   );
 }
 
-function SideCell({ video, onPlay }: { video?: ServerVideo; onPlay: (video: ServerVideo) => void }) {
+/** Cuándo se grabó, de dónde sale la fecha y, si hace falta, corregirla a mano. */
+function RecordingLine({ video, siblings, harvestId }: { video: ServerVideo; siblings: ServerVideo[]; harvestId: string }) {
+  const id = useId();
+  const client = useQueryClient();
+  const [editing, setEditing] = useState(false);
+  const recording = video.grabacion ?? { fecha: null, fuente: null };
+  const [value, setValue] = useState(recording.fecha ? madridInputValue(recording.fecha) : "");
+  const save = useMutation({
+    mutationFn: (fecha: string | null) => saveRecordingDate(video.id, fecha),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ["videos-recibidos", harvestId] });
+      setEditing(false);
+    },
+  });
+  const monday = mondayOfIsoWeek(harvestId);
+  const problem = monday ? recordingProblem(video, siblings, monday) : null;
+  const link = "font-medium text-brand-ink underline-offset-3 hover:underline";
+
+  if (editing) {
+    return (
+      <form
+        className="mt-1 flex flex-wrap items-center gap-1.5 text-xs"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (value) save.mutate(value);
+        }}
+      >
+        <label htmlFor={id} className="sr-only">Fecha y hora de la grabación, hora de España</label>
+        <input id={id} type="datetime-local" required value={value} onChange={(event) => setValue(event.target.value)} className="input min-h-8 text-xs" />
+        <button type="submit" className={link} disabled={save.isPending}>Guardar</button>
+        <button type="button" className="text-muted underline-offset-3 hover:underline" onClick={() => setEditing(false)}>Cancelar</button>
+        {save.isError && <span role="alert" className="basis-full text-bad-ink">{save.error.message}</span>}
+      </form>
+    );
+  }
+  return (
+    <span className="mt-0.5 block text-xs text-muted">
+      {recording.fecha ? (
+        <>Grabado: <span className="font-medium text-ink">{fmtDate(recording.fecha)}</span>{recording.fuente && ` (${SOURCE_LABELS[recording.fuente]})`}</>
+      ) : (
+        "Sin fecha de grabación"
+      )}{" "}
+      <button type="button" className={link} onClick={() => setEditing(true)}>Corregir</button>
+      {recording.fuente === "manual" && (
+        <>
+          {" · "}
+          <button type="button" className={link} disabled={save.isPending} onClick={() => save.mutate(null)}>Quitar corrección</button>
+        </>
+      )}
+      {problem && (
+        <span className="mt-0.5 flex items-start gap-1 font-medium text-warn-ink">
+          <AlertTriangle size={13} className="mt-0.5 shrink-0" aria-hidden />
+          {problem}
+        </span>
+      )}
+      {save.isError && <span role="alert" className="block text-bad-ink">{save.error.message}</span>}
+    </span>
+  );
+}
+
+function SideCell({ video, siblings, harvestId, onPlay }: {
+  video?: ServerVideo;
+  siblings: ServerVideo[];
+  harvestId: string;
+  onPlay: (video: ServerVideo) => void;
+}) {
   if (!video) return <td className="text-muted">Pendiente</td>;
   return (
     <td>
@@ -64,7 +130,8 @@ function SideCell({ video, onPlay }: { video?: ServerVideo; onPlay: (video: Serv
       <span className="block max-w-56 truncate text-xs text-muted">
         {video.fileName} · {formatSize(video.sizeBytes)}
       </span>
-      {video.receivedAt && <span className="block text-xs text-muted">{fmtDate(video.receivedAt)}</span>}
+      <RecordingLine video={video} siblings={siblings} harvestId={harvestId} />
+      {video.receivedAt && <span className="block text-xs text-muted">Recibido: {fmtDate(video.receivedAt)}</span>}
       {video.calidad.estado === "pendiente" && <span className="block text-xs text-muted">Revisando la imagen…</span>}
       {video.calidad.estado === "error" && <span className="block text-xs text-muted">No se ha podido revisar la imagen</span>}
       {qualityMessages(video.calidad).map((message) => (
@@ -112,7 +179,7 @@ function fmtValue(value: number | null, unit: string): string {
   return value === null ? "Sin indicar" : `${new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1 }).format(value)} ${unit}`;
 }
 
-function GreenhousePanel({ greenhouse }: { greenhouse: HarvestOverview["invernaderos"][number] }) {
+function GreenhousePanel({ greenhouse, harvestId }: { greenhouse: HarvestOverview["invernaderos"][number]; harvestId: string }) {
   const { datos, videos } = greenhouse;
   const hileras = datos.hileras ?? 0;
   const total = hileras * 2;
@@ -147,7 +214,13 @@ function GreenhousePanel({ greenhouse }: { greenhouse: HarvestOverview["invernad
               <tr key={hilera}>
                 <th scope="row" className="whitespace-nowrap">Hilera {hilera}</th>
                 {SIDES.map((lado) => (
-                  <SideCell key={lado} video={videos.find((v) => v.hilera === hilera && v.lado === lado)} onPlay={setPlaying} />
+                  <SideCell
+                    key={lado}
+                    video={videos.find((v) => v.hilera === hilera && v.lado === lado)}
+                    siblings={videos}
+                    harvestId={harvestId}
+                    onPlay={setPlaying}
+                  />
                 ))}
               </tr>
             ))}
@@ -223,7 +296,7 @@ export default function VideosPage() {
       {header}
       <div className="grid gap-5">
         {overview.data.invernaderos.map((greenhouse) => (
-          <GreenhousePanel key={greenhouse.id} greenhouse={greenhouse} />
+          <GreenhousePanel key={greenhouse.id} greenhouse={greenhouse} harvestId={overview.data.id} />
         ))}
       </div>
     </>

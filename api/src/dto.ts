@@ -1,5 +1,7 @@
 /** Formato compartido de las respuestas sobre datos de la semana y vídeos. */
 
+import { recordingOf } from "./recording.js";
+
 export const weeklyColumns = `
   w.variety, COALESCE(w.hileras, g.default_hileras) AS hileras, w.longitud_m, w.temperatura_c,
   w.humedad_pct, w.kilos_semana_pasada`;
@@ -52,6 +54,7 @@ export function videoDto(row: Record<string, unknown>) {
     sizeBytes: Number(row.size_bytes),
     status: row.status,
     receivedAt: row.received_at ?? null,
+    grabacion: recordingOf(row),
     calidad: {
       estado: row.quality_status,
       avisos: (row.quality as { avisos?: string[] } | null)?.avisos ?? [],
