@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, Play, X } from "lucide-react";
 import { useId, useState } from "react";
+import { VideosRecibidosGraficos } from "@/components/charts/VideosRecibidos";
 import { EmptyState, ErrorState, PageHeader, Panel, Pill, Skeleton } from "@/components/ui";
 import { countMessages, countSummary } from "@/lib/count";
 import { fmtDate } from "@/lib/format";
@@ -202,6 +203,7 @@ function GreenhousePanel({ greenhouse, harvestId }: { greenhouse: HarvestOvervie
         </span>
       }
     >
+      <VideosRecibidosGraficos videos={videos} hileras={hileras} longitudM={datos.longitudM} />
       <div className="overflow-x-auto">
         <table className="data-table">
           <thead>

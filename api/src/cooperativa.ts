@@ -5,7 +5,7 @@ import { requireSession, type SessionUser } from "./auth.js";
 import { createFieldRouter } from "./campo.js";
 import { hashToken, type Pool } from "./db.js";
 import { harvestWeek, isValidMonday, proposedUploadHarvest, upcomingHarvests, uploadableHarvests } from "./harvests.js";
-import { RECEIVED_VIDEOS_SQL, videoDto, weeklyColumns, weeklyData } from "./dto.js";
+import { coopVideoDto, RECEIVED_VIDEOS_SQL, videoDto, weeklyColumns, weeklyData } from "./dto.js";
 import { recordingOf } from "./recording.js";
 import { VIDEO_TYPES } from "./uploads.js";
 import { WeatherUnavailable, type WeatherService } from "./weather.js";
@@ -56,7 +56,7 @@ export function createCooperativeRouter(pool: Pool, videoDir: string, weather: W
         nombre: g.name,
         cultivo: g.crop,
         datos: weeklyData(g),
-        videos: videos.rows.filter((v) => v.greenhouse_id === g.id).map(videoDto),
+        videos: videos.rows.filter((v) => v.greenhouse_id === g.id).map(coopVideoDto),
       })),
     });
   });

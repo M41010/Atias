@@ -1034,12 +1034,34 @@ describe("API", () => {
       assert.equal(analysisCalls.length, 1);
     });
 
-    it("la cooperativa ve el mismo resultado", async () => {
+    it("la cooperativa ve el mismo resultado, con las medidas", async () => {
       await uploadComplete();
-      analysisBody = JSON.stringify({ medidas: {}, avisos: ["DESENFOCADO"] });
+      const calidad = async () =>
+        ((await (await coop(`/recolecciones/${HARVEST}`)).json()) as { invernaderos: { id: string; videos: { calidad: unknown }[] }[] })
+          .invernaderos.find((g) => g.id === "inv-1")?.videos[0].calidad;
+      assert.deepEqual(await calidad(), { estado: "pendiente", avisos: [], medidas: null });
+      analysisBody = JSON.stringify({
+        medidas: { duracionS: 95.2, anchura: 1920, altura: 1080, brillo: 80.5, sobreexpuesto: 0.01, nitidez: 12.3, raro: "x" },
+        avisos: ["DESENFOCADO"],
+      });
       await reviewPendingVideos(pool, analysisUrl);
-      const body = await (await coop(`/recolecciones/${HARVEST}`)).json() as { invernaderos: { id: string; videos: { calidad: unknown }[] }[] };
-      assert.deepEqual(body.invernaderos.find((g) => g.id === "inv-1")?.videos[0].calidad, { estado: "avisos", avisos: ["DESENFOCADO"] });
+      assert.deepEqual(await calidad(), {
+        estado: "avisos",
+        avisos: ["DESENFOCADO"],
+        medidas: { duracionS: 95.2, anchura: 1920, altura: 1080, brillo: 80.5, sobreexpuesto: 0.01, nitidez: 12.3 },
+      });
+      // El agricultor no recibe las medidas.
+      assert.deepEqual(await quality(), { estado: "avisos", avisos: ["DESENFOCADO"] });
+    });
+
+    it("la cooperativa recibe null en las medidas que faltan o no son cifras", async () => {
+      await uploadComplete();
+      analysisBody = JSON.stringify({ medidas: { brillo: "mucho", duracionS: null }, avisos: [] });
+      await reviewPendingVideos(pool, analysisUrl);
+      const body = await (await coop(`/recolecciones/${HARVEST}`)).json() as { invernaderos: { id: string; videos: { calidad: { medidas: unknown } }[] }[] };
+      assert.deepEqual(body.invernaderos.find((g) => g.id === "inv-1")?.videos[0].calidad.medidas, {
+        duracionS: null, anchura: null, altura: null, brillo: null, sobreexpuesto: null, nitidez: null,
+      });
     });
 
     it("no revisa subidas a medias ni vídeos retirados", async () => {

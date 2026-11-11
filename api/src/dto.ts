@@ -52,6 +52,30 @@ export const RECEIVED_VIDEOS_SQL = `
   WHERE v.harvest_id = $1 AND v.status = 'recibido'
   ORDER BY v.hilera, v.lado`;
 
+/** Medidas de la revisión de calidad: solo las cifras conocidas. Sin medidas (pendiente, ilegible), null. */
+function qualityMeasures(row: Record<string, unknown>) {
+  const measures = (row.quality as { medidas?: unknown } | null)?.medidas;
+  if (!measures || typeof measures !== "object") return null;
+  const num = (key: string) => {
+    const value = (measures as Record<string, unknown>)[key];
+    return typeof value === "number" && Number.isFinite(value) ? value : null;
+  };
+  return {
+    duracionS: num("duracionS"),
+    anchura: num("anchura"),
+    altura: num("altura"),
+    brillo: num("brillo"),
+    sobreexpuesto: num("sobreexpuesto"),
+    nitidez: num("nitidez"),
+  };
+}
+
+/** Para la cooperativa: además, las medidas de la revisión de calidad, para ver por qué avisa. */
+export function coopVideoDto(row: Record<string, unknown>) {
+  const video = videoDto(row);
+  return { ...video, calidad: { ...video.calidad, medidas: qualityMeasures(row) } };
+}
+
 export function videoDto(row: Record<string, unknown>) {
   const origen = row.uploaded_via === "cooperativa" ? "cooperativa" : "agricultor";
   return {
