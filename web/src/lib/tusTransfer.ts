@@ -49,7 +49,8 @@ export function startTransfer({
     chunkSize: CHUNK_BYTES,
     retryDelays: RETRY_DELAYS_MS,
     headers,
-    metadata,
+    // Fecha del archivo en el dispositivo: la API la usa como fecha de grabación si el vídeo no trae la suya.
+    metadata: { ...metadata, lastmodified: String(file.lastModified) },
     fingerprint: async () => ["atias", ...fingerprint].join("|"),
     removeFingerprintOnSuccess: true,
     // Si el servidor está caído, tus-js-client trataría el error 5xx al consultar por dónde iba

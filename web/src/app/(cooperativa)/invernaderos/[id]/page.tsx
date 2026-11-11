@@ -21,7 +21,7 @@ import {
   WarningList,
 } from "@/components/ui";
 import { type GreenhouseRow, type HileraRow, markSeen } from "@/lib/api";
-import { fmtBetween, fmtDate, fmtDay, fmtDecimal, fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
+import { fmtBetween, fmtCaptureSpan, fmtDay, fmtDecimal, fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
 import { queryKeys, useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
 import { useDataMode } from "@/lib/mode";
 import type { Video } from "@/lib/simulated";
@@ -322,7 +322,7 @@ export default function GreenhousePage() {
         title={g.info.name}
         description={
           <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-            {g.familyName} · {g.growerName} · Técnico: {g.technicianName} · Captura: {fmtDate(g.capturedAt)}
+            {g.familyName} · {g.growerName} · Técnico: {g.technicianName} · Captura: {fmtCaptureSpan(g.captureDates)}{!g.captureFromRecording && " (cuando llegaron: no se sabe cuándo se grabaron)"}
             <StatusPill status={g.status} />
           </span>
         }

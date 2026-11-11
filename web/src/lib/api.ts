@@ -17,6 +17,7 @@ import {
 } from "./calc";
 import { countMessages } from "./count";
 import { getDataMode } from "./mode";
+import { captureDates, recordingWarnings } from "./recording";
 import { type ControlWithAtias, fetchFieldData, fetchHarvestList, type FieldData, type FieldGreenhouse } from "./serverApi";
 import {
   addDays,
@@ -88,7 +89,12 @@ export type GreenhouseRow = {
   technicianId: string;
   technicianName: string;
   criterion: string;
+  /** Primera captura del invernadero: cuándo se grabó o, si no se sabe, cuándo llegó. */
   capturedAt: string;
+  /** Todas las fechas de captura del invernadero, para dar el intervalo. */
+  captureDates: string[];
+  /** false si no se sabe cuándo se grabó ningún vídeo y las fechas son las de recepción. */
+  captureFromRecording: boolean;
   status: GreenhouseStatus;
   isNew: boolean;
   partial: boolean;
@@ -381,7 +387,7 @@ function assemble(meta: ReportMeta, greenhouses: GreenhouseRow[], used: Params):
     partial: greenhouses.some((g) => g.partial),
     totalHileras: greenhouses.reduce((total, g) => total + g.hileras.length, 0),
     missingHileras: greenhouses.reduce((total, g) => total + g.missingHileras, 0),
-    captureDates: greenhouses.map((g) => g.capturedAt),
+    captureDates: greenhouses.flatMap((g) => g.captureDates),
     realKg,
     errorPct: realKg === null ? null : errorPct(forecast.kg, realKg),
     days: used.days,
@@ -432,6 +438,8 @@ export function buildDemoReport(id: string, params: Params, real: WeatherMap): H
       technicianName: technician?.name ?? "—",
       criterion: family.criterion,
       capturedAt: capture.capturedAt,
+      captureDates: [capture.capturedAt],
+      captureFromRecording: true,
       status: partial ? "analizando" : capture.warnings.length > 0 ? "con_advertencias" : "analizado",
       isNew: capture.isNew && !readStorage<string[]>(SEEN_KEY, []).includes(`${id}/${info.id}`),
       partial,
@@ -616,7 +624,7 @@ export function buildRealReport(
     const matureFruits = analyzed.reduce((total, h) => total + (h.matureFruits ?? 0), 0);
     const partial = analyzed.length < hileras.length;
 
-    const warnings = [...built.warnings];
+    const warnings = [...built.warnings, ...recordingWarnings(g, monday)];
     const sheet = (message: string, action: string, severity: AppWarning["severity"] = "media") =>
       warnings.unshift({ severity, message, scope: g.nombre, greenhouseId: g.id, hilera: 0, action });
     if (!g.familia) sheet(`Falta indicar la familia: se calcula como ${family.name}.`, "Complétalo en Datos de campo.", "alta");
@@ -627,7 +635,7 @@ export function buildRealReport(
     const technicianKg = fullWeek(g.previsiones.tecnico);
     const farmerKg = fullWeek(g.previsiones.agricultor);
     const atiasDays = roundKeepingTotal(splitByDay(observed, forecast, dayShares(summary)).map((d) => d.kg));
-    const received = g.videos.map((v) => v.receivedAt).filter((v): v is string => Boolean(v)).sort();
+    const capture = captureDates(g.videos);
     return {
       info: {
         id: g.id,
@@ -645,7 +653,9 @@ export function buildRealReport(
       technicianId: g.tecnico ?? "",
       technicianName: g.tecnico ?? "—",
       criterion: family.criterion,
-      capturedAt: received.at(-1) ?? `${addDays(monday, -2)}T12:00:00+01:00`,
+      capturedAt: capture.dates[0] ?? `${addDays(monday, -2)}T12:00:00+01:00`,
+      captureDates: capture.dates,
+      captureFromRecording: capture.fromRecording,
       status: partial ? "analizando" : warnings.some((w) => w.severity === "alta") ? "con_advertencias" : "analizado",
       isNew: false,
       partial,

@@ -34,6 +34,17 @@ export type UploadLimits = {
 const reject = (status_code: number, body: string) => ({ status_code, body });
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Fechas anteriores son un reloj mal puesto o un valor vacío. */
+const EARLIEST_RECORDING_MS = Date.UTC(2015, 0, 1);
+const FUTURE_MARGIN_MS = 2 * 24 * 3_600_000;
+
+/** Fecha del archivo en el dispositivo (milisegundos desde 1970, como la da el navegador), si es creíble. */
+export function fileModifiedAt(raw: string | null | undefined, now = Date.now()): Date | null {
+  if (!raw || !/^\d{1,15}$/.test(raw)) return null;
+  const ms = Number(raw);
+  return ms >= EARLIEST_RECORDING_MS && ms <= now + FUTURE_MARGIN_MS ? new Date(ms) : null;
+}
+
 export function createVideoStore(directory: string): FileStore {
   return new FileStore({ directory });
 }
@@ -95,7 +106,7 @@ export function createUploadServer(
       const uploader = await resolveUploader(pool, req);
       if (!uploader) throw reject(403, "Enlace no válido\n");
 
-      const { filename, filetype, hilera: rawHilera, lado, invernadero, recoleccion } = upload.metadata ?? {};
+      const { filename, filetype, hilera: rawHilera, lado, invernadero, recoleccion, lastmodified } = upload.metadata ?? {};
       const hilera = Number(rawHilera);
       const mimeType = filetype?.trim().toLowerCase() ?? "";
       if (!upload.size) throw reject(400, "Falta el tamaño del vídeo\n");
@@ -138,9 +149,11 @@ export function createUploadServer(
         [link.greenhouseId, link.harvestId, hilera, lado],
       );
       await pool.query(
-        `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'subiendo')`,
-        [upload.id, link.greenhouseId, link.harvestId, hilera, lado, fileName, mimeType, upload.size],
+        `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status,
+           file_modified_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'subiendo', $9)`,
+        [upload.id, link.greenhouseId, link.harvestId, hilera, lado, fileName, mimeType, upload.size,
+          fileModifiedAt(lastmodified)],
       );
       return {};
     },

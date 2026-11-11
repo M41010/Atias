@@ -6,11 +6,19 @@ import { createFieldRouter } from "./campo.js";
 import { hashToken, type Pool } from "./db.js";
 import { harvestWeek, isValidMonday, proposedUploadHarvest, upcomingHarvests, uploadableHarvests } from "./harvests.js";
 import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
+import { recordingOf } from "./recording.js";
 import { VIDEO_TYPES } from "./uploads.js";
 import { WeatherUnavailable, type WeatherService } from "./weather.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const CROPS = new Set(["tomate_cherry", "pimiento", "pepino"]);
+
+/** AAAA-MM-DDTHH:MM que existe en el calendario: la ida y vuelta descarta el 30 de febrero. */
+function isLocalDateTime(value: unknown): value is string {
+  if (typeof value !== "string" || !/^20\d\d-\d\d-\d\dT\d\d:\d\d$/.test(value)) return false;
+  const date = new Date(`${value}:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 16) === value;
+}
 
 /** Rutas de la cooperativa. Todas exigen haber iniciado sesión. */
 export function createCooperativeRouter(pool: Pool, videoDir: string, weather: WeatherService): Router {
@@ -154,6 +162,33 @@ export function createCooperativeRouter(pool: Pool, videoDir: string, weather: W
       if (error.status === 404) res.status(404).json({ error: "Archivo no encontrado" });
       else next(error);
     });
+  });
+
+  // Corrige a mano cuándo se grabó: fecha y hora de España (AAAA-MM-DDTHH:MM). null vuelve a la del vídeo.
+  router.put("/videos/:id/grabacion", async (req, res) => {
+    const user: SessionUser = res.locals.user;
+    const fecha = (req.body as Record<string, unknown> | undefined)?.fecha;
+    if (!UUID.test(req.params.id)) {
+      res.status(404).json({ error: "Vídeo no encontrado" });
+      return;
+    }
+    if (fecha !== null && !isLocalDateTime(fecha)) {
+      res.status(400).json({ error: "Indica la fecha y la hora de la grabación" });
+      return;
+    }
+    const { rows } = await pool.query(
+      `UPDATE videos SET
+         manual_recorded_at = CASE WHEN $2::text IS NULL THEN NULL ELSE $2::timestamp AT TIME ZONE 'Europe/Madrid' END,
+         manual_recorded_by = CASE WHEN $2::text IS NULL THEN NULL ELSE $3::uuid END
+       WHERE id = $1 AND status = 'recibido'
+       RETURNING manual_recorded_at, metadata_recorded_at, file_modified_at`,
+      [req.params.id, fecha, user.id],
+    );
+    if (!rows[0]) {
+      res.status(404).json({ error: "Vídeo no encontrado" });
+      return;
+    }
+    res.json(recordingOf(rows[0]));
   });
 
   // ---- Meteorología ----
