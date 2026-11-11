@@ -146,4 +146,10 @@ describe("roundKeepingTotal", () => {
     expect(rounded.reduce((a, b) => a + b, 0)).toBe(502);
     expect(rounded.every(Number.isInteger)).toBe(true);
   });
+
+  it("con un total dado lo reparte, aunque no sea el redondeo de la suma", () => {
+    expect(roundKeepingTotal([1.5, 1.5, 1.5], 5)).toEqual([2, 2, 1]);
+    expect(roundKeepingTotal([1.5, 1.5, 1.5], 4)).toEqual([2, 1, 1]);
+    expect(roundKeepingTotal([3.3, 3.3, 3.4], 9)).toEqual([3, 3, 3]);
+  });
 });
