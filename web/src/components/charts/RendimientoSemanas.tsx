@@ -12,6 +12,7 @@ import {
   type Normalization,
   normalizeWeek,
   SERIES_COLOR,
+  SERIES_SHAPE,
   semanasDelInvernadero,
   tendencia,
   type WeekPoint,
@@ -82,18 +83,18 @@ export function RendimientoSemanas({ report, greenhouseId }: { report: HarvestRe
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Legend
           items={[
-            ...(hasReal ? [{ key: "real", label: "Real", swatch: <Marker shape="dash" x={8} y={6} color={SERIES_COLOR.real} size={4} /> }] : []),
+            ...(hasReal ? [{ key: "real", label: "Real", swatch: <Marker shape={SERIES_SHAPE.real} x={8} y={6} color={SERIES_COLOR.real} size={4} /> }] : []),
             {
               key: "atias",
               label: "Previsión de Atias, con su margen",
               swatch: (
                 <>
                   <line x1={8} x2={8} y1={0} y2={12} stroke={SERIES_COLOR.atias} strokeWidth={2} strokeLinecap="round" />
-                  <Marker shape="diamond" x={8} y={6} color={SERIES_COLOR.atias} size={3.5} />
+                  <Marker shape={SERIES_SHAPE.atias} x={8} y={6} color={SERIES_COLOR.atias} size={3.5} />
                 </>
               ),
             },
-            { key: "observed", label: "Observado", swatch: <Marker shape="circle" x={8} y={6} color={SERIES_COLOR.observed} size={4} /> },
+            { key: "observed", label: "Observado", swatch: <Marker shape={SERIES_SHAPE.observed} x={8} y={6} color={SERIES_COLOR.observed} size={4} /> },
           ]}
         />
         <div role="group" aria-label="Cómo comparar las semanas" className="inline-flex rounded-md border border-line-strong p-0.5 text-xs font-medium">
@@ -152,17 +153,9 @@ export function RendimientoSemanas({ report, greenhouseId }: { report: HarvestRe
                 >
                   <rect x={cx - band / 2 + 1} y={m.top} width={band - 2} height={plotH} rx={4} fill="transparent" strokeWidth={2} />
                   <line x1={cx - off} x2={cx - off} y1={y(p.forecast.min)} y2={y(p.forecast.max)} stroke={SERIES_COLOR.atias} strokeWidth={2} strokeLinecap="round" />
-                  <Marker shape="diamond" x={cx - off} y={y(p.forecast.kg)} color={p.w.partial ? "var(--color-surface)" : SERIES_COLOR.atias} />
-                  {p.w.partial && (
-                    <path
-                      d={`M${cx - off} ${y(p.forecast.kg) - 5}L${cx - off + 5} ${y(p.forecast.kg)}L${cx - off} ${y(p.forecast.kg) + 5}L${cx - off - 5} ${y(p.forecast.kg)}Z`}
-                      fill="var(--color-surface)"
-                      stroke={SERIES_COLOR.atias}
-                      strokeWidth={2}
-                    />
-                  )}
-                  <Marker shape="circle" x={cx + off} y={y(p.observed.kg)} color={SERIES_COLOR.observed} size={4.5} />
-                  {p.real !== null && <Marker shape="dash" x={cx} y={y(p.real)} color={SERIES_COLOR.real} size={5} />}
+                  <Marker shape={SERIES_SHAPE.atias} x={cx - off} y={y(p.forecast.kg)} color={SERIES_COLOR.atias} hollow={p.w.partial} />
+                  <Marker shape={SERIES_SHAPE.observed} x={cx + off} y={y(p.observed.kg)} color={SERIES_COLOR.observed} size={4.5} />
+                  {p.real !== null && <Marker shape={SERIES_SHAPE.real} x={cx} y={y(p.real)} color={SERIES_COLOR.real} size={5} />}
                   <text x={cx} y={height - 8} textAnchor="middle" fontSize={11} fill={p.w.current ? "var(--color-ink)" : "var(--color-muted)"} fontWeight={p.w.current ? 600 : 400}>
                     {SHORT(p.w)}
                   </text>

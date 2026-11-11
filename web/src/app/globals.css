@@ -27,6 +27,16 @@
   --color-warn-ink: #77500a;
   --color-bad-soft: #fbe9e6;
   --color-bad-ink: #a42b1a;
+
+  /* Series de los gráficos: lo mismo, el mismo color en toda la app (ver components/charts/series.tsx). */
+  --color-serie-real: #0f2b20;
+  --color-serie-atias: #c98a0c;
+  --color-serie-observado: #17803d;
+  --color-serie-tecnico: #2a78d6;
+  --color-serie-agricultor: #9d3f8f;
+  --color-serie-lado-a: #008a78;
+  --color-serie-lado-b: #6250d6;
+  --color-serie-grados-dia: #d95926;
 }
 
 :root {

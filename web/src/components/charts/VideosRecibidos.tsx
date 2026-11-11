@@ -8,6 +8,7 @@
 import { AlertTriangle, CheckCircle2, Clock, Film, Loader2 } from "lucide-react";
 import { type CSSProperties, useEffect, useId, useRef, useState } from "react";
 import type { ServerVideo, Side } from "@/lib/upload";
+import { Marker, SERIE } from "./series";
 import {
   countNotes,
   defaultHilera,
@@ -27,11 +28,8 @@ import {
   statusGrid,
 } from "./videosRecibidosData";
 
-/**
- * Lado A en el verde de la marca y lado B en azul: comprobados para daltonismo (ΔE 23 deutan,
- * 7,5 tritan, por eso cada lado lleva además su forma: círculo el A, cuadrado el B).
- */
-const SIDE_COLORS: Record<Side, string> = { A: "var(--color-brand)", B: "#2a78d6" };
+/** Cada lado con su color y su forma, los de toda la app (series.tsx): A verde azulado y círculo, B violeta y cuadrado. */
+const SIDE_SERIE: Record<Side, (typeof SERIE)["ladoA"]> = { A: SERIE.ladoA, B: SERIE.ladoB };
 
 const fmtInt = (value: number) => new Intl.NumberFormat("es-ES").format(value);
 const fmtM = (value: number) => new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1 }).format(value);
@@ -135,16 +133,13 @@ const tramoLabel = (point: ProfilePoint) =>
   point.desdeM !== null && point.hastaM !== null ? `Tramo ${point.n} · ${fmtM(point.desdeM)}–${fmtM(point.hastaM)} m` : `Tramo ${point.n}`;
 
 function SideMarker({ lado, x, y, r = 4 }: { lado: Side; x: number; y: number; r?: number }) {
-  const common = { fill: SIDE_COLORS[lado], stroke: "var(--color-surface)", strokeWidth: 2 };
-  return lado === "A"
-    ? <circle cx={x} cy={y} r={r} {...common} />
-    : <rect x={x - r} y={y - r} width={r * 2} height={r * 2} rx={1} {...common} />;
+  return <Marker shape={SIDE_SERIE[lado].shape} x={x} y={y} color={SIDE_SERIE[lado].color} size={r} />;
 }
 
 function LegendKey({ lado }: { lado: Side }) {
   return (
     <svg width="22" height="10" aria-hidden className="shrink-0">
-      <line x1="1" x2="21" y1="5" y2="5" stroke={SIDE_COLORS[lado]} strokeWidth="2" strokeLinecap="round" />
+      <line x1="1" x2="21" y1="5" y2="5" stroke={SIDE_SERIE[lado].color} strokeWidth="2" strokeLinecap="round" />
       <SideMarker lado={lado} x={11} y={5} r={3.5} />
     </svg>
   );
@@ -224,7 +219,7 @@ function ProfileChart({ videos, hilera, longitudM, scaleMax }: { videos: ServerV
               const points = profile.puntos.map((p, i) => `${x(i)},${y(p.valores[lado] ?? 0)}`).join(" ");
               return (
                 <g key={lado}>
-                  {count > 1 && <polyline points={points} fill="none" stroke={SIDE_COLORS[lado]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />}
+                  {count > 1 && <polyline points={points} fill="none" stroke={SIDE_SERIE[lado].color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />}
                   {profile.puntos.map((p, i) => (
                     <SideMarker key={p.n} lado={lado} x={x(i)} y={y(p.valores[lado] ?? 0)} r={active === i ? 5 : 4} />
                   ))}
@@ -256,7 +251,7 @@ function ProfileChart({ videos, hilera, longitudM, scaleMax }: { videos: ServerV
             <p className="mb-0.5 whitespace-nowrap text-muted">{tramoLabel(activePoint)}</p>
             {SIDES.map((lado) => (
               <p key={lado} className="flex items-center gap-1.5 whitespace-nowrap">
-                <span aria-hidden className="h-0.5 w-3 rounded-full" style={{ background: SIDE_COLORS[lado] }} />
+                <span aria-hidden className="h-0.5 w-3 rounded-full" style={{ background: SIDE_SERIE[lado].color }} />
                 <span className="font-semibold tabular-nums text-ink">
                   {activePoint.valores[lado] === null ? "—" : fmtInt(activePoint.valores[lado]!)}
                 </span>

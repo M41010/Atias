@@ -6,20 +6,27 @@
 
 import type { GreenhouseRow, HarvestReport, WeatherSummary } from "../../lib/api";
 import { harvestDayShares, type KgRange, splitByDay } from "../../lib/calc";
+import { SERIE } from "./series";
 
 /**
- * Colores de serie. Los mismos en todos los gráficos de la ficha: Atias en ámbar (lo experimental,
- * como en la banda de la previsión), lo observado en verde (como su banda), lo real en tinta y las
- * previsiones humanas en azul y magenta. Comprobados con el validador de paleta (separación con
- * daltonismo y visión normal); ámbar y magenta quedan por debajo de 3:1 sobre blanco, así que
- * siempre van con leyenda, forma distinta y la tabla de datos debajo.
+ * Colores y formas de serie: los de toda la app (series.tsx), con los nombres que usan estos datos.
+ * Lo real en tinta, Atias en ámbar (lo experimental), lo observado en verde, el técnico en azul y el
+ * agricultor en ciruela.
  */
 export const SERIES_COLOR = {
-  real: "var(--color-ink)",
-  atias: "#c98a0c",
-  technician: "#2a78d6",
-  farmer: "#e87ba4",
-  observed: "#17803d",
+  real: SERIE.real.color,
+  atias: SERIE.atias.color,
+  technician: SERIE.tecnico.color,
+  farmer: SERIE.agricultor.color,
+  observed: SERIE.observado.color,
+} as const;
+
+export const SERIES_SHAPE = {
+  real: SERIE.real.shape,
+  atias: SERIE.atias.shape,
+  technician: SERIE.tecnico.shape,
+  farmer: SERIE.agricultor.shape,
+  observed: SERIE.observado.shape,
 } as const;
 
 /** Escala secuencial de un solo tono (verde), de poco a mucho. Luminosidad monótona comprobada. */

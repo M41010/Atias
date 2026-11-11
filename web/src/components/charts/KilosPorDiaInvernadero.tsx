@@ -2,11 +2,10 @@
 
 import type { GreenhouseRow } from "@/lib/api";
 import { fmtDay, fmtKg } from "@/lib/format";
-import { type DaySeriesKey, kilosPorDia, niceTicks, SERIES_COLOR } from "./invernaderoDatos";
+import { type DaySeriesKey, kilosPorDia, niceTicks, SERIES_COLOR, SERIES_SHAPE } from "./invernaderoDatos";
 import { Legend, Marker, Tip, TipRow, useMeasuredWidth, useTip } from "./InvernaderoMarco";
 
 const LABEL: Record<DaySeriesKey, string> = { real: "Real", technician: "Técnico", farmer: "Agricultor", atias: "Atias" };
-const SHAPE = { real: "dash", technician: "circle", farmer: "square", atias: "diamond" } as const;
 
 /**
  * Kilos por día, de lunes a viernes: lo recogido como raya de referencia y cada previsión como un
@@ -40,10 +39,10 @@ export function KilosPorDiaInvernadero({ g }: { g: GreenhouseRow }) {
             key === "atias" ? (
               <>
                 <line x1={8} x2={8} y1={0} y2={12} stroke={SERIES_COLOR.atias} strokeWidth={2} strokeLinecap="round" />
-                <Marker shape="diamond" x={8} y={6} color={SERIES_COLOR.atias} size={3.5} />
+                <Marker shape={SERIES_SHAPE.atias} x={8} y={6} color={SERIES_COLOR.atias} size={3.5} />
               </>
             ) : (
-              <Marker shape={SHAPE[key]} x={8} y={6} color={SERIES_COLOR[key]} size={key === "real" ? 4 : 4.5} />
+              <Marker shape={SERIES_SHAPE[key]} x={8} y={6} color={SERIES_COLOR[key]} size={key === "real" ? 4 : 4.5} />
             ),
         }))}
       />
@@ -88,7 +87,7 @@ export function KilosPorDiaInvernadero({ g }: { g: GreenhouseRow }) {
                 )}
                 <line x1={cx + offset("atias")} x2={cx + offset("atias")} y1={y(r.min)} y2={y(r.max)} stroke={SERIES_COLOR.atias} strokeWidth={2} strokeLinecap="round" />
                 {points.map((s) =>
-                  d[s] === null ? null : <Marker key={s} shape={SHAPE[s]} x={cx + offset(s)} y={y(d[s] as number)} color={SERIES_COLOR[s]} />,
+                  d[s] === null ? null : <Marker key={s} shape={SERIES_SHAPE[s]} x={cx + offset(s)} y={y(d[s] as number)} color={SERIES_COLOR[s]} />,
                 )}
                 <text x={cx} y={height - 8} textAnchor="middle" fontSize={11} fill="var(--color-muted)">
                   {shortDays ? fmtDay(d.date).split(",")[0] : fmtDay(d.date)}

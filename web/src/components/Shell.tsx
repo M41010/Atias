@@ -4,7 +4,7 @@ import { CalendarDays, ChartColumn, ClipboardList, Crosshair, Home, Link2, LogOu
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { notifyManager, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthGate } from "@/components/AuthGate";
 import { Wordmark } from "@/components/Wordmark";
 import { fmtDate } from "@/lib/format";
@@ -139,7 +139,15 @@ function useShownCopy(): CopyStatus {
       setStatus((value) => (value.savedAt === next.savedAt && value.failing === next.failing ? value : next));
     };
     update();
-    return cache.subscribe(update);
+    // La caché avisa en el mismo instante en que otro componente crea su consulta, a mitad de su
+    // render: actualizar el estado ahí da «Cannot update a component (Notices) while rendering a
+    // different component». batchCalls aplaza el aviso a después del render.
+    let active = true;
+    const unsubscribe = cache.subscribe(notifyManager.batchCalls(() => active && update()));
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, [client]);
   return status;
 }

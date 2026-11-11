@@ -54,7 +54,7 @@ function SeasonTrend() {
           </p>
         ) : (
           <>
-            <Legend ids={["real", "atias"]} after={{ atias: <Pill tone="warn">Experimental</Pill> }} />
+            <Legend lines ids={["real", "atias"]} after={{ atias: <Pill tone="warn">Experimental</Pill> }} />
             <TendenciaTemporada weeks={weeks} />
           </>
         )}
