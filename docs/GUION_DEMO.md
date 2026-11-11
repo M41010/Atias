@@ -10,11 +10,13 @@ haría falta para avalar el piloto.
 - [ ] Sesión iniciada en **Acceso de la cooperativa**.
 - [ ] Interruptor **Demostración** en **Sí** (menú lateral). Se ven datos simulados con la franja amarilla
   «Modo demostración: datos simulados»: así nadie confunde la demo con resultados reales.
-- [ ] Pestañas abiertas en este orden: Resumen, Previsión diaria, Invernaderos, Temporeros, Datos de campo,
-  Precisión.
-- [ ] Para la pantalla del agricultor: un enlace creado en **Enlaces** (**Crear enlace**) y abierto en una
-  pestaña con la vista de móvil del navegador (F12 → icono de móvil). Hoy la app solo se abre desde este
-  ordenador, no desde el móvil.
+- [ ] Pestañas abiertas **unos minutos antes**, en este orden: Resumen, Previsión diaria, Invernaderos,
+  Temporeros, Datos de campo, Precisión. La primera vez se pide el tiempo a Open-Meteo; si la conexión
+  falla, Precisión puede tardar unos 10 segundos. Abiertas antes, luego van al momento.
+- [ ] Para la pantalla del agricultor: un enlace creado en **Enlaces** (**Crear enlace**). Enlaces es
+  siempre real: crea el del invernadero que grabará el 14-11, así sirve también para el piloto. Ábrelo en
+  una pestaña con la vista de móvil del navegador (F12 → icono de móvil). Hoy la app solo se abre desde
+  este ordenador, no desde el móvil.
 - [ ] Este guion impreso y algo para apuntar sus respuestas.
 
 ## Recorrido (unos 10 minutos)
@@ -22,10 +24,10 @@ haría falta para avalar el piloto.
 | # | Pantalla y clic | Qué enseñar | Qué decir |
 |---|---|---|---|
 | 1 | **Resumen** | Previsión para la venta, temporeros necesarios y fruta madura observada, cada una con su margen. Advertencias. | «Cada lunes tendrías esto: cuánto vender y a cuántos llamar, con el margen al lado. Y te avisa si un vídeo salió mal.» |
-| 2 | **Previsión diaria** | Tabla de lunes a viernes por familia: R (real), Téc. (técnico) y Atias. Abrir una familia con la flecha. | «Es la misma vista que ya usáis: real y previsión por día. Atias va al lado del técnico para comparar, no lo sustituye.» |
+| 2 | **Previsión diaria** → **Recolección 26–30 oct** | Tabla de lunes a viernes por familia: R (real), Téc. (técnico) y Atias. Abrir una familia con la flecha. En la de 2–6 nov la columna R aún está vacía: los datos simulados se quedan en el viernes 6. | «Es la misma vista que ya usáis: real y previsión por día. Atias va al lado del técnico para comparar, no lo sustituye.» |
 | 3 | **Invernaderos** → clic en un invernadero → botón **Hilera 1** | Kilos por día de ese invernadero y el detalle por hilera y tramo. | «De dónde sale cada kilo: hilera a hilera, tramo a tramo. Se puede comprobar.» |
 | 4 | **Temporeros** | Personas por día y por familia. Cambiar **Kg por jornal** o los **Días de recolección** y ver cómo cambia. | «Pones cuántos kilos recoge una persona en cada cultivo y te dice a cuántos llamar cada día.» |
-| 5 | **Datos de campo** | Ficha del invernadero, **Previsiones y cosecha por día** y **Tramos de control**. | «Aquí se apuntan la previsión del agricultor y del técnico y los kilos de la báscula. Con esto medimos el error de verdad.» |
+| 5 | **Datos de campo** | Ficha del invernadero, **Previsiones y cosecha por día** y **Tramos de control**. **Ojo:** esta pantalla es siempre real (la franja cambia a «Datos reales del piloto»). Solo enseñar: no escribir ni pulsar **Guardar**. | «Aquí se apuntan la previsión del agricultor y del técnico y los kilos de la báscula. Con esto medimos el error de verdad.» |
 | 6 | **Precisión** | Atias, agricultor y técnico frente a lo recogido. Señalar la franja de datos simulados. | «Esto es lo más importante: cuánto se equivoca cada uno frente a la báscula. Ahora son datos simulados; los reales llegan con el piloto.» |
 | 7 | **Precisión** → botón **Presentar** | Pantalla completa, se pasa con las flechas. | «Así lo enseñaremos a los dueños el 23, con los datos reales del piloto.» |
 | 8 | **Resumen** → botón **Informe PDF** → **Imprimir o guardar en PDF** | La hoja semanal para quien no entra en la app. | «Cada semana, una hoja para quien prefiera el papel o el correo.» |
