@@ -85,9 +85,16 @@ Si no se puede recoger tanto, basta con **pesar 50 frutos maduros** de plantas d
 
 Todo esto, y lo de la hoja de campo, se apunta en la app de la cooperativa, en **Datos de campo**. El resultado se ve en **Precisión**.
 
-## 8. Subir los vídeos
+## 8. Enviar los vídeos
 
-Con el enlace que dará la cooperativa (lo creamos el miércoles 11, cuando conozcamos el invernadero). Mejor con wifi: si se corta, la subida sigue donde se quedó.
+En esta primera prueba el agricultor no sube los vídeos: los envía y se suben a Atias desde el ordenador
+con el enlace de su invernadero. Cómo enviarlos sin que pierdan calidad, y antes de cuándo, está en la
+hoja **Cómo enviar los vídeos** (`docs/ENVIO_VIDEOS.pdf`). Lo más importante:
+
+- **No mandarlos como vídeo normal por WhatsApp**, porque los comprime. Mejor en mano, por Google Drive o
+  por WhatsApp como documento.
+- **Como muy tarde el domingo a las 20:00:** el enlace caduca el lunes a las 00:00.
+- No borrarlos del móvil hasta confirmar que han llegado.
 
 ---
 
