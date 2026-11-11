@@ -16,6 +16,7 @@ import {
   listReports,
 } from "@/lib/api";
 import { ExcelButton } from "@/components/ExcelButton";
+import { KilosPorDia } from "@/components/charts/KilosPorDia";
 import { errorPct } from "@/lib/calc";
 import { dailySheets, excelFileName } from "@/lib/excelExport";
 import { fmtDate, fmtDay, fmtKg, fmtPct } from "@/lib/format";
@@ -345,6 +346,7 @@ export default function PrevisionPage() {
               </span>
             }
           >
+            <KilosPorDia dates={data.dates} totals={totals(rows)} />
             <DailyTable report={data} rows={rows} />
           </Panel>
         )}

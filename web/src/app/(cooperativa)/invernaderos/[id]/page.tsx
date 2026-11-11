@@ -6,7 +6,7 @@ import { AlertTriangle, ArrowLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { KilosPorDia } from "@/components/charts/KilosPorDia";
+import { KilosPorDiaInvernadero } from "@/components/charts/KilosPorDiaInvernadero";
 import { MapaInvernadero } from "@/components/charts/MapaInvernadero";
 import { RendimientoSemanas } from "@/components/charts/RendimientoSemanas";
 import { TiempoMaduracion } from "@/components/charts/TiempoMaduracion";
@@ -119,7 +119,7 @@ function DailyPanel({ g }: { g: GreenhouseRow }) {
   const showFarmer = g.daily.some((d) => d.farmer !== null);
   return (
     <Panel title="Kilos por día" description="Cada día se recoge una zona del invernadero. Lo que madura después de grabar se reparte según el calor de cada día; el del fin de semana, el lunes.">
-      <KilosPorDia g={g} />
+      <KilosPorDiaInvernadero g={g} />
       <div className="overflow-x-auto border-t border-line">
         <table className="data-table">
           <thead>

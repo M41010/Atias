@@ -5,8 +5,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Maximize, X } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { ErrorSemanalChart, ErrorSemanalLegend } from "@/components/charts/ErrorSemanal";
 import { Wordmark } from "@/components/Wordmark";
-import { listReports } from "@/lib/api";
+import { type HarvestReport, listReports } from "@/lib/api";
+import { weeklyError } from "@/lib/errorSemanal";
 import { fmtDay, fmtInt, fmtKg, fmtPct } from "@/lib/format";
 import { queryKeys, useDocumentTitle } from "@/lib/hooks";
 import { useDataMode } from "@/lib/mode";
@@ -110,9 +112,10 @@ function DaysChart({ summary }: { summary: PilotSummary }) {
   );
 }
 
-function slides(s: PilotSummary): ReactNode[] {
+function slides(s: PilotSummary, reports: HarvestReport[]): ReactNode[] {
   const weeks = s.weeksMeasured;
   const atias = s.results.atias;
+  const weekly = weeklyError(reports);
   return [
     <Slide key="portada" dark eyebrow={`Piloto · Semana ${s.report.isoWeek}`} title={<>Contar la cosecha antes de recogerla</>}>
       <p className="max-w-[48ch] text-xl text-canvas/80">
@@ -150,6 +153,18 @@ function slides(s: PilotSummary): ReactNode[] {
       </div>
       <p className="max-w-[60ch] text-lg text-muted">Error en kilos de la semana frente a lo recogido. Signo positivo: estimó de más.</p>
     </Slide>,
+    // Solo con dos semanas o más: con una, no hay evolución que enseñar.
+    ...(weekly.enough
+      ? [
+        <Slide key="evolucion" eyebrow="Semana a semana" title="Cómo evoluciona el error">
+          <div className="grid w-full max-w-5xl gap-4">
+            <ErrorSemanalLegend data={weekly} large />
+            <ErrorSemanalChart data={weekly} large />
+          </div>
+          <p className="max-w-[60ch] text-lg text-muted">La franja verde es el objetivo: hasta el {TARGET_PCT} % de error en kilos de la semana.</p>
+        </Slide>,
+      ]
+      : []),
     <Slide key="lectura" dark eyebrow="Qué significa" title={weeks < MIN_PAIRS ? "Una primera medida, no una conclusión" : "La precisión, medida"}>
       <div className="grid max-w-[60ch] gap-4 text-xl text-canvas/85">
         {atias.errorPct !== null && <p>Esta semana Atias se desvió un {fmtPct(atias.errorPct)} de lo recogido. El objetivo es no pasar del {TARGET_PCT} %.</p>}
@@ -169,7 +184,7 @@ export default function PresentacionPage() {
   const mode = useDataMode();
   const reports = useQuery({ queryKey: queryKeys.reports(mode), queryFn: listReports });
   const summary = reports.data ? pilotSummary(reports.data) : null;
-  const pages = summary ? slides(summary) : [];
+  const pages = summary && reports.data ? slides(summary, reports.data) : [];
   const [index, setIndex] = useState(0);
   const go = useCallback((step: number) => setIndex((i) => Math.min(Math.max(i + step, 0), Math.max(pages.length - 1, 0))), [pages.length]);
 
