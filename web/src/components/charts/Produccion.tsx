@@ -4,23 +4,21 @@
  * Gráficos de producción hechos a mano en SVG: columnas agrupadas (por periodo o por día) y barras
  * por familia. Lo usan Producción, la tendencia de Resumen y los kilos por día de Previsión diaria.
  *
- * Colores por serie, siempre los mismos: lo recogido en Verde Hoja (lo observado), la previsión de
- * Atias en Ámbar Señal (lo experimental) y la del técnico en azul, el único color que no es un token
- * de la app: hacía falta un tercer tono que se distinga de los otros dos también con daltonismo
- * (comprobado con el validador de paleta). El ámbar tiene 2,95:1 sobre blanco, por eso cada gráfico
- * lleva leyenda y su tabla con las mismas cifras.
+ * Colores y formas por serie: los de toda la app (series.tsx). Lo recogido en tinta, la previsión de
+ * Atias en ámbar (lo experimental) y la del técnico en azul. El ámbar tiene 2,95:1 sobre blanco, por
+ * eso cada gráfico lleva leyenda y su tabla con las mismas cifras.
  */
 
 import { type KeyboardEvent, type ReactNode, type RefObject, useLayoutEffect, useRef, useState } from "react";
 import { fmtKg } from "@/lib/format";
-
-export const TECHNICIAN_BLUE = "#2a78d6";
+import { type MarkShape, SERIE, type SeriesKey, SeriesSwatch } from "./series";
 
 export type SeriesId = "real" | "technician" | "atias";
-export const SERIES: Record<SeriesId, { name: string; short: string; color: string }> = {
-  real: { name: "Recogido", short: "R", color: "var(--color-brand)" },
-  technician: { name: "Previsión del técnico", short: "Téc.", color: TECHNICIAN_BLUE },
-  atias: { name: "Previsto por Atias", short: "Atias", color: "var(--color-warn)" },
+const SERIES_KEY: Record<SeriesId, SeriesKey> = { real: "real", technician: "tecnico", atias: "atias" };
+export const SERIES: Record<SeriesId, { name: string; short: string; color: string; shape: MarkShape }> = {
+  real: { name: "Recogido", short: "R", ...SERIE.real },
+  technician: { name: "Previsión del técnico", short: "Téc.", ...SERIE.tecnico },
+  atias: { name: "Previsto por Atias", short: "Atias", ...SERIE.atias },
 };
 
 export type ChartSeries = { id: SeriesId; values: (number | null)[] };
@@ -66,14 +64,19 @@ function columnPath(x: number, y: number, w: number, h: number): string {
   return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
 }
 
-export function Legend({ ids, after }: { ids: SeriesId[]; after?: Partial<Record<SeriesId, ReactNode>> }) {
+/** Leyenda: cuadrado de color para columnas; trazo y forma de punto para líneas (`lines`). */
+export function Legend({ ids, after, lines = false }: { ids: SeriesId[]; after?: Partial<Record<SeriesId, ReactNode>>; lines?: boolean }) {
   return (
     <ul className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted">
       {ids.map((id) => (
         <li key={id} className="flex items-center gap-1.5">
-          <svg width="10" height="10" aria-hidden className="shrink-0">
-            <rect width="10" height="10" rx="2" fill={SERIES[id].color} />
-          </svg>
+          {lines ? (
+            <SeriesSwatch serie={SERIES_KEY[id]} />
+          ) : (
+            <svg width="10" height="10" aria-hidden className="shrink-0">
+              <rect width="10" height="10" rx="2" fill={SERIES[id].color} />
+            </svg>
+          )}
           {SERIES[id].name}
           {after?.[id]}
         </li>

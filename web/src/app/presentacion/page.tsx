@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Maximize, X } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { ErrorSemanalChart, ErrorSemanalLegend } from "@/components/charts/ErrorSemanal";
+import { SERIE } from "@/components/charts/series";
 import { Wordmark } from "@/components/Wordmark";
 import { type HarvestReport, listReports } from "@/lib/api";
 import { weeklyError } from "@/lib/errorSemanal";
@@ -18,10 +19,10 @@ import { MIN_PAIRS, TARGET_PCT, VERDICT_TEXT } from "@/lib/validation";
 
 const WHO: Record<Forecaster, string> = { atias: "Atias", agricultor: "Agricultor", tecnico: "Técnico" };
 const SERIES = [
-  { key: "real", label: "Recogido", color: "var(--color-ink)" },
-  { key: "atias", label: "Atias", color: "var(--color-sprout)" },
-  { key: "agricultor", label: "Agricultor", color: "var(--color-warn)" },
-  { key: "tecnico", label: "Técnico", color: "var(--color-control)" },
+  { key: "real", label: "Recogido", color: SERIE.real.color },
+  { key: "atias", label: "Atias", color: SERIE.atias.color },
+  { key: "agricultor", label: "Agricultor", color: SERIE.agricultor.color },
+  { key: "tecnico", label: "Técnico", color: SERIE.tecnico.color },
 ] as const;
 
 const signed = (value: number) => `${value > 0 ? "+" : value < 0 ? "−" : ""}${fmtPct(Math.abs(value))}`;

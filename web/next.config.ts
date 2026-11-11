@@ -64,6 +64,14 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    // Next comprueba en desarrollo que cada página navegue al instante, pero nuestras páginas no se
+    // dibujan en el servidor: AuthGate espera a la sesión, en el navegador, antes de enseñarlas. Next
+    // las da por «descartadas» y avisaba en cada pantalla («Could not validate that a segment in
+    // your UI has instant navigation»). Las páginas son componentes de cliente y no pueden exportar
+    // `instant = false`; así solo se comprueba la página que lo pida con `export const instant`.
+    instantInsights: { validationLevel: "manual-warning" },
+  },
   turbopack: {
     rules: {
       "*.css": {

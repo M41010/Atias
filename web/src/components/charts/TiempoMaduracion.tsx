@@ -3,10 +3,8 @@
 import type { WeatherSummary } from "@/lib/api";
 import { fmtDay, fmtDecimal } from "@/lib/format";
 import { niceTicks, tiempoMaduracion } from "./invernaderoDatos";
+import { GRADOS_DIA } from "./series";
 import { Legend, Tip, TipRow, useMeasuredWidth, useTip } from "./InvernaderoMarco";
-
-/** Naranja de calor: un solo tono para una sola serie. Más de 3:1 sobre blanco. */
-const HEAT = "#d95926";
 
 const KIND_WORD = { observado: "medido", prevision: "previsto", normal: "sin previsión: lo normal" } as const;
 
@@ -44,9 +42,9 @@ export function TiempoMaduracion({ weather }: { weather: WeatherSummary }) {
       <figure className="grid grid-cols-1 gap-3">
         <Legend
           items={[
-            { key: "medido", label: "Grados-día medidos", swatch: <rect x={3} y={0} width={10} height={12} rx={2} fill={HEAT} /> },
+            { key: "medido", label: "Grados-día medidos", swatch: <rect x={3} y={0} width={10} height={12} rx={2} fill={GRADOS_DIA} /> },
             ...(data.days.some((d) => d.kind === "prevision")
-              ? [{ key: "previsto", label: "Previstos", swatch: <rect x={3} y={0} width={10} height={12} rx={2} fill={HEAT} fillOpacity={0.4} /> }]
+              ? [{ key: "previsto", label: "Previstos", swatch: <rect x={3} y={0} width={10} height={12} rx={2} fill={GRADOS_DIA} fillOpacity={0.4} /> }]
               : []),
             { key: "normal", label: "Lo normal", swatch: <line x1={1} x2={15} y1={6} y2={6} stroke="var(--color-ink)" strokeWidth={2.5} strokeLinecap="round" /> },
           ]}
@@ -79,7 +77,7 @@ export function TiempoMaduracion({ weather }: { weather: WeatherSummary }) {
                   {...bind(
                     <>
                       <p className="mb-1 font-medium text-ink">{fmtDay(d.date)} <span className="font-normal text-muted">· {KIND_WORD[d.kind]}</span></p>
-                      {d.kind !== "normal" && <TipRow color={HEAT} label="Grados-día" value={fmtDecimal(d.degreeDays)} />}
+                      {d.kind !== "normal" && <TipRow color={GRADOS_DIA} label="Grados-día" value={fmtDecimal(d.degreeDays)} />}
                       <TipRow color="var(--color-ink)" label="Lo normal" value={fmtDecimal(d.normal)} />
                     </>,
                   )}
@@ -88,7 +86,7 @@ export function TiempoMaduracion({ weather }: { weather: WeatherSummary }) {
                   {d.kind !== "normal" && h > 0 && (
                     <path
                       d={roundedTop(cx - bar / 2, y(d.degreeDays), bar, h, Math.min(4, h))}
-                      fill={HEAT}
+                      fill={GRADOS_DIA}
                       fillOpacity={d.kind === "prevision" ? 0.4 : 1}
                     />
                   )}

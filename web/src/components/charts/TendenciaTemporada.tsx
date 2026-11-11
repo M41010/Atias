@@ -9,6 +9,7 @@ import { type KeyboardEvent, type PointerEvent, useState } from "react";
 import type { Period } from "@/lib/produccion";
 import { realIncomplete } from "@/lib/produccion";
 import { axisTicks, type SeriesId, SERIES, tickFormat, Tooltip, useWidth } from "./Produccion";
+import { Marker } from "./series";
 
 const LEFT = 52;
 const RIGHT = 16;
@@ -95,7 +96,7 @@ export function TendenciaTemporada({ weeks, height = 168 }: { weeks: Period[]; h
                   <path key={d} d={d} fill="none" stroke={SERIES[id].color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
                 ))}
                 {points.map((p, i) => p && (weeks.length <= 12 || i === last || i === active || (points[i - 1] == null && points[i + 1] == null)) && (
-                  <circle key={i} cx={p.x} cy={p.y} r={4} fill={SERIES[id].color} stroke="var(--color-surface)" strokeWidth={2} />
+                  <Marker key={i} shape={SERIES[id].shape} x={p.x} y={p.y} size={4} color={SERIES[id].color} />
                 ))}
               </g>
             );

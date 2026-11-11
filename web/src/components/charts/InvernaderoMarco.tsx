@@ -78,20 +78,8 @@ export function TipRow({ color, label, value, shape = "line" }: { color?: string
   );
 }
 
-/**
- * Marcas de serie con forma propia, para que no dependan solo del color: círculo (técnico), cuadrado
- * (agricultor), rombo (Atias y previsión) y raya (real). Con anillo del color de la superficie.
- */
-export function Marker({ shape, x, y, color, size = 5 }: { shape: "circle" | "square" | "diamond" | "dash"; x: number; y: number; color: string; size?: number }) {
-  const ring = { stroke: "var(--color-surface)", strokeWidth: 2, paintOrder: "stroke" as const };
-  if (shape === "circle") return <circle cx={x} cy={y} r={size} fill={color} {...ring} />;
-  if (shape === "square") return <rect x={x - size + 0.5} y={y - size + 0.5} width={size * 2 - 1} height={size * 2 - 1} rx={1.5} fill={color} {...ring} />;
-  if (shape === "diamond") {
-    const d = size + 1;
-    return <path d={`M${x} ${y - d}L${x + d} ${y}L${x} ${y + d}L${x - d} ${y}Z`} fill={color} {...ring} />;
-  }
-  return <line x1={x - size * 1.6} x2={x + size * 1.6} y1={y} y2={y} stroke={color} strokeWidth={2.5} strokeLinecap="round" />;
-}
+/** Las marcas de serie son las de toda la app (series.tsx). */
+export { Marker } from "./series";
 
 export type LegendItem ={ key: string; label: string; swatch: ReactNode };
 

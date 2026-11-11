@@ -8,17 +8,17 @@ import { type ErrorPoint, errorAxis, FORECASTERS, type WeeklyError, weeklyError 
 import { fmtInt, fmtPct } from "@/lib/format";
 import type { Forecaster } from "@/lib/precision";
 import { TARGET_PCT } from "@/lib/validation";
+import { Marker, type MarkShape, OBJETIVO, SERIE, SeriesSwatch } from "./series";
 
 /*
- * Tres previsiones, tres tonos fijos (validados con el comprobador de paletas: separación con
- * daltonismo ΔE ≥ 11,7 en todos los pares y contraste ≥ 3:1 sobre blanco). Atias lleva el verde de la
- * marca; el ámbar queda para lo experimental y el rojo para los fallos, así que ninguno se usa aquí.
- * Cada previsión lleva además su forma de punto: la identidad nunca depende solo del color.
+ * Tres previsiones con el color y la forma de toda la app (series.tsx): Atias en ámbar y rombo, el
+ * técnico en azul y círculo, el agricultor en ciruela y cuadrado. El ámbar no llega a 3:1 sobre
+ * blanco, así que cada línea lleva su forma, su rótulo al final y la tabla con las mismas cifras.
  */
-const SERIES: Record<Forecaster, { name: string; color: string; shape: "circle" | "square" | "diamond" }> = {
-  atias: { name: "Atias", color: "#17803d", shape: "circle" },
-  agricultor: { name: "Agricultor", color: "#2a78d6", shape: "square" },
-  tecnico: { name: "Técnico", color: "#9d3f8f", shape: "diamond" },
+const SERIES: Record<Forecaster, { name: string; color: string; shape: MarkShape }> = {
+  atias: { name: "Atias", ...SERIE.atias },
+  agricultor: { name: "Agricultor", ...SERIE.agricultor },
+  tecnico: { name: "Técnico", ...SERIE.tecnico },
 };
 
 const pctAxis = (v: number) => `${fmtInt(v)} %`;
@@ -29,25 +29,8 @@ function whyNot(p: ErrorPoint): string | null {
   return null;
 }
 
-function Marker({ shape, x, y, r, color, hollow }: { shape: "circle" | "square" | "diamond"; x: number; y: number; r: number; color: string; hollow: boolean }) {
-  // Relleno: anillo del color de la superficie para que se lea al cruzar otra línea. Hueco: borde del color de la serie.
-  const paint = hollow
-    ? { fill: "var(--color-surface)", stroke: color, strokeWidth: 2 }
-    : { fill: color, stroke: "var(--color-surface)", strokeWidth: 2 };
-  if (shape === "circle") return <circle cx={x} cy={y} r={r} {...paint} />;
-  if (shape === "square") return <rect x={x - r * 0.9} y={y - r * 0.9} width={r * 1.8} height={r * 1.8} rx={1} {...paint} />;
-  const d = r * 1.25;
-  return <path d={`M${x} ${y - d}L${x + d} ${y}L${x} ${y + d}L${x - d} ${y}Z`} strokeLinejoin="round" {...paint} />;
-}
-
 function KeyMark({ who, hollow = false }: { who: Forecaster; hollow?: boolean }) {
-  const s = SERIES[who];
-  return (
-    <svg width="26" height="12" viewBox="0 0 26 12" aria-hidden className="shrink-0">
-      {!hollow && <line x1="1" x2="25" y1="6" y2="6" stroke={s.color} strokeWidth="2" strokeLinecap="round" />}
-      <Marker shape={s.shape} x={13} y={6} r={4} color={s.color} hollow={hollow} />
-    </svg>
-  );
+  return <SeriesSwatch serie={who} hollow={hollow} />;
 }
 
 /** Frase para lectores de pantalla: de dónde a dónde va cada previsión. */
@@ -145,14 +128,14 @@ export function ErrorSemanalChart({ data, large = false }: { data: WeeklyError; 
           <desc id={descId}>{describe(data, shown)} Usa las flechas para recorrer las semanas.</desc>
 
           {/* Banda del objetivo: por debajo de la línea, dentro del objetivo. */}
-          <rect x={m.left} width={plotW} y={y(TARGET_PCT)} height={y(0) - y(TARGET_PCT)} fill="var(--color-brand-soft)" />
+          <rect x={m.left} width={plotW} y={y(TARGET_PCT)} height={y(0) - y(TARGET_PCT)} fill={OBJETIVO.zone} />
           {axis.ticks.map((t) => (
             <g key={t}>
               <line x1={m.left} x2={m.left + plotW} y1={y(t)} y2={y(t)} stroke="var(--color-line)" strokeWidth={1} shapeRendering="crispEdges" />
               <text x={m.left - 8} y={y(t)} dy="0.32em" textAnchor="end" fill="var(--color-muted)" className="tabular-nums">{pctAxis(t)}</text>
             </g>
           ))}
-          <line x1={m.left} x2={m.left + plotW} y1={y(TARGET_PCT)} y2={y(TARGET_PCT)} stroke="var(--color-brand-ink)" strokeWidth={1} shapeRendering="crispEdges" />
+          <line x1={m.left} x2={m.left + plotW} y1={y(TARGET_PCT)} y2={y(TARGET_PCT)} stroke={OBJETIVO.line} strokeWidth={1} shapeRendering="crispEdges" />
           <text x={m.left + 6} y={y(TARGET_PCT) - 6} fill="var(--color-brand-ink)" fontWeight={500}>Objetivo: hasta {TARGET_PCT} %</text>
 
           {data.weeks.map((w, i) => (i % labelEvery === 0 || i === n - 1) && (n - 1 - i >= labelEvery || i === n - 1) ? (
@@ -172,7 +155,7 @@ export function ErrorSemanalChart({ data, large = false }: { data: WeeklyError; 
               <g key={who}>
                 <path d={d} fill="none" stroke={SERIES[who].color} strokeWidth={large ? 3 : 2} strokeLinejoin="round" strokeLinecap="round" />
                 {points.map((p, i) => p && (
-                  <Marker key={i} shape={SERIES[who].shape} x={x(i)} y={y(p.errorPct)} r={active === i ? r + 1.5 : r} color={SERIES[who].color} hollow={!p.counts} />
+                  <Marker key={i} shape={SERIES[who].shape} x={x(i)} y={y(p.errorPct)} size={active === i ? r + 1.5 : r} color={SERIES[who].color} hollow={!p.counts} />
                 ))}
               </g>
             );

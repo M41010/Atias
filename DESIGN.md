@@ -229,6 +229,9 @@ Neutros de matiz verdoso muy leve, con tres familias semánticas que nunca se us
 - **Línea Fuerte** (#c9cec7): borde de botón secundario, borde discontinuo de estado vacío y barra de desplazamiento.
 - **Borde de Control** (#89938b): borde de campos y selector (3,18:1 sobre blanco, para que el control se identifique como tal).
 
+### Series de los gráficos
+Lo mismo lleva el mismo color y la misma forma en todos los gráficos (tokens `--color-serie-*`, nombrados en `web/src/components/charts/series.tsx`): Real o recogido en tinta (#0f2b20, raya); Atias en Ámbar Señal (#c98a0c, rombo); observado en Verde Hoja (#17803d, triángulo); técnico en azul (#2a78d6, círculo); agricultor en ciruela (#9d3f8f, cuadrado); lado A en verde azulado (#008a78, círculo) y lado B en violeta (#6250d6, cuadrado); grados-día en naranja (#d95926). El objetivo es una línea Verde Hoja Tinta sobre zona Verde Hoja Suave. El ámbar no llega a 3:1 sobre blanco: todo gráfico con Atias lleva leyenda, forma propia y tabla con las cifras.
+
 ### Named Rules
 **La Regla del Ámbar Honesto.** El ámbar significa «todavía no probado»: experimental, simulado, parcial o provisional. Si un dato está validado, no lleva ámbar; si no lo está, no se le quita.
 

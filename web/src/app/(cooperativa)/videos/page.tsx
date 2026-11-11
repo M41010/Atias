@@ -268,7 +268,7 @@ export default function VideosPage() {
   const header = (
     <PageHeader
       title="Vídeos recibidos"
-      description="Lo que ha enviado cada agricultor. Se actualiza solo. Aún no se cuentan frutos: los kilos del resto de la app siguen simulados."
+      description="Lo que ha enviado cada agricultor y los frutos maduros que Atias ha contado en cada lado. Se actualiza solo."
       actions={harvests.data && harvests.data.length > 0 ? (
         <label className="flex items-center gap-2 text-sm text-muted">
           <span className="sr-only md:not-sr-only">Recolección</span>
