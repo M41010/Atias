@@ -142,13 +142,15 @@ async function getHourly(url: URL): Promise<Hourly> {
   return body.hourly;
 }
 
-function openMeteoUrl(base: string, lat: number, lon: number, start: string, end: string, precipitation: boolean): URL {
+function openMeteoUrl(
+  base: string, lat: number, lon: number, start: string, end: string, precipitation: boolean, timezone = TIME_ZONE,
+): URL {
   const url = new URL(base);
   url.search = new URLSearchParams({
     latitude: String(lat),
     longitude: String(lon),
     hourly: precipitation ? "temperature_2m,precipitation" : "temperature_2m",
-    timezone: TIME_ZONE,
+    timezone,
     timeformat: "unixtime",
     start_date: start,
     end_date: end,
@@ -168,6 +170,14 @@ export function createWeatherService(pool: Pool, config: WeatherConfig = {}) {
   // antes de servir lo guardado. Se recuerda el fallo y, durante un rato, se sirve lo guardado al
   // momento sin volver a intentarlo.
   const failedAt = new Map<string, number>();
+  // Si Open-Meteo respondió bien pero aún faltan horas (porque no tiene dato de alguna), la semana
+  // seguiría pareciendo incompleta y se pediría en cada carga. Tras una respuesta buena se espera
+  // lo mismo que dura una previsión antes de volver a pedirla.
+  const fetchedAt = new Map<string, number>();
+  const fetchedRecently = (key: string) => {
+    const at = fetchedAt.get(key);
+    return at !== undefined && now() - at >= 0 && now() - at < FORECAST_MAX_AGE_MS;
+  };
 
   const once = (key: string, task: () => Promise<void>) => {
     const failed = failedAt.get(key);
@@ -180,6 +190,7 @@ export function createWeatherService(pool: Pool, config: WeatherConfig = {}) {
     const promise = task()
       .then(() => {
         failedAt.delete(key);
+        fetchedAt.set(key, now());
       })
       .catch((error: unknown) => {
         failedAt.set(key, now());
@@ -239,11 +250,20 @@ export function createWeatherService(pool: Pool, config: WeatherConfig = {}) {
       [point.id, start, end, current, FORECAST_MAX_AGE_MS],
     );
     if (rows[0].hours >= expected && rows[0].outdated === 0) return;
+    const key = `semana:${point.id}:${saturday}`;
+    // Solo si ya hay algo guardado: sin datos siempre se pide.
+    if (rows[0].hours > 0 && fetchedRecently(key)) return;
 
-    await once(`semana:${point.id}:${saturday}`, async () => {
+    await once(key, async () => {
       // Lo muy antiguo solo está en el histórico, que va unos días por detrás.
       const base = saturday < addDays(today, -FORECAST_PAST_DAYS) ? archiveUrl : forecastUrl;
-      const hourly = await getHourly(openMeteoUrl(base, point.lat, point.lon, saturday, lastDay, true));
+      // Se pide en UTC y desde el viernes: con la zona de Madrid, Open-Meteo aplica a las fechas de
+      // verano el desfase de hoy y la semana llegaba sin la hora de las 00:00 del sábado. Como nunca
+      // parecía completa, se volvía a pedir en cada carga. Las horas son absolutas (unixtime), así que
+      // pedir en UTC no cambia nada más.
+      const hourly = await getHourly(
+        openMeteoUrl(base, point.lat, point.lon, addDays(saturday, -1), lastDay, true, "GMT"),
+      );
       const times: number[] = [];
       const temps: number[] = [];
       const rain: (number | null)[] = [];

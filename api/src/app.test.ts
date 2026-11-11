@@ -64,9 +64,16 @@ describe("API", () => {
       return;
     }
     const archive = url.pathname === "/v1/archive";
-    const endMs = localMidnight(new Date(Date.parse(`${end}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10));
+    const nextDay = new Date(Date.parse(`${end}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+    // Como el Open-Meteo real: en UTC da días UTC exactos; con la zona de Madrid, la previsión aplica a
+    // fechas de verano el desfase de hoy (invierno, +1 h), así que el día empieza una hora tarde.
+    const dayStart = (date: string) =>
+      url.searchParams.get("timezone") === "GMT"
+        ? Date.parse(`${date}T00:00:00Z`)
+        : archive ? localMidnight(date) : Date.parse(`${date}T00:00:00Z`) - 3_600_000;
+    const endMs = dayStart(nextDay);
     const time: number[] = [];
-    for (let t = localMidnight(start); t < endMs; t += 3_600_000) time.push(t / 1000);
+    for (let t = dayStart(start); t < endMs; t += 3_600_000) time.push(t / 1000);
     res.setHeader("content-type", "application/json");
     res.end(JSON.stringify({
       hourly: {
@@ -1598,7 +1605,33 @@ describe("API", () => {
 
     it("lo muy antiguo se pide al histórico", async () => {
       await week("2026-06-01");
-      assert.ok(meteoCalls.includes("/v1/archive 2026-05-30 2026-06-05"));
+      // Desde el viernes y en UTC, para cubrir la medianoche de Madrid del sábado.
+      assert.ok(meteoCalls.includes("/v1/archive 2026-05-29 2026-06-05"));
+    });
+
+    it("una semana de horario de verano llega completa y no se vuelve a pedir en cada carga", async () => {
+      // Antes, Open-Meteo devolvía estas fechas con el desfase de invierno y faltaba la hora de las
+      // 00:00 del sábado: la semana nunca parecía completa y se pedía en cada carga.
+      const dias = await days(await week("2026-10-19"));
+      assert.equal(dias[0].fecha, "2026-10-17");
+      assert.ok(dias.every((d) => d.temperaturaHoraria.length === 24));
+      const calls = meteoCalls.length;
+      await week("2026-10-19");
+      assert.equal(meteoCalls.length, calls, "no debe volver a llamar a Open-Meteo");
+    });
+
+    it("si a una semana le sigue faltando alguna hora, no la vuelve a pedir hasta pasada una hora", async () => {
+      await week("2026-11-02");
+      // Se quita una hora, como si Open-Meteo no tuviera ese dato.
+      await pool.query(
+        "DELETE FROM point_weather WHERE measured_at = (SELECT min(measured_at) FROM point_weather WHERE measured_at >= '2026-10-30T23:00:00Z')",
+      );
+      const calls = meteoCalls.length;
+      await week("2026-11-02");
+      assert.equal(meteoCalls.length, calls, "tras una respuesta buena no se repite enseguida");
+      weatherNow += 2 * 3_600_000;
+      await week("2026-11-02");
+      assert.ok(meteoCalls.length > calls, "pasada la hora, se vuelve a pedir");
     });
 
     it("si Open-Meteo falla, sirve lo guardado avisando, y sin nada guardado responde 503", async () => {
