@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ClipboardList, Crosshair, Home, Link2, LogOut, Presentation, Scale, SlidersHorizontal, Upload, Users, Video, Warehouse, WifiOff } from "lucide-react";
+import { CalendarDays, ChartColumn, ClipboardList, Crosshair, Home, Link2, LogOut, Presentation, Scale, SlidersHorizontal, Upload, Users, Video, Warehouse, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
@@ -24,6 +24,7 @@ import { fetchCurrentUser, signOut } from "@/lib/serverApi";
 const NAV = [
   { href: "/", label: "Resumen", icon: Home },
   { href: "/prevision", label: "Previsión diaria", icon: CalendarDays },
+  { href: "/produccion", label: "Producción", icon: ChartColumn },
   { href: "/invernaderos", label: "Invernaderos", icon: Warehouse },
   { href: "/videos", label: "Vídeos recibidos", icon: Video },
   { href: "/subir-videos", label: "Subir vídeos", icon: Upload },
