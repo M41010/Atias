@@ -180,7 +180,8 @@ function ProfileChart({ videos, hilera, longitudM, scaleMax }: { videos: ServerV
   const every = Math.max(1, Math.ceil(36 / Math.max(band, 1)));
   const withMeters = profile.puntos[0]?.desdeM !== null;
   const activePoint = active !== null ? profile.puntos[active] : null;
-  const tooltipLeft = active !== null ? Math.min(Math.max(x(active), 80), Math.max(width - 80, 80)) : 0;
+  // La ayuda va al lado de la línea guía, sin tapar los puntos de ese tramo.
+  const tooltipOnLeft = active !== null && x(active) > width / 2;
 
   return (
     <figure aria-labelledby={titleId}>
@@ -249,8 +250,8 @@ function ProfileChart({ videos, hilera, longitudM, scaleMax }: { videos: ServerV
         {activePoint && (
           <div
             aria-hidden
-            className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs shadow-sm"
-            style={{ left: tooltipLeft, top: 0 }}
+            className={`pointer-events-none absolute z-10 rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs shadow-sm ${tooltipOnLeft ? "-translate-x-full" : ""}`}
+            style={{ left: x(active!) + (tooltipOnLeft ? -10 : 10), top: 0 }}
           >
             <p className="mb-0.5 whitespace-nowrap text-muted">{tramoLabel(activePoint)}</p>
             {SIDES.map((lado) => (
@@ -310,12 +311,12 @@ function ThresholdBar({ bar }: { bar: QualityBar }) {
   const failZone: CSSProperties = bar.sentido === "min"
     ? { left: 0, width: pct(bar.umbral) }
     : { left: pct(bar.umbral), right: 0 };
-  const status = bar.ok === null ? "Sin medida" : bar.ok ? "Bien" : bar.sentido === "min" ? "Por debajo del mínimo" : "Por encima del máximo";
+  const status = bar.ok === null ? "Sin medida" : bar.ok ? "Bien" : bar.sentido === "min" ? "Bajo el mínimo" : "Sobre el máximo";
   return (
     <div className="grid gap-1">
       <div className="flex items-baseline justify-between gap-2 text-xs">
-        <span className="font-medium text-ink">{bar.etiqueta}</span>
-        <span className="tabular-nums text-muted">{bar.texto}</span>
+        <span className="whitespace-nowrap font-medium text-ink">{bar.etiqueta}</span>
+        <span className="whitespace-nowrap tabular-nums text-muted">{bar.texto}</span>
       </div>
       <div
         role="img"
@@ -332,9 +333,9 @@ function ThresholdBar({ bar }: { bar: QualityBar }) {
         <div className="absolute -inset-y-1 w-0.5 -translate-x-1/2 rounded-full bg-ink" style={{ left: pct(bar.umbral) }} />
       </div>
       <div className="flex items-center justify-between gap-2 text-xs">
-        <span className="text-muted">{bar.umbralTexto}</span>
+        <span className="whitespace-nowrap text-muted">{bar.umbralTexto}</span>
         {bar.ok === false && (
-          <span className="flex items-center gap-1 font-medium text-bad-ink">
+          <span className="flex items-center gap-1 whitespace-nowrap font-medium text-bad-ink">
             <AlertTriangle size={12} aria-hidden />
             {status}
           </span>

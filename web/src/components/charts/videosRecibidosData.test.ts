@@ -134,7 +134,7 @@ describe("calidad de la imagen", () => {
     const bars = qualityBars({ duracionS: 95.4, anchura: 1280, altura: 720, brillo: 20, sobreexpuesto: 0.3, nitidez: 140 });
     expect(bars.map((b) => [b.clave, b.ok, b.texto])).toEqual([
       ["brillo", false, "20 de 255"],
-      ["sobreexpuesto", false, "30 % de la imagen"],
+      ["sobreexpuesto", false, "30 %"],
       ["nitidez", true, "140"],
       ["resolucion", false, "1280 × 720"],
       ["duracion", true, "95 s"],

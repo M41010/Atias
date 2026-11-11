@@ -221,7 +221,7 @@ export function qualityBars(measures: QualityMeasures | null | undefined): Quali
     bar({
       clave: "sobreexpuesto", etiqueta: "Zonas quemadas", valor: sobre === null ? null : sobre * 100, sentido: "max",
       umbral: L.sobreexpuestoMax * 100, escalaMax: 100,
-      texto: sobre === null ? "Sin medida" : `${fmt(sobre * 100, 1)} % de la imagen`, umbralTexto: `Máximo ${fmt(L.sobreexpuestoMax * 100)} %`,
+      texto: sobre === null ? "Sin medida" : `${fmt(sobre * 100, 1)} %`, umbralTexto: `Máximo ${fmt(L.sobreexpuestoMax * 100)} %`,
     }),
     bar({
       clave: "nitidez", etiqueta: "Nitidez", valor: nitidez, sentido: "min", umbral: L.nitidezMin,
