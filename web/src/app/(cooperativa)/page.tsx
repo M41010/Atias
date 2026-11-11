@@ -19,7 +19,49 @@ import {
 } from "@/components/ui";
 import { excelFileName, summarySheets } from "@/lib/excelExport";
 import { fmtInt, fmtKg, fmtPct, fmtRange } from "@/lib/format";
-import { useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
+import { queryKeys, useDocumentTitle, useReport, useSelectedHarvest } from "@/lib/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { Legend } from "@/components/charts/Produccion";
+import { TendenciaTemporada } from "@/components/charts/TendenciaTemporada";
+import { listReports } from "@/lib/api";
+import { useDataMode } from "@/lib/mode";
+import { productionPeriods } from "@/lib/produccion";
+
+/** Kilos totales de cada semana de la temporada; el detalle por familia está en Producción. */
+function SeasonTrend() {
+  const mode = useDataMode();
+  const { data, isError } = useQuery({ queryKey: queryKeys.reports(mode), queryFn: listReports });
+  const weeks = data ? productionPeriods(data, "semana") : [];
+  return (
+    <Panel
+      title="Tendencia de la temporada"
+      description="Kilos de todas las familias por semana: lo recogido frente a lo previsto por Atias."
+      actions={
+        <Link href="/produccion" className="text-sm font-medium text-brand-ink underline-offset-3 hover:underline">
+          Ver producción
+        </Link>
+      }
+    >
+      <div className="grid gap-3 px-5 py-4">
+        {isError ? (
+          <p role="alert" className="text-sm text-bad-ink">No se ha podido cargar la temporada.</p>
+        ) : !data ? (
+          <div className="h-40 animate-pulse rounded bg-sunken motion-reduce:animate-none" />
+        ) : weeks.length < 2 ? (
+          <p className="text-sm text-muted">
+            {weeks.length === 0 ? "Todavía no hay semanas con capturas." : "Solo hay una semana con capturas."} La
+            tendencia aparecerá cuando haya al menos dos.
+          </p>
+        ) : (
+          <>
+            <Legend ids={["real", "atias"]} after={{ atias: <Pill tone="warn">Experimental</Pill> }} />
+            <TendenciaTemporada weeks={weeks} />
+          </>
+        )}
+      </div>
+    </Panel>
+  );
+}
 
 export default function ResumenPage() {
   useDocumentTitle("Resumen");
@@ -101,6 +143,8 @@ export default function ResumenPage() {
             </dl>
           </Panel>
         )}
+
+        <SeasonTrend />
 
         <Panel
           title="Por familia"
