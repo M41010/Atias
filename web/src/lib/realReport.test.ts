@@ -89,7 +89,8 @@ describe("kilos a partir del conteo real", () => {
     expect(report.simulated).toBe(false);
     expect(report.isoWeek).toBe(47);
     expect(g.matureFruits).toBe(320);
-    expect(g.observed.kg).toBeCloseTo(3.2);
+    // 3,2 kg contados: se dan en kilos enteros, como se muestran.
+    expect(g.observed.kg).toBe(3);
     expect(g.partial).toBe(true);
     expect(g.realKg).toBe(60);
     expect(g.farmerKg).toBe(50);
@@ -98,6 +99,31 @@ describe("kilos a partir del conteo real", () => {
     expect(g.weather.source).toBe("sin_datos");
     expect(g.daily.reduce((s, d) => s + d.atias, 0)).toBe(Math.round(g.forecast.kg));
     expect(g.warnings.some((w) => w.message.startsWith("Sin ubicación"))).toBe(true);
+  });
+
+  it("los totales son la suma de lo que se ve: hileras, invernaderos, familias y días cuadran al kilo", () => {
+    // Kilos con decimales en cada hilera, para que redondear cada parte por separado no cuadre.
+    const side = (h: number, lado: "A" | "B", maduros: number) => video(h, lado, [{ maduros, inmaduros: 37 }]);
+    const many = (id: string, base: number) =>
+      greenhouse({
+        id,
+        nombre: id,
+        hileras: 4,
+        tramos: 1,
+        videos: [1, 2, 3, 4].flatMap((h) => [side(h, "A", base + h * 13), side(h, "B", 0)]),
+      });
+    const data: FieldData = { ...field(greenhouse()), invernaderos: [many("inv-1", 1234), many("inv-2", 2345)] };
+    const report = buildRealReport(data, DEFAULT_PARAMS, new Map(), true);
+    const add = (values: number[]) => values.reduce((a, b) => a + b, 0);
+    for (const g of report.greenhouses) {
+      expect(add(g.hileras.map((h) => h.forecast?.kg ?? 0))).toBe(g.forecast.kg);
+      expect(add(g.hileras.map((h) => h.observed?.kg ?? 0))).toBe(g.observed.kg);
+      expect(add(g.daily.map((d) => d.atias))).toBe(g.forecast.kg);
+      expect(Number.isInteger(g.forecast.min) && Number.isInteger(g.forecast.max)).toBe(true);
+    }
+    expect(add(report.greenhouses.map((g) => g.forecast.kg))).toBe(report.forecast.kg);
+    expect(add(report.families.map((f) => f.forecast.kg))).toBe(report.forecast.kg);
+    expect(add(report.dates.map((_, i) => add(report.greenhouses.map((g) => g.daily[i].atias))))).toBe(report.forecast.kg);
   });
 });
 
