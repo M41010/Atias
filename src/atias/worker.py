@@ -1,6 +1,7 @@
 """Servicio de análisis, accesible solo desde la API.
 
 - ``POST /calidad``: revisa luz, nitidez y duración de un vídeo recibido.
+- ``POST /grabacion``: lee de los metadatos del vídeo cuándo se grabó. Solo lee las cabeceras.
 - ``POST /conteo``: cuenta los frutos de un vídeo por tramo y clase con el detector entrenado del
   cultivo. Si aún no hay modelo para ese cultivo responde 503 ``sin_detector``.
 
@@ -24,6 +25,7 @@ import numpy as np
 
 from .domain import CropProfile, load_profiles
 from .quality import review_video
+from .recording import recording_time
 from .vision.onnx_detector import OnnxDetector
 from .vision.rows import RowVideoError, analyze_row_video
 
@@ -84,7 +86,7 @@ class Handler(BaseHTTPRequestHandler):
             self._reply(404, {"error": "Ruta no encontrada"})
 
     def do_POST(self) -> None:  # noqa: N802 - nombre impuesto por http.server
-        if self.path not in ("/calidad", "/conteo"):
+        if self.path not in ("/calidad", "/grabacion", "/conteo"):
             self._reply(404, {"error": "Ruta no encontrada"})
             return
         try:
@@ -106,6 +108,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path == "/calidad":
             self._reply(200, review_video(path))
+        elif self.path == "/grabacion":
+            self._reply(200, recording_time(path))
         else:
             self._count(path, body)
 

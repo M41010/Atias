@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DetailedError, Upload as TusUpload } from "tus-js-client";
+import type { DetailedError, Upload as TusUpload } from "tus-js-client";
 import { useOnline } from "./hooks";
 import {
   ApiError,
@@ -11,8 +11,8 @@ import {
   type LinkInfo,
   restoreVideo,
   saveWeeklyData,
-  UPLOADS_ENDPOINT,
 } from "./serverApi";
+import { startTransfer as startTusTransfer, uploadStatus } from "./tusTransfer";
 import {
   addUpload,
   cancelUpload,
@@ -35,8 +35,6 @@ import {
   videoMimeType,
 } from "./upload";
 
-const CHUNK_BYTES = 8 * 1024 * 1024;
-const RETRY_DELAYS_MS = [0, 1000, 3000, 5000, 10_000, 20_000, 30_000, 60_000];
 const SAVE_DEBOUNCE_MS = 700;
 const QUALITY_POLL_MS = 5000;
 
@@ -44,7 +42,7 @@ export type SaveState = "guardado" | "guardando" | "error";
 type Removed = { kind: "recibido"; upload: Upload } | { kind: "cancelado"; file: File };
 
 function uploadErrorMessage(error: Error | DetailedError): string {
-  const status = "originalResponse" in error ? error.originalResponse?.getStatus() : undefined;
+  const status = uploadStatus(error);
   if (status === 403) return "Este enlace ya no es válido. Pide uno nuevo a la cooperativa.";
   if (status === 413) return "El vídeo supera los 8 GB. Graba la hilera con menos calidad.";
   if (status === 415) return "Ese archivo no es un vídeo, o su formato no se admite. Usa MP4, MOV o WebM.";
@@ -74,11 +72,9 @@ export function useUploadSession(token: string, link: LinkInfo) {
   const hasActive = summary.active > 0;
 
   const startTransfer = useCallback((key: string, target: Upload, file: File) => {
-    const transfer = new TusUpload(file, {
-      endpoint: UPLOADS_ENDPOINT,
+    const transfer = startTusTransfer({
+      file,
       uploadUrl: uploadUrls.current.get(key) ?? null,
-      chunkSize: CHUNK_BYTES,
-      retryDelays: RETRY_DELAYS_MS,
       headers: { [LINK_HEADER]: token },
       metadata: {
         filename: file.name,
@@ -86,35 +82,16 @@ export function useUploadSession(token: string, link: LinkInfo) {
         hilera: String(target.hilera),
         lado: target.lado,
       },
-      // Identifica el mismo archivo en el mismo lado: volver a elegirlo continúa por donde iba.
-      fingerprint: async (f: File) => ["atias", token, key, f.name, f.size, f.lastModified].join("|"),
-      removeFingerprintOnSuccess: true,
-      // Si el servidor está caído, tus-js-client trataría el error 5xx al consultar por dónde iba
-      // como «esa subida ya no existe» y empezaría otra desde cero. Debe contar como fallo temporal.
-      onAfterResponse: (request, response) => {
-        if (request.getMethod() === "HEAD" && response.getStatus() >= 500) {
-          throw new Error("Servidor no disponible");
-        }
-      },
-      // Se reintenta solo ante fallos de red o del servidor; un 4xx no se arregla reintentando.
-      onShouldRetry: (error) => {
-        const status = error.originalResponse?.getStatus() ?? 0;
-        // Sin espacio (507) no se arregla solo: reintentar solo llenaría el registro.
-        const retriable = status === 0 || (status >= 500 && status !== 507) || status === 409 || status === 423;
-        if (retriable) setUploads((value) => markReconnecting(value, key));
-        return retriable;
-      },
-      onUploadUrlAvailable: () => {
-        if (transfer.url) uploadUrls.current.set(key, transfer.url);
-      },
-      onProgress: (sent, total) => {
-        setUploads((value) => setProgress(value, key, total > 0 ? sent / total : 0));
-      },
-      onSuccess: () => {
+      fingerprint: [token, key, file.name, file.size, file.lastModified],
+      isCurrent: (t) => current.current?.transfer === t,
+      onReconnecting: () => setUploads((value) => markReconnecting(value, key)),
+      onUploadUrl: (url) => uploadUrls.current.set(key, url),
+      onProgress: (fraction) => setUploads((value) => setProgress(value, key, fraction)),
+      onSuccess: (videoId) => {
         current.current = null;
         files.current.delete(key);
         uploadUrls.current.delete(key);
-        setUploads((value) => markReceived(value, key, transfer.url?.split("/").pop()));
+        setUploads((value) => markReceived(value, key, videoId));
       },
       onError: (error) => {
         current.current = null;
@@ -122,12 +99,6 @@ export function useUploadSession(token: string, link: LinkInfo) {
       },
     });
     current.current = { key, transfer };
-    void transfer.findPreviousUploads().then((previous) => {
-      // Si la subida se canceló mientras tanto, no se arranca.
-      if (current.current?.transfer !== transfer) return;
-      if (!uploadUrls.current.has(key) && previous[0]) transfer.resumeFromPreviousUpload(previous[0]);
-      transfer.start();
-    });
   }, [token]);
 
   // Motor de la cola: una subida cada vez, en pausa sin conexión y sigue sola al volver.

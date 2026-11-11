@@ -112,18 +112,26 @@ export class LoginLimiter {
 
 const hashSessionToken = (token: string) => createHash("sha256").update(token).digest("hex");
 
-function readCookie(req: Request, name: string): string | undefined {
-  for (const part of (req.headers.cookie ?? "").split(";")) {
+function cookieValue(header: string | null | undefined, name: string): string | undefined {
+  for (const part of (header ?? "").split(";")) {
     const [key, ...value] = part.trim().split("=");
     if (key === name) return value.join("=");
   }
   return undefined;
 }
 
+const readCookie = (req: Request, name: string) => cookieValue(req.headers.cookie, name);
+
 export type SessionUser = { id: string; email: string; name: string };
 
-async function findSessionUser(pool: Pool, req: Request): Promise<SessionUser | null> {
-  const token = readCookie(req, SESSION_COOKIE);
+const findSessionUser = (pool: Pool, req: Request) => sessionUserFromCookie(pool, req.headers.cookie);
+
+/** Persona de la cooperativa con sesión en esta cabecera Cookie, o null si no hay sesión válida. */
+export async function sessionUserFromCookie(
+  pool: Pool,
+  cookieHeader: string | null | undefined,
+): Promise<SessionUser | null> {
+  const token = cookieValue(cookieHeader, SESSION_COOKIE);
   if (!token || token.length > 100) return null;
   const { rows } = await pool.query(
     `SELECT u.id, u.email, u.name FROM sessions s

@@ -22,12 +22,18 @@ export const fmtDate = (iso: string) => dateFormat.format(new Date(iso));
 const dayFormat = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Madrid" });
 const timeFormat = new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" });
 
-/** Día y horas de todas las capturas de la semana, por ejemplo: sáb, 31 oct, 08:12–17:05. */
+/**
+ * Día y horas de todas las capturas de la semana, por ejemplo: sáb, 31 oct, 08:12–17:05. Si caen
+ * en días distintos se dicen los dos: sáb, 31 oct, 08:12 – dom, 1 nov, 10:05.
+ */
 export function fmtCaptureSpan(isoDates: string[]): string {
   if (isoDates.length === 0) return "";
-  const sorted = [...isoDates].sort();
+  const sorted = [...isoDates].sort((a, b) => Date.parse(a) - Date.parse(b));
   const first = new Date(sorted[0]);
   const last = new Date(sorted[sorted.length - 1]);
+  if (dayFormat.format(first) !== dayFormat.format(last)) {
+    return `${dayFormat.format(first)}, ${timeFormat.format(first)} – ${dayFormat.format(last)}, ${timeFormat.format(last)}`;
+  }
   const hours = sorted.length === 1 ? timeFormat.format(first) : `${timeFormat.format(first)}–${timeFormat.format(last)}`;
   return `${dayFormat.format(first)}, ${hours}`;
 }

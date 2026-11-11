@@ -4,13 +4,21 @@ import express, { type Router } from "express";
 import { requireSession, type SessionUser } from "./auth.js";
 import { createFieldRouter } from "./campo.js";
 import { hashToken, type Pool } from "./db.js";
-import { harvestWeek, isValidMonday, upcomingHarvests } from "./harvests.js";
+import { harvestWeek, isValidMonday, proposedUploadHarvest, upcomingHarvests, uploadableHarvests } from "./harvests.js";
 import { videoDto, weeklyColumns, weeklyData } from "./dto.js";
+import { recordingOf } from "./recording.js";
 import { VIDEO_TYPES } from "./uploads.js";
 import { WeatherUnavailable, type WeatherService } from "./weather.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const CROPS = new Set(["tomate_cherry", "pimiento", "pepino"]);
+
+/** AAAA-MM-DDTHH:MM que existe en el calendario: la ida y vuelta descarta el 30 de febrero. */
+function isLocalDateTime(value: unknown): value is string {
+  if (typeof value !== "string" || !/^20\d\d-\d\d-\d\dT\d\d:\d\d$/.test(value)) return false;
+  const date = new Date(`${value}:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 16) === value;
+}
 
 /** Rutas de la cooperativa. Todas exigen haber iniciado sesión. */
 export function createCooperativeRouter(pool: Pool, videoDir: string, weather: WeatherService): Router {
@@ -156,6 +164,33 @@ export function createCooperativeRouter(pool: Pool, videoDir: string, weather: W
     });
   });
 
+  // Corrige a mano cuándo se grabó: fecha y hora de España (AAAA-MM-DDTHH:MM). null vuelve a la del vídeo.
+  router.put("/videos/:id/grabacion", async (req, res) => {
+    const user: SessionUser = res.locals.user;
+    const fecha = (req.body as Record<string, unknown> | undefined)?.fecha;
+    if (!UUID.test(req.params.id)) {
+      res.status(404).json({ error: "Vídeo no encontrado" });
+      return;
+    }
+    if (fecha !== null && !isLocalDateTime(fecha)) {
+      res.status(400).json({ error: "Indica la fecha y la hora de la grabación" });
+      return;
+    }
+    const { rows } = await pool.query(
+      `UPDATE videos SET
+         manual_recorded_at = CASE WHEN $2::text IS NULL THEN NULL ELSE $2::timestamp AT TIME ZONE 'Europe/Madrid' END,
+         manual_recorded_by = CASE WHEN $2::text IS NULL THEN NULL ELSE $3::uuid END
+       WHERE id = $1 AND status = 'recibido'
+       RETURNING manual_recorded_at, metadata_recorded_at, file_modified_at`,
+      [req.params.id, fecha, user.id],
+    );
+    if (!rows[0]) {
+      res.status(404).json({ error: "Vídeo no encontrado" });
+      return;
+    }
+    res.json(recordingOf(rows[0]));
+  });
+
   // ---- Meteorología ----
   // Temperatura por hora de sábado a viernes en un lugar, y lo normal en esas fechas.
   router.get("/meteorologia", async (req, res) => {
@@ -226,6 +261,67 @@ export function createCooperativeRouter(pool: Pool, videoDir: string, weather: W
       }
       throw error;
     }
+  });
+
+  // ---- Subir vídeos desde la cooperativa ----
+  // Recolecciones a las que se puede subir: las ya registradas y las semanas abiertas.
+  router.get("/subidas", async (_req, res) => {
+    const { rows } = await pool.query("SELECT id, label, starts_on::text AS starts_on FROM harvests");
+    const byId = new Map<string, { id: string; etiqueta: string; inicio: string }>(
+      rows.map((r) => [r.id, { id: r.id, etiqueta: r.label, inicio: r.starts_on }]),
+    );
+    for (const week of uploadableHarvests()) {
+      if (!byId.has(week.id)) byId.set(week.id, { id: week.id, etiqueta: week.etiqueta, inicio: week.inicio });
+    }
+    res.json({
+      recolecciones: [...byId.values()].sort((a, b) => b.inicio.localeCompare(a.inicio)),
+      propuesta: proposedUploadHarvest().id,
+    });
+  });
+
+  // Invernaderos con sus hileras en esa recolección y los vídeos que ya tienen.
+  router.get("/subidas/:recoleccion", async (req, res) => {
+    const harvest = await pool.query("SELECT id, label FROM harvests WHERE id = $1", [req.params.recoleccion]);
+    const week = uploadableHarvests().find((h) => h.id === req.params.recoleccion);
+    const label = harvest.rows[0]?.label ?? week?.etiqueta;
+    if (!label) {
+      res.status(404).json({ error: "Recolección no encontrada" });
+      return;
+    }
+    const greenhouses = await pool.query(
+      `SELECT g.id, g.name, g.crop, COALESCE(w.hileras, g.default_hileras) AS hileras
+       FROM greenhouses g
+       LEFT JOIN weekly_data w ON w.greenhouse_id = g.id AND w.harvest_id = $1
+       ORDER BY g.name`,
+      [req.params.recoleccion],
+    );
+    const videos = await pool.query(
+      "SELECT * FROM videos WHERE harvest_id = $1 AND status = 'recibido' ORDER BY hilera, lado",
+      [req.params.recoleccion],
+    );
+    res.json({
+      recoleccion: { id: req.params.recoleccion, etiqueta: label },
+      invernaderos: greenhouses.rows.map((g) => ({
+        id: g.id,
+        nombre: g.name,
+        cultivo: g.crop,
+        hileras: g.hileras,
+        videos: videos.rows.filter((v) => v.greenhouse_id === g.id).map(videoDto),
+      })),
+    });
+  });
+
+  // Cancelar una subida sin terminar. Lo ya recibido no se toca: sigue vigente.
+  router.post("/subidas/videos/:id/descartar", async (req, res) => {
+    if (!UUID.test(req.params.id)) {
+      res.status(404).json({ error: "Subida no encontrada" });
+      return;
+    }
+    const { rowCount } = await pool.query(
+      "UPDATE videos SET status = 'sustituido', delete_after = now() WHERE id = $1 AND status = 'subiendo'",
+      [req.params.id],
+    );
+    res.status(rowCount ? 204 : 404).end();
   });
 
   // ---- Enlaces del agricultor ----
