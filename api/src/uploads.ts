@@ -2,8 +2,9 @@ import { randomUUID } from "node:crypto";
 import { statfs } from "node:fs/promises";
 import { FileStore } from "@tus/file-store";
 import { Server } from "@tus/server";
+import { sessionUserFromCookie } from "./auth.js";
 import type { Pool } from "./db.js";
-import { currentHileras, LINK_HEADER, resolveLink } from "./links.js";
+import { cooperativeTarget, currentHileras, type Link, LINK_HEADER, resolveLink } from "./links.js";
 
 // Un vídeo de 10 minutos grabado en 4K con el móvil ocupa unos 4-6 GB.
 export const MAX_VIDEO_BYTES = 8 * 1024 ** 3;
@@ -49,8 +50,22 @@ export function createVideoStore(directory: string): FileStore {
 }
 
 /**
- * Servidor de subidas reanudables (protocolo tus). Cada petición se valida contra el enlace,
- * y una subida solo es accesible desde el enlace de su propio invernadero y recolección.
+ * Quién sube: el agricultor con su enlace o, si la petición no trae enlace, la cooperativa con su
+ * sesión. Un enlace no válido nunca pasa a comprobarse como sesión.
+ */
+async function resolveUploader(pool: Pool, req: Request): Promise<{ link: Link | null } | null> {
+  const token = req.headers.get(LINK_HEADER);
+  if (token !== null) {
+    const link = await resolveLink(pool, token);
+    return link ? { link } : null;
+  }
+  return (await sessionUserFromCookie(pool, req.headers.get("cookie"))) ? { link: null } : null;
+}
+
+/**
+ * Servidor de subidas reanudables (protocolo tus). Cada petición se valida contra el enlace, y una
+ * subida solo es accesible desde el enlace de su propio invernadero y recolección. La cooperativa,
+ * con su sesión, sube a cualquier invernadero y elige la recolección en los metadatos.
  */
 export function createUploadServer(
   pool: Pool,
@@ -65,8 +80,9 @@ export function createUploadServer(
     namingFunction: () => randomUUID(),
 
     onIncomingRequest: async (req, uploadId) => {
-      const link = await resolveLink(pool, req.headers.get(LINK_HEADER));
-      if (!link) throw reject(403, "Enlace no válido\n");
+      const uploader = await resolveUploader(pool, req);
+      if (!uploader) throw reject(403, "Enlace no válido\n");
+      const { link } = uploader;
 
       // Los vídeos no se descargan por aquí, y se quitan solo mediante la API del enlace.
       if (req.method === "GET" || req.method === "DELETE") throw reject(405, "Método no permitido\n");
@@ -78,7 +94,8 @@ export function createUploadServer(
         [uploadId],
       );
       const video = rows[0];
-      if (!video || video.greenhouse_id !== link.greenhouseId || video.harvest_id !== link.harvestId) {
+      const otherTarget = link && (video?.greenhouse_id !== link.greenhouseId || video?.harvest_id !== link.harvestId);
+      if (!video || otherTarget) {
         throw reject(404, "Subida no encontrada\n");
       }
       if (video.status === "sustituido" || video.status === "quitado") throw reject(410, "Subida retirada\n");
@@ -86,15 +103,19 @@ export function createUploadServer(
     },
 
     onUploadCreate: async (req, upload) => {
-      const link = await resolveLink(pool, req.headers.get(LINK_HEADER));
-      if (!link) throw reject(403, "Enlace no válido\n");
+      const uploader = await resolveUploader(pool, req);
+      if (!uploader) throw reject(403, "Enlace no válido\n");
 
-      const { filename, filetype, hilera: rawHilera, lado, lastmodified } = upload.metadata ?? {};
+      const { filename, filetype, hilera: rawHilera, lado, invernadero, recoleccion, lastmodified } = upload.metadata ?? {};
       const hilera = Number(rawHilera);
       const mimeType = filetype?.trim().toLowerCase() ?? "";
       if (!upload.size) throw reject(400, "Falta el tamaño del vídeo\n");
       if (!VIDEO_TYPES.has(mimeType)) throw reject(415, "El archivo no es un vídeo\n");
       if (lado !== "A" && lado !== "B") throw reject(400, "Lado no válido\n");
+      // Con enlace, el destino lo fija el enlace y se ignora lo que digan los metadatos.
+      const cooperative = uploader.link ? null : await cooperativeTarget(pool, invernadero, recoleccion);
+      const link = uploader.link ?? cooperative?.target;
+      if (!link) throw reject(404, "Invernadero o recolección no encontrados\n");
       const hileras = await currentHileras(pool, link);
       if (!Number.isInteger(hilera) || hilera < 1 || hilera > hileras) {
         throw reject(400, "Hilera no válida\n");
@@ -113,6 +134,13 @@ export function createUploadServer(
         throw reject(507, "No queda espacio para guardar el vídeo\n");
       }
       const fileName = (filename ?? "video").replace(/[\p{Cc}]/gu, "").slice(0, 255) || "video";
+      if (cooperative?.newHarvest) {
+        const week = cooperative.newHarvest;
+        await pool.query(
+          "INSERT INTO harvests (id, label, starts_on) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING",
+          [week.id, week.etiqueta, week.inicio],
+        );
+      }
 
       // Una subida anterior sin terminar en este mismo lado queda sustituida por esta.
       await pool.query(

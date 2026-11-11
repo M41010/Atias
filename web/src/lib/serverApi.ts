@@ -117,6 +117,24 @@ export const createGreenhouse = async (nombre: string, cultivo: CropId, hileras:
   await request("/api/cooperativa/invernaderos", { method: "POST", body: JSON.stringify({ nombre, cultivo, hileras }) });
 };
 
+// ---- Subir vídeos desde la cooperativa ----
+export type UploadHarvest = { id: string; etiqueta: string; inicio: string };
+export type UploadTargets = {
+  recoleccion: { id: string; etiqueta: string };
+  invernaderos: { id: string; nombre: string; cultivo: CropId; hileras: number; videos: ServerVideo[] }[];
+};
+
+export const fetchUploadHarvests = async (): Promise<{ recolecciones: UploadHarvest[]; propuesta: string }> =>
+  (await request("/api/cooperativa/subidas")).json();
+
+export const fetchUploadTargets = async (harvestId: string): Promise<UploadTargets> =>
+  (await request(`/api/cooperativa/subidas/${encodeURIComponent(harvestId)}`)).json();
+
+/** Retira una subida sin terminar. Lo ya recibido sigue vigente. */
+export const discardUpload = async (videoId: string): Promise<void> => {
+  await request(`/api/cooperativa/subidas/videos/${encodeURIComponent(videoId)}/descartar`, { method: "POST" });
+};
+
 // ---- Cosecha real ----
 export type HarvestScope = "lunes_viernes" | "cosecha_inmediata";
 export type HarvestRecord = { kg: number; registradoPor: string; registradoEn: string };
