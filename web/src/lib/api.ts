@@ -17,6 +17,7 @@ import {
 } from "./calc";
 import { countMessages } from "./count";
 import { getDataMode } from "./mode";
+import { captureDates, recordingWarnings } from "./recording";
 import { type ControlWithAtias, fetchFieldData, fetchHarvestList, type FieldData, type FieldGreenhouse } from "./serverApi";
 import {
   addDays,
@@ -88,7 +89,12 @@ export type GreenhouseRow = {
   technicianId: string;
   technicianName: string;
   criterion: string;
+  /** Primera captura del invernadero: cuándo se grabó o, si no se sabe, cuándo llegó. */
   capturedAt: string;
+  /** Todas las fechas de captura del invernadero, para dar el intervalo. */
+  captureDates: string[];
+  /** false si no se sabe cuándo se grabó ningún vídeo y las fechas son las de recepción. */
+  captureFromRecording: boolean;
   status: GreenhouseStatus;
   isNew: boolean;
   partial: boolean;
@@ -202,6 +208,7 @@ function currentParams(): Params {
 
 function roundRange(range: KgRange): KgRange {
   // Una décima: con datos reales un tramo puede tener pocos kilos y redondear a enteros los borraría.
+  // Para enseñarlos, wholeTramos los reparte luego en enteros a partir de la hilera.
   const r = (v: number) => Math.round(v * 10) / 10;
   return { kg: r(range.kg), min: r(range.min), max: r(range.max) };
 }
@@ -225,6 +232,22 @@ function buildHilera(h: Hilera, ripeningPct: number, factor: number): HileraRow 
   };
 }
 
+/** Reparte los kilos enteros de la hilera entre sus tramos: al abrirla, los tramos suman lo que dice la hilera. */
+function wholeTramos(tramos: TramoRow[], observed: KgRange, forecast: KgRange): TramoRow[] {
+  const split = (pick: (t: TramoRow) => KgRange, total: KgRange) => ({
+    kg: roundKeepingTotal(tramos.map((t) => pick(t).kg), total.kg),
+    min: roundKeepingTotal(tramos.map((t) => pick(t).min), total.min),
+    max: roundKeepingTotal(tramos.map((t) => pick(t).max), total.max),
+  });
+  const o = split((t) => t.observed, observed);
+  const f = split((t) => t.forecast, forecast);
+  return tramos.map((t, i) => ({
+    ...t,
+    observed: { kg: o.kg[i], min: o.min[i], max: o.max[i] },
+    forecast: { kg: f.kg[i], min: f.min[i], max: f.max[i] },
+  }));
+}
+
 /**
  * Kilos del invernadero en enteros, que es como se muestran. Cada hilera se redondea sin que cambie
  * la suma: así las hileras suman el invernadero, los invernaderos la familia y el total, y los días
@@ -243,7 +266,10 @@ function wholeKg(hileras: HileraRow[]): { hileras: HileraRow[]; observed: KgRang
   const at = (r: { kg: number[]; min: number[]; max: number[] }, i: number): KgRange => ({ kg: r.kg[i], min: r.min[i], max: r.max[i] });
   const out = hileras.map((h) => {
     const i = analyzed.indexOf(h);
-    return i < 0 ? h : { ...h, observed: at(rounded.observed, i), forecast: at(rounded.forecast, i) };
+    if (i < 0) return h;
+    const observed = at(rounded.observed, i);
+    const forecast = at(rounded.forecast, i);
+    return { ...h, observed, forecast, tramos: wholeTramos(h.tramos, observed, forecast) };
   });
   const done = out.filter((h) => h.observed && h.forecast);
   return {
@@ -361,7 +387,7 @@ function assemble(meta: ReportMeta, greenhouses: GreenhouseRow[], used: Params):
     partial: greenhouses.some((g) => g.partial),
     totalHileras: greenhouses.reduce((total, g) => total + g.hileras.length, 0),
     missingHileras: greenhouses.reduce((total, g) => total + g.missingHileras, 0),
-    captureDates: greenhouses.map((g) => g.capturedAt),
+    captureDates: greenhouses.flatMap((g) => g.captureDates),
     realKg,
     errorPct: realKg === null ? null : errorPct(forecast.kg, realKg),
     days: used.days,
@@ -379,7 +405,7 @@ function assemble(meta: ReportMeta, greenhouses: GreenhouseRow[], used: Params):
 
 // ---- Modo demostración: datos simulados ----
 
-function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestReport | null {
+export function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestReport | null {
   const harvest = HARVESTS.find((h) => h.id === id);
   if (!harvest) return null;
   const isLatest = id === DEMO_LATEST_ID;
@@ -412,6 +438,8 @@ function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestR
       technicianName: technician?.name ?? "—",
       criterion: family.criterion,
       capturedAt: capture.capturedAt,
+      captureDates: [capture.capturedAt],
+      captureFromRecording: true,
       status: partial ? "analizando" : capture.warnings.length > 0 ? "con_advertencias" : "analizado",
       isNew: capture.isNew && !readStorage<string[]>(SEEN_KEY, []).includes(`${id}/${info.id}`),
       partial,
@@ -596,7 +624,7 @@ export function buildRealReport(
     const matureFruits = analyzed.reduce((total, h) => total + (h.matureFruits ?? 0), 0);
     const partial = analyzed.length < hileras.length;
 
-    const warnings = [...built.warnings];
+    const warnings = [...built.warnings, ...recordingWarnings(g, monday)];
     const sheet = (message: string, action: string, severity: AppWarning["severity"] = "media") =>
       warnings.unshift({ severity, message, scope: g.nombre, greenhouseId: g.id, hilera: 0, action });
     if (!g.familia) sheet(`Falta indicar la familia: se calcula como ${family.name}.`, "Complétalo en Datos de campo.", "alta");
@@ -607,7 +635,7 @@ export function buildRealReport(
     const technicianKg = fullWeek(g.previsiones.tecnico);
     const farmerKg = fullWeek(g.previsiones.agricultor);
     const atiasDays = roundKeepingTotal(splitByDay(observed, forecast, dayShares(summary)).map((d) => d.kg));
-    const received = g.videos.map((v) => v.receivedAt).filter((v): v is string => Boolean(v)).sort();
+    const capture = captureDates(g.videos);
     return {
       info: {
         id: g.id,
@@ -625,7 +653,9 @@ export function buildRealReport(
       technicianId: g.tecnico ?? "",
       technicianName: g.tecnico ?? "—",
       criterion: family.criterion,
-      capturedAt: received.at(-1) ?? `${addDays(monday, -2)}T12:00:00+01:00`,
+      capturedAt: capture.dates[0] ?? `${addDays(monday, -2)}T12:00:00+01:00`,
+      captureDates: capture.dates,
+      captureFromRecording: capture.fromRecording,
       status: partial ? "analizando" : warnings.some((w) => w.severity === "alta") ? "con_advertencias" : "analizado",
       isNew: false,
       partial,

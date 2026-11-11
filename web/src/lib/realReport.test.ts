@@ -125,6 +125,48 @@ describe("kilos a partir del conteo real", () => {
     expect(add(report.families.map((f) => f.forecast.kg))).toBe(report.forecast.kg);
     expect(add(report.dates.map((_, i) => add(report.greenhouses.map((g) => g.daily[i].atias))))).toBe(report.forecast.kg);
   });
+
+  it("al abrir una hilera, sus tramos en kilos enteros suman lo que dice la hilera", () => {
+    // Tres tramos de 1,5 kg: redondeados uno a uno serían 2 + 2 + 2 = 6 frente a los 5 de la hilera.
+    const tramos = [1, 2, 3].map(() => ({ maduros: 150, inmaduros: 37 }));
+    const g = greenhouse({ hileras: 1, tramos: 3, videos: [video(1, "A", tramos), video(1, "B", tramos)] });
+    const [hilera] = buildRealReport(field(g), DEFAULT_PARAMS, new Map(), true).greenhouses[0].hileras;
+    const add = (values: number[]) => values.reduce((a, b) => a + b, 0);
+    for (const range of ["observed", "forecast"] as const) {
+      for (const key of ["kg", "min", "max"] as const) {
+        const parts = hilera.tramos.map((t) => t[range][key]);
+        expect(parts.every(Number.isInteger)).toBe(true);
+        expect(add(parts)).toBe(hilera[range]?.[key]);
+      }
+    }
+    expect(hilera.observed?.kg).toBe(5);
+  });
+});
+
+describe("captura en el informe real", () => {
+  it("es cuándo se grabó y avisa de un vídeo de otra semana", () => {
+    const [a, b] = greenhouse().videos;
+    const g = greenhouse({
+      videos: [
+        { ...a, grabacion: { fecha: "2026-11-14T08:00:00Z", fuente: "metadatos" } },
+        { ...b, grabacion: { fecha: "2026-11-07T08:00:00Z", fuente: "archivo" } },
+      ],
+    });
+    const report = buildRealReport(field(g), DEFAULT_PARAMS, new Map(), true);
+    const row = report.greenhouses[0];
+    expect(row.capturedAt).toBe("2026-11-07T08:00:00Z");
+    expect(row.captureFromRecording).toBe(true);
+    expect(report.captureDates).toEqual(["2026-11-07T08:00:00Z", "2026-11-14T08:00:00Z"]);
+    expect(row.warnings.filter((w) => w.message.startsWith("Grabado el")).map((w) => w.scope)).toEqual([
+      "Invernadero 1 · Hilera 1 · Lado B",
+    ]);
+  });
+
+  it("sin fecha de grabación usa la de llegada y lo marca", () => {
+    const row = buildRealReport(field(greenhouse()), DEFAULT_PARAMS, new Map(), true).greenhouses[0];
+    expect(row.capturedAt).toBe("2026-11-14T10:00:00Z");
+    expect(row.captureFromRecording).toBe(false);
+  });
 });
 
 describe("precisión", () => {

@@ -2,6 +2,7 @@
 
 import type { VideoCount } from "./count";
 import type { VideoQuality } from "./quality";
+import type { VideoRecording } from "./recording";
 
 export type Side = "A" | "B";
 export type UploadStatus = "en_cola" | "subiendo" | "recibido" | "interrumpido" | "error";
@@ -31,6 +32,8 @@ export type ServerVideo = {
   sizeBytes: number;
   status: "recibido" | "subiendo";
   receivedAt: string | null;
+  /** Cuándo se grabó y de dónde sale la fecha. Falta en respuestas de una API anterior. */
+  grabacion?: VideoRecording;
   calidad: VideoQuality;
   /** Frutos contados por el detector. */
   conteo?: VideoCount;

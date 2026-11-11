@@ -1,0 +1,20 @@
+# Ensayo del agricultor (scripts/ensayo-agricultor). Una pila aparte, con sus propias imágenes,
+# volúmenes y puertos, que no toca la de Atias. La arranca y la borra `npm run ensayo`:
+#   docker compose -p atias-ensayo -f compose.yaml -f compose.ensayo.yaml up -d --build --wait
+services:
+  web:
+    # Otro nombre de imagen: si no, construir el ensayo sustituiría la imagen de la pila real.
+    image: atias-ensayo-web
+
+  api:
+    image: atias-ensayo-api
+    environment:
+      ATIAS_DATOS_DEMO: "1"
+
+  analisis:
+    image: atias-ensayo-analisis
+    # Aún no hay detector entrenado: el ensayo cuenta con el de referencia por color, para medir
+    # el recorrido completo. Sus números no valen; la cooperativa ve el aviso «detector de prueba».
+    command: [".venv/bin/python", "/ensayo/detector_ensayo.py"]
+    volumes:
+      - ./scripts/ensayo-agricultor/detector_ensayo.py:/ensayo/detector_ensayo.py:ro

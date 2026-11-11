@@ -4,18 +4,19 @@
  */
 import assert from "node:assert/strict";
 import { mkdtemp, readdir, rm } from "node:fs/promises";
-import { createServer, type Server } from "node:http";
+import { Agent, createServer, request, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, before, beforeEach, describe, it } from "node:test";
 import type { FileStore } from "@tus/file-store";
-import { createApp, parseTrustedProxy } from "./app.js";
+import { createApp, keepConnectionsOpen, parseTrustedProxy } from "./app.js";
 import { disableUser, LoginLimiter, setUserPassword } from "./auth.js";
 import { createPool, hashToken, migrate, type Pool, removeDemoLinks, seedDemo } from "./db.js";
 import { harvestWeek, upcomingHarvests } from "./harvests.js";
 import { countPendingVideos } from "./counting.js";
 import { createQualityRunner, reviewPendingVideos } from "./quality.js";
+import { readRecordingDates } from "./recording.js";
 import { createVideoStore, purgeExpired } from "./uploads.js";
 import { localDateHour, localMidnight } from "./weather.js";
 
@@ -44,6 +45,9 @@ describe("API", () => {
   let analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
   let analysisCalls: string[] = [];
   let analysisUrl = "";
+  let recordingStatus = 200;
+  let recordingBody = JSON.stringify({ fecha: null, fuente: null });
+  let recordingCalls: string[] = [];
   // Open-Meteo falso: el histórico da la hora del día como temperatura; la previsión, 20 °C y 0,1 mm/h.
   let meteoDown = false;
   let meteoCalls: string[] = [];
@@ -89,6 +93,12 @@ describe("API", () => {
         res.end(JSON.stringify(reply.body));
         return;
       }
+      if (req.url === "/grabacion") {
+        recordingCalls.push(JSON.parse(body).video);
+        res.statusCode = recordingStatus;
+        res.end(recordingBody);
+        return;
+      }
       if (req.url === "/calidad") analysisCalls.push(JSON.parse(body).video);
       res.statusCode = analysisStatus;
       res.end(analysisBody);
@@ -129,14 +139,18 @@ describe("API", () => {
   }
 
   async function createUpload(
-    { hilera = 1, lado = "A", size = 10, filetype = "video/mp4", filename = "a.mp4", token = TOKEN } = {},
+    {
+      hilera = 1, lado = "A", size = 10, filetype = "video/mp4", filename = "a.mp4", token = TOKEN,
+      lastmodified = undefined as string | undefined,
+    } = {},
   ) {
+    const extra = lastmodified === undefined ? "" : `,lastmodified ${b64(lastmodified)}`;
     return fetch(`${api}/api/subidas`, {
       method: "POST",
       headers: {
         ...tusHeaders(token),
         "upload-length": String(size),
-        "upload-metadata": `filename ${b64(filename)},filetype ${b64(filetype)},hilera ${b64(String(hilera))},lado ${b64(lado)}`,
+        "upload-metadata": `filename ${b64(filename)},filetype ${b64(filetype)},hilera ${b64(String(hilera))},lado ${b64(lado)}${extra}`,
       },
     });
   }
@@ -188,6 +202,9 @@ describe("API", () => {
     analysisStatus = 200;
     analysisBody = JSON.stringify({ medidas: {}, avisos: [] });
     analysisCalls = [];
+    recordingStatus = 200;
+    recordingBody = JSON.stringify({ fecha: null, fuente: null });
+    recordingCalls = [];
     freeSpace = Number.MAX_SAFE_INTEGER;
     await pool.query("DELETE FROM videos; DELETE FROM weekly_data; DELETE FROM harvest_records; DELETE FROM control_counts;");
     await pool.query("DELETE FROM daily_forecasts; DELETE FROM daily_harvests;");
@@ -400,6 +417,189 @@ describe("API", () => {
       const videos = await received();
       assert.equal(videos.length, 1);
       assert.equal(videos[0].fileName, "b.mp4");
+    });
+  });
+
+  describe("subida desde la cooperativa", () => {
+    /** Subida con la sesión de la cooperativa, sin enlace. */
+    const coopCreate = (
+      { hilera = 1, lado = "A", size = 10, filetype = "video/mp4", invernadero = "inv-1", recoleccion = HARVEST,
+        headers = {} as Record<string, string> } = {},
+    ) =>
+      fetch(`${api}/api/subidas`, {
+        method: "POST",
+        headers: {
+          cookie,
+          "tus-resumable": "1.0.0",
+          "upload-length": String(size),
+          "upload-metadata": [
+            `filename ${b64("inv1-h3-A.mp4")}`, `filetype ${b64(filetype)}`, `hilera ${b64(String(hilera))}`,
+            `lado ${b64(lado)}`, `invernadero ${b64(invernadero)}`, `recoleccion ${b64(recoleccion)}`,
+          ].join(","),
+          ...headers,
+        },
+      });
+    const coopPatch = (location: string, body: Buffer, offset: number) =>
+      fetch(`${api}${location}`, {
+        method: "PATCH",
+        headers: { cookie, "tus-resumable": "1.0.0", "upload-offset": String(offset), "content-type": "application/offset+octet-stream" },
+        body: new Uint8Array(body),
+      });
+    async function coopComplete(options: Parameters<typeof coopCreate>[0] = {}) {
+      const created = await coopCreate({ ...options, size: 10 });
+      assert.equal(created.status, 201);
+      const location = created.headers.get("location") as string;
+      assert.equal((await coopPatch(location, Buffer.alloc(10, 1), 0)).status, 204);
+      return location.split("/").at(-1) as string;
+    }
+    const overview = async (harvest = HARVEST) =>
+      await (await coop(`/recolecciones/${harvest}`)).json() as {
+        invernaderos: { id: string; videos: { id: string; hilera: number; lado: string; calidad: { estado: string } }[] }[];
+      };
+
+    it("sube con la sesión, por partes y reanudando, y llega donde los del agricultor", async () => {
+      const created = await coopCreate({ hilera: 3, lado: "B", invernadero: "inv-2" });
+      assert.equal(created.status, 201);
+      const location = created.headers.get("location") as string;
+      assert.equal((await coopPatch(location, Buffer.alloc(4, 1), 0)).status, 204);
+      const head = await fetch(`${api}${location}`, { method: "HEAD", headers: { cookie, "tus-resumable": "1.0.0" } });
+      assert.equal(head.headers.get("upload-offset"), "4");
+      assert.equal((await coopPatch(location, Buffer.alloc(6, 1), 4)).status, 204);
+
+      const id = location.split("/").at(-1) as string;
+      const greenhouse = (await overview()).invernaderos.find((g) => g.id === "inv-2");
+      assert.deepEqual(greenhouse?.videos.map((v) => [v.id, v.hilera, v.lado, v.calidad.estado]), [[id, 3, "B", "pendiente"]]);
+      // El agricultor de ese invernadero también lo ve.
+      const seen = await (await link("", {}, OTHER_TOKEN)).json() as { videos: { id: string }[] };
+      assert.deepEqual(seen.videos.map((v) => v.id), [id]);
+    });
+
+    it("no depende de ningún enlace: funciona con los enlaces caducados o revocados", async () => {
+      await pool.query("UPDATE upload_links SET expires_at = now() - interval '1 minute', revoked_at = now()");
+      try {
+        await coopComplete();
+        assert.equal((await overview()).invernaderos.find((g) => g.id === "inv-1")?.videos.length, 1);
+      } finally {
+        // Los enlaces de prueba no caducan: si no se dejan así, la limpieza de cada prueba los borraría.
+        await pool.query("UPDATE upload_links SET expires_at = NULL");
+      }
+    });
+
+    it("sustituye como el agricultor: lo anterior sigue vigente hasta que llega el nuevo completo", async () => {
+      const farmer = await uploadComplete({ filename: "del-agricultor.mp4" });
+      const created = await coopCreate();
+      const location = created.headers.get("location") as string;
+      assert.equal((await received()).find((v) => v.status === "recibido")?.id, farmer);
+      await coopPatch(location, Buffer.alloc(10, 1), 0);
+      const videos = await received();
+      assert.equal(videos.length, 1);
+      assert.equal(videos[0].fileName, "inv1-h3-A.mp4");
+      const { rows } = await pool.query("SELECT status FROM videos WHERE id = $1", [farmer]);
+      assert.equal(rows[0].status, "sustituido");
+    });
+
+    it("registra la recolección de una semana abierta al subir, no antes", async () => {
+      const week = upcomingHarvests()[1];
+      const list = await (await coop("/subidas")).json() as { recolecciones: { id: string }[]; propuesta: string };
+      assert.ok(list.recolecciones.some((h) => h.id === week.id));
+      assert.ok(list.recolecciones.some((h) => h.id === list.propuesta));
+      const targets = await (await coop(`/subidas/${week.id}`)).json() as { invernaderos: { id: string; hileras: number }[] };
+      assert.equal(targets.invernaderos.find((g) => g.id === "inv-1")?.hileras, 4);
+      assert.equal((await pool.query("SELECT 1 FROM harvests WHERE id = $1", [week.id])).rowCount, 0);
+
+      await coopComplete({ recoleccion: week.id });
+      const { rows } = await pool.query("SELECT label FROM harvests WHERE id = $1", [week.id]);
+      assert.equal(rows[0].label, week.etiqueta);
+      assert.equal((await overview(week.id)).invernaderos.find((g) => g.id === "inv-1")?.videos.length, 1);
+    });
+
+    it("rechaza sin sesión, con una sesión caducada o con un enlace falso aunque haya sesión", async () => {
+      const noSession = await fetch(`${api}/api/subidas`, {
+        method: "POST",
+        headers: { "tus-resumable": "1.0.0", "upload-length": "10", "upload-metadata": `invernadero ${b64("inv-1")}` },
+      });
+      assert.equal(noSession.status, 403);
+      assert.equal((await coopCreate({ headers: { "x-atias-enlace": "falso" } })).status, 403);
+      await pool.query("UPDATE sessions SET expires_at = now() - interval '1 minute'");
+      assert.equal((await coopCreate()).status, 403);
+      assert.equal((await pool.query("SELECT 1 FROM videos")).rowCount, 0);
+    });
+
+    it("una subida empezada no se puede continuar tras cerrar la sesión", async () => {
+      const location = (await coopCreate()).headers.get("location") as string;
+      await fetch(`${api}/api/auth/salir`, { method: "POST", headers: { cookie } });
+      assert.equal((await coopPatch(location, Buffer.alloc(10, 1), 0)).status, 403);
+    });
+
+    it("valida invernadero, recolección, hilera, tipo, tamaño y espacio", async () => {
+      assert.equal((await coopCreate({ invernadero: "no-existe" })).status, 404);
+      assert.equal((await coopCreate({ recoleccion: "2020-W02" })).status, 404);
+      assert.equal((await coopCreate({ recoleccion: harvestWeek("2099-01-05").id })).status, 404);
+      assert.equal((await coopCreate({ hilera: 5 })).status, 400);
+      assert.equal((await coopCreate({ lado: "C" })).status, 400);
+      assert.equal((await coopCreate({ filetype: "text/html" })).status, 415);
+      assert.equal((await coopCreate({ size: 8 * 1024 ** 3 + 1 })).status, 413);
+      freeSpace = MIN_FREE + 5;
+      assert.equal((await coopCreate()).status, 507);
+      assert.equal((await pool.query("SELECT 1 FROM videos")).rowCount, 0);
+    });
+
+    it("las hileras que indicó el agricultor mandan sobre las previstas", async () => {
+      await pool.query(
+        "INSERT INTO weekly_data (greenhouse_id, harvest_id, hileras) VALUES ('inv-1', $1, 6)", [HARVEST],
+      );
+      assert.equal((await coopCreate({ hilera: 6 })).status, 201);
+      assert.equal((await coopCreate({ hilera: 7 })).status, 400);
+    });
+
+    it("limita las versiones guardadas igual que con enlace", async () => {
+      await pool.query(
+        `INSERT INTO videos (id, greenhouse_id, harvest_id, hilera, lado, file_name, mime_type, size_bytes, status)
+         SELECT gen_random_uuid(), 'inv-1', $1, 1, 'A', 'v.mp4', 'video/mp4', 10, 'sustituido'
+         FROM generate_series(1, 32)`,
+        [HARVEST],
+      );
+      assert.equal((await coopCreate()).status, 429);
+    });
+
+    it("no acepta subidas enviadas desde otra web", async () => {
+      assert.equal((await coopCreate({ headers: { origin: "https://malicioso.test" } })).status, 403);
+      assert.equal((await coopCreate({ headers: { "sec-fetch-site": "cross-site" } })).status, 403);
+      assert.equal((await pool.query("SELECT 1 FROM videos")).rowCount, 0);
+    });
+
+    it("con enlace, el destino lo fija el enlace aunque los metadatos digan otro", async () => {
+      const created = await fetch(`${api}/api/subidas`, {
+        method: "POST",
+        headers: {
+          ...tusHeaders(),
+          "upload-length": "10",
+          "upload-metadata": [
+            `filetype ${b64("video/mp4")}`, `hilera ${b64("1")}`, `lado ${b64("A")}`,
+            `invernadero ${b64("inv-2")}`, `recoleccion ${b64(upcomingHarvests()[0].id)}`,
+          ].join(","),
+        },
+      });
+      assert.equal(created.status, 201);
+      const { rows } = await pool.query("SELECT greenhouse_id, harvest_id FROM videos");
+      assert.deepEqual(rows, [{ greenhouse_id: "inv-1", harvest_id: HARVEST }]);
+    });
+
+    it("descartar retira una subida sin terminar, pero nunca un vídeo recibido", async () => {
+      const location = (await coopCreate()).headers.get("location") as string;
+      const id = location.split("/").at(-1) as string;
+      assert.equal((await coop(`/subidas/videos/${id}/descartar`, { method: "POST" })).status, 204);
+      assert.equal((await coopPatch(location, Buffer.alloc(10, 1), 0)).status, 410);
+
+      const done = await coopComplete({ hilera: 2 });
+      assert.equal((await coop(`/subidas/videos/${done}/descartar`, { method: "POST" })).status, 404);
+      assert.equal((await coop("/subidas/videos/no-es-uuid/descartar", { method: "POST" })).status, 404);
+      assert.equal((await received()).find((v) => v.id === done)?.status, "recibido");
+    });
+
+    it("una recolección cerrada y sin registrar no se ofrece", async () => {
+      assert.equal((await coop("/subidas/2020-W02")).status, 404);
+      assert.equal((await coop(`/subidas/${HARVEST}`)).status, 200);
     });
   });
 
@@ -668,6 +868,8 @@ describe("API", () => {
         ["POST", "/enlaces"], ["POST", "/enlaces/x/revocar"],
         ["GET", "/videos/00000000-0000-0000-0000-000000000000/contenido"],
         ["GET", `/recolecciones/${HARVEST}/cosecha`], ["PUT", `/recolecciones/${HARVEST}/cosecha/inv-1/lunes_viernes`],
+        ["PUT", "/videos/00000000-0000-0000-0000-000000000000/grabacion"],
+        ["GET", "/subidas"], ["GET", `/subidas/${HARVEST}`], ["POST", "/subidas/videos/x/descartar"],
       ]) {
         const response = await fetch(`${api}/api/cooperativa${path}`, { method });
         assert.equal(response.status, 401, `${method} ${path}`);
@@ -841,6 +1043,94 @@ describe("API", () => {
       const run = createQualityRunner(pool, analysisUrl);
       await Promise.all([run(), run(), run()]);
       assert.equal(analysisCalls.length, 1);
+    });
+  });
+
+  describe("fecha de grabación", () => {
+    type Recording = { fecha: string | null; fuente: string | null };
+    const recording = async () =>
+      ((await (await coop(`/recolecciones/${HARVEST}`)).json()) as {
+        invernaderos: { id: string; videos: { grabacion: Recording }[] }[];
+      }).invernaderos.find((g) => g.id === "inv-1")?.videos[0].grabacion;
+    const correct = (id: string, fecha: string | null) =>
+      coop(`/videos/${id}/grabacion`, { method: "PUT", body: JSON.stringify({ fecha }) });
+    const saturday = Date.parse("2026-11-07T08:30:00Z");
+
+    it("sin metadatos usa la fecha del archivo que manda el navegador", async () => {
+      await uploadComplete({ lastmodified: String(saturday) });
+      assert.deepEqual(await recording(), { fecha: "2026-11-07T08:30:00.000Z", fuente: "archivo" });
+    });
+
+    it("descarta fechas del archivo que no son creíbles", async () => {
+      await uploadComplete({ lastmodified: "0" });
+      await uploadComplete({ lado: "B", lastmodified: "no-es-fecha" });
+      const { rows } = await pool.query("SELECT file_modified_at FROM videos");
+      assert.ok(rows.every((r) => r.file_modified_at === null));
+      assert.deepEqual(await recording(), { fecha: null, fuente: null });
+    });
+
+    it("la de los metadatos del vídeo manda sobre la del archivo, una sola vez por vídeo", async () => {
+      const id = await uploadComplete({ lastmodified: String(Date.parse("2026-11-08T21:00:00Z")) });
+      recordingBody = JSON.stringify({ fecha: "2026-11-07T08:12:33Z", fuente: "metadatos" });
+      assert.equal(await readRecordingDates(pool, analysisUrl), 1);
+      assert.deepEqual(recordingCalls, [id]);
+      assert.deepEqual(await recording(), { fecha: "2026-11-07T08:12:33.000Z", fuente: "metadatos" });
+      assert.equal(await readRecordingDates(pool, analysisUrl), 0);
+    });
+
+    it("con el servicio caído o sin la ruta, se vuelve a intentar", async () => {
+      await uploadComplete();
+      assert.equal(await readRecordingDates(pool, "http://127.0.0.1:1"), 0);
+      recordingStatus = 404;
+      recordingBody = JSON.stringify({ error: "Ruta no encontrada" });
+      assert.equal(await readRecordingDates(pool, analysisUrl), 0);
+      recordingStatus = 500;
+      assert.equal(await readRecordingDates(pool, analysisUrl), 0);
+      const { rows } = await pool.query("SELECT recording_checked_at FROM videos");
+      assert.equal(rows[0].recording_checked_at, null);
+    });
+
+    it("un vídeo sin fecha legible queda leído y sin fecha", async () => {
+      await uploadComplete();
+      recordingStatus = 404;
+      recordingBody = JSON.stringify({ error: "Vídeo no encontrado" });
+      assert.equal(await readRecordingDates(pool, analysisUrl), 1);
+      assert.equal(await readRecordingDates(pool, analysisUrl), 0);
+    });
+
+    it("la revisión periódica también lee la fecha", async () => {
+      await uploadComplete();
+      await createQualityRunner(pool, analysisUrl)();
+      assert.equal(recordingCalls.length, 1);
+    });
+
+    it("la cooperativa la corrige en hora de España y puede volver a la del vídeo", async () => {
+      const id = await uploadComplete({ lastmodified: String(saturday) });
+      const response = await correct(id, "2026-11-07T10:15");
+      assert.equal(response.status, 200);
+      assert.deepEqual(await response.json(), { fecha: "2026-11-07T09:15:00.000Z", fuente: "manual" });
+      assert.deepEqual(await recording(), { fecha: "2026-11-07T09:15:00.000Z", fuente: "manual" });
+      assert.equal((await correct(id, null)).status, 200);
+      assert.equal((await recording())?.fuente, "archivo");
+    });
+
+    it("rechaza fechas no válidas y vídeos que no existen", async () => {
+      const id = await uploadComplete();
+      for (const fecha of ["2026-02-30T10:00", "2026-13-01T10:00", "ayer", "2026-11-07", 5]) {
+        assert.equal((await correct(id, fecha as string)).status, 400, String(fecha));
+      }
+      assert.equal((await correct("00000000-0000-4000-8000-000000000000", "2026-11-07T10:00")).status, 404);
+      assert.equal((await correct("x", "2026-11-07T10:00")).status, 404);
+    });
+
+    it("el agricultor ve la fecha pero no puede corregirla", async () => {
+      const id = await uploadComplete({ lastmodified: String(saturday) });
+      assert.equal(((await received())[0] as unknown as { grabacion: Recording }).grabacion.fuente, "archivo");
+      const response = await fetch(`${api}/api/cooperativa/videos/${id}/grabacion`, {
+        method: "PUT", headers: { "x-atias-enlace": TOKEN, "content-type": "application/json" },
+        body: JSON.stringify({ fecha: "2026-11-07T10:00" }),
+      });
+      assert.equal(response.status, 401);
     });
   });
 
@@ -1092,6 +1382,7 @@ describe("API", () => {
         muestra: { frutos: number; gramos: number } | null;
         previsiones: { agricultor: (number | null)[]; tecnico: (number | null)[] };
         real: (number | null)[];
+        realOrigen: ("erp" | "manual" | null)[];
         controles: { etiqueta: string; visibles: number; atias: { frutos: number | null; motivo: string | null } }[];
       }[];
     };
@@ -1131,6 +1422,7 @@ describe("API", () => {
       await pool.query("INSERT INTO daily_harvests (greenhouse_id, day, kg, source) VALUES ('inv-1', '2026-11-09', 500, 'erp')");
       assert.equal((await put("/real", { dias: [1, 110, 95, null, null] })).status, 204);
       assert.deepEqual((await inv1()).real, [500, 110, 95, null, null]);
+      assert.deepEqual((await inv1()).realOrigen, ["erp", "manual", "manual", null, null]);
     });
 
     it("guarda la ficha, la longitud de la hilera y la muestra de peso", async () => {
@@ -1304,5 +1596,32 @@ describe("API", () => {
       assert.ok(list.recolecciones.some((h) => h.id === HARVEST));
       assert.equal((await coop("/recolecciones/nada")).status, 404);
     });
+  });
+});
+
+describe("Conexiones que reutiliza la web", () => {
+  // La web reenvía /api por conexiones abiertas. Si la API las cerraba a los 5 s, la consulta
+  // cada 5 s de la pantalla de subida chocaba con el cierre y fallaba (ECONNRESET, error 500).
+  it("siguen abiertas tras más de 5 s sin uso", async () => {
+    const server = keepConnectionsOpen(createServer((_req, res) => res.end("ok")));
+    const url = await listen(server);
+    const agent = new Agent({ keepAlive: true, maxSockets: 1 });
+    const get = () => new Promise<boolean>((resolve, reject) => {
+      const req = request(url, { agent }, (res) => {
+        res.resume();
+        res.on("end", () => resolve(req.reusedSocket));
+      });
+      req.on("error", reject);
+      req.end();
+    });
+    try {
+      assert.equal(await get(), false);
+      await new Promise((resolve) => setTimeout(resolve, 5500));
+      assert.equal(await get(), true, "debe reutilizar la misma conexión");
+    } finally {
+      agent.destroy();
+      server.closeAllConnections();
+      await close(server);
+    }
   });
 });

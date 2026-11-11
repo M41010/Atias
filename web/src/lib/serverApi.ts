@@ -1,6 +1,7 @@
 /** Llamadas reales a la API de Express. Pasan por la propia web, en el mismo origen. */
 
 import type { CropId } from "./simulated";
+import type { VideoRecording } from "./recording";
 import type { FarmerData, ServerVideo } from "./upload";
 
 export const LINK_HEADER = "x-atias-enlace";
@@ -70,6 +71,10 @@ export type HarvestOverview = {
 export const fetchHarvestList = async (): Promise<{ id: string; etiqueta: string }[]> =>
   ((await (await request("/api/cooperativa/recolecciones")).json()) as { recolecciones: { id: string; etiqueta: string }[] }).recolecciones;
 
+/** Corrige cuándo se grabó un vídeo: AAAA-MM-DDTHH:MM en hora de España, o null para volver a la del vídeo. */
+export const saveRecordingDate = async (videoId: string, fecha: string | null): Promise<VideoRecording> =>
+  (await request(`/api/cooperativa/videos/${encodeURIComponent(videoId)}/grabacion`, { method: "PUT", body: JSON.stringify({ fecha }) })).json();
+
 export const fetchHarvestOverview = async (id: string): Promise<HarvestOverview> =>
   (await request(`/api/cooperativa/recolecciones/${encodeURIComponent(id)}`)).json();
 
@@ -110,6 +115,24 @@ export const revokeLink = async (id: string): Promise<void> => {
 
 export const createGreenhouse = async (nombre: string, cultivo: CropId, hileras: number): Promise<void> => {
   await request("/api/cooperativa/invernaderos", { method: "POST", body: JSON.stringify({ nombre, cultivo, hileras }) });
+};
+
+// ---- Subir vídeos desde la cooperativa ----
+export type UploadHarvest = { id: string; etiqueta: string; inicio: string };
+export type UploadTargets = {
+  recoleccion: { id: string; etiqueta: string };
+  invernaderos: { id: string; nombre: string; cultivo: CropId; hileras: number; videos: ServerVideo[] }[];
+};
+
+export const fetchUploadHarvests = async (): Promise<{ recolecciones: UploadHarvest[]; propuesta: string }> =>
+  (await request("/api/cooperativa/subidas")).json();
+
+export const fetchUploadTargets = async (harvestId: string): Promise<UploadTargets> =>
+  (await request(`/api/cooperativa/subidas/${encodeURIComponent(harvestId)}`)).json();
+
+/** Retira una subida sin terminar. Lo ya recibido sigue vigente. */
+export const discardUpload = async (videoId: string): Promise<void> => {
+  await request(`/api/cooperativa/subidas/videos/${encodeURIComponent(videoId)}/descartar`, { method: "POST" });
 };
 
 // ---- Cosecha real ----
@@ -179,6 +202,8 @@ export type FieldGreenhouse = {
   videos: ServerVideo[];
   previsiones: { agricultor: DayValues; tecnico: DayValues };
   real: DayValues;
+  /** De dónde viene cada día del recogido; lo del ERP no se cambia a mano. Falta en datos antiguos. */
+  realOrigen?: ("erp" | "manual" | null)[];
   cosecha: { lunesViernes: number | null; inmediata: number | null };
   controles: ControlWithAtias[];
 };

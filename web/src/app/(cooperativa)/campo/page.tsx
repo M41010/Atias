@@ -1,8 +1,9 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2 } from "lucide-react";
+import { ClipboardPaste, Plus, Trash2 } from "lucide-react";
 import { type ReactNode, useId, useState } from "react";
+import { KilosImportPanel, PasteKilos } from "@/components/KilosImport";
 import { EmptyState, ErrorState, PageHeader, Panel, Skeleton } from "@/components/ui";
 import { fmtDay, fmtInt } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/hooks";
@@ -177,6 +178,10 @@ function DaysPanel({ harvestId, days, g }: { harvestId: string; days: string[]; 
   };
   const [values, setValues] = useState(initial);
   const [problem, setProblem] = useState<string | null>(null);
+  const [paste, setPaste] = useState<{ text: string; series: SeriesKey; day: number } | null>(null);
+  const [pasted, setPasted] = useState<number | null>(null);
+  // Lo que llegó del ERP no se cambia a mano: la API no lo pisa, y la tabla no deja escribirlo.
+  const erpDays = days.map((_, i) => g.realOrigen?.[i] === "erp");
   const save = useFieldSave(harvestId, async (all: Record<SeriesKey, DayValues>) => {
     await saveForecast(harvestId, g.id, "agricultor", all.agricultor);
     await saveForecast(harvestId, g.id, "tecnico", all.tecnico);
@@ -191,6 +196,7 @@ function DaysPanel({ harvestId, days, g }: { harvestId: string; days: string[]; 
       parsed[key] = series as DayValues;
     }
     setProblem(null);
+    setPasted(null);
     save.mutate(parsed);
   };
 
@@ -203,6 +209,11 @@ function DaysPanel({ harvestId, days, g }: { harvestId: string; days: string[]; 
     <Panel
       title="Previsiones y cosecha por día"
       description="Kilos de lunes a viernes. La previsión del agricultor tiene que darse sin conocer la de Atias. Deja vacío lo que no se sepa."
+      actions={
+        <button type="button" className="btn-secondary" onClick={() => setPaste({ text: "", series: "agricultor", day: 0 })} disabled={paste !== null}>
+          <ClipboardPaste size={16} aria-hidden /> Pegar desde Excel
+        </button>
+      }
     >
       <div className="overflow-x-auto">
         <table className="data-table">
@@ -217,23 +228,58 @@ function DaysPanel({ harvestId, days, g }: { harvestId: string; days: string[]; 
             {SERIES.map(({ key, label }) => (
               <tr key={key}>
                 <th scope="row" className="whitespace-nowrap">{label}</th>
-                {days.map((d, i) => (
-                  <td key={d} className="num">
-                    <input
-                      aria-label={`${label}, ${fmtDay(d)}, en kilos`}
-                      inputMode="decimal"
-                      value={values[key][i]}
-                      onChange={(e) => setValues((v) => ({ ...v, [key]: v[key].map((t, j) => (j === i ? e.target.value : t)) }))}
-                      className="input w-24 text-right tabular-nums"
-                    />
-                  </td>
-                ))}
+                {days.map((d, i) => {
+                  const fromErp = key === "real" && erpDays[i];
+                  return (
+                    <td key={d} className="num">
+                      <input
+                        aria-label={`${label}, ${fmtDay(d)}, en kilos${fromErp ? ", llegó del ERP" : ""}`}
+                        inputMode="decimal"
+                        value={values[key][i]}
+                        readOnly={fromErp}
+                        title={fromErp ? "Llegó del ERP: no se cambia a mano" : undefined}
+                        onChange={(e) => setValues((v) => ({ ...v, [key]: v[key].map((t, j) => (j === i ? e.target.value : t)) }))}
+                        onPaste={(e) => {
+                          // Un bloque de varias celdas (con tabuladores o saltos de línea) se revisa antes de ponerlo.
+                          const text = e.clipboardData.getData("text/plain");
+                          if (!/[\t\n]/.test(text.replace(/\r?\n$/, ""))) return;
+                          e.preventDefault();
+                          setPaste({ text, series: key, day: i });
+                        }}
+                        className={`input w-24 text-right tabular-nums ${fromErp ? "bg-sunken text-muted" : ""}`}
+                      />
+                      {fromErp && <span className="mt-0.5 block text-xs text-muted">ERP</span>}
+                    </td>
+                  );
+                })}
                 <td className="num font-semibold">{total(key)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {paste && (
+        <PasteKilos
+          // Cada pegado nuevo empieza con su texto.
+          key={`${paste.series}-${paste.day}-${paste.text}`}
+          days={days}
+          values={values}
+          erpDays={erpDays}
+          initialText={paste.text}
+          initialStart={{ series: paste.series, day: paste.day }}
+          onApply={(next, changed) => {
+            setValues(next);
+            setPaste(null);
+            setPasted(changed);
+          }}
+          onClose={() => setPaste(null)}
+        />
+      )}
+      {pasted !== null && (
+        <p role="status" className="border-t border-line px-5 py-2 text-sm text-warn-ink">
+          {pasted === 1 ? "1 valor puesto" : `${pasted} valores puestos`} en la tabla. Aún no está guardado: revísalo y pulsa Guardar.
+        </p>
+      )}
       <SaveBar onSave={submit} pending={save.isPending} error={save.error} done={save.isSuccess} problem={problem} />
     </Panel>
   );
@@ -403,7 +449,9 @@ function GreenhouseForms({ field, g }: { field: FieldData; g: FieldGreenhouse })
   return (
     <div className="grid gap-5">
       <SheetPanel key={`ficha-${key}`} harvestId={field.id} g={g} />
-      <DaysPanel key={`dias-${key}`} harvestId={field.id} days={field.dias} g={g} />
+      {/* Si los kilos guardados cambian (por ejemplo, al importar un Excel), la tabla se rellena de nuevo
+          para que Guardar no devuelva los valores de antes. */}
+      <DaysPanel key={`dias-${key}-${JSON.stringify([g.previsiones, g.real, g.realOrigen])}`} harvestId={field.id} days={field.dias} g={g} />
       <ControlsPanel key={`ctl-${key}`} harvestId={field.id} g={g} />
     </div>
   );
@@ -458,7 +506,10 @@ export default function CampoPage() {
   return (
     <>
       {header}
-      <GreenhouseForms field={field.data} g={current} />
+      <div className="grid gap-5">
+        <KilosImportPanel key={`importar-${field.data.id}`} field={field.data} />
+        <GreenhouseForms field={field.data} g={current} />
+      </div>
     </>
   );
 }

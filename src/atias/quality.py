@@ -14,6 +14,9 @@ import numpy as np
 from .vision.pipeline import MAX_OVEREXPOSED_SHARE, MIN_MEAN_BRIGHTNESS, MIN_SHARPNESS
 
 MIN_DURATION_SECONDS = 10.0
+# La guía de grabación pide 4K o 1080p. Un vídeo reenviado por WhatsApp llega a 480p o 720p, y el
+# detector vería cada fruto con muy pocos píxeles: hay que pedir el archivo original.
+MIN_SHORT_SIDE = 1080
 SAMPLED_FRAMES = 40
 UNKNOWN_LENGTH_STEP = 15
 ANALYSIS_WIDTH = 640
@@ -73,6 +76,8 @@ def review_video(path: str | Path) -> dict:
         warnings.append("DESENFOCADO")
     if duration is not None and duration < MIN_DURATION_SECONDS:
         warnings.append("MUY_CORTO")
+    if 0 < min(size) < MIN_SHORT_SIDE:
+        warnings.append("BAJA_RESOLUCION")
     return {
         "medidas": {
             "duracionS": round(duration, 1) if duration is not None else None,

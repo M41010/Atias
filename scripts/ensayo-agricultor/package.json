@@ -1,0 +1,12 @@
+{
+  "name": "atias-ensayo-agricultor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ensayo": "node ejecutar.mjs",
+    "navegador": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}

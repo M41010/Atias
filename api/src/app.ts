@@ -1,4 +1,5 @@
 import type { FileStore } from "@tus/file-store";
+import type { Server as HttpServer } from "node:http";
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import { createAuthRouter, LoginLimiter } from "./auth.js";
 import { createCooperativeRouter } from "./cooperativa.js";
@@ -18,6 +19,20 @@ export function parseTrustedProxy(value: string | undefined): TrustedProxy {
   if (value === "1") return true;
   if (value?.trim().toLowerCase() === "cloudflare") return "cloudflare";
   return false;
+}
+
+/**
+ * Cuánto mantiene la API abierta una conexión sin uso. La web reenvía /api por conexiones que
+ * reutiliza; si la API cierra una justo cuando la web manda otra petición por ella, esa petición
+ * falla (ECONNRESET) y el agricultor ve un error. Con los 5 s de Node pasaba a menudo, porque la
+ * pantalla de subida consulta cada 5 s. Debe superar el tiempo que la web guarda las conexiones.
+ */
+export const KEEP_ALIVE_MS = 65_000;
+
+export function keepConnectionsOpen<T extends HttpServer>(server: T): T {
+  server.keepAliveTimeout = KEEP_ALIVE_MS;
+  server.headersTimeout = KEEP_ALIVE_MS + 1000;
+  return server;
 }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

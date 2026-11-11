@@ -7,6 +7,7 @@ const MESSAGES: Record<string, string> = {
   SOBREEXPUESTO: "Demasiada luz: hay zonas quemadas",
   DESENFOCADO: "Imagen movida o desenfocada",
   MUY_CORTO: "Muy corto para recorrer una hilera",
+  BAJA_RESOLUCION: "Resolución baja: hace falta el vídeo original, en 4K o 1080p",
   ILEGIBLE: "No se ha podido leer el vídeo",
 };
 

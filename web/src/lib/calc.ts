@@ -108,15 +108,27 @@ export function splitByDay(observed: KgRange, forecast: KgRange, shares: number[
   }));
 }
 
-/** Redondea a enteros sin que cambie la suma: el total del día cuadra con el de la semana. */
-export function roundKeepingTotal(values: number[]): number[] {
+/**
+ * Redondea a enteros sin que cambie la suma: el total del día cuadra con el de la semana. Con `total`
+ * se reparte ese entero (por ejemplo, el de la hilera ya redondeado entre sus tramos).
+ */
+export function roundKeepingTotal(values: number[], total?: number): number[] {
   const floors = values.map(Math.floor);
-  let missing = Math.round(values.reduce((a, b) => a + b, 0)) - floors.reduce((a, b) => a + b, 0);
+  const target = total ?? Math.round(values.reduce((a, b) => a + b, 0));
+  let missing = target - floors.reduce((a, b) => a + b, 0);
   const order = values.map((v, i) => ({ i, rest: v - Math.floor(v) })).sort((a, b) => b.rest - a.rest);
   for (const { i } of order) {
     if (missing <= 0) break;
     floors[i] += 1;
     missing -= 1;
+  }
+  // Solo con `total` puede sobrar: se quita a los que menos parte decimal tenían, sin bajar de cero.
+  for (const { i } of [...order].reverse()) {
+    if (missing >= 0) break;
+    if (floors[i] > 0) {
+      floors[i] -= 1;
+      missing += 1;
+    }
   }
   return floors;
 }

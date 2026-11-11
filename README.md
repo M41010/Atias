@@ -37,7 +37,10 @@ Más opciones, como desarrollo o pruebas desde el móvil, en [docs/DOCKER.md](do
 uv run pytest                                                # Python
 cd web; npm test                                             # Web
 docker compose -f compose.test.yaml run --rm --build api-test  # API, con PostgreSQL real
+cd scripts/ensayo-agricultor; npm run ensayo                 # Ensayo del agricultor, de punta a punta
 ```
+
+El ensayo del agricultor se explica en [docs/DOCKER.md](docs/DOCKER.md#ensayo-del-agricultor).
 
 ## Revisar registros de cosecha
 

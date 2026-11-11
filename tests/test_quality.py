@@ -14,14 +14,15 @@ from atias.quality import review_video
 from atias.worker import create_server
 
 FPS = 10
-SIZE = (320, 180)
+# 1080p: la resolución mínima que pide la guía de grabación.
+SIZE = (1920, 1080)
 
 
-def write_video(path, *, seconds=12, brightness=1.0, blur=False, value=None):
-    writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"mp4v"), FPS, SIZE)
+def write_video(path, *, seconds=12, brightness=1.0, blur=False, value=None, size=SIZE):
+    writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"mp4v"), FPS, size)
     rng = np.random.default_rng(1)
     # Textura fija con detalle: se comporta como un cultivo, no como un fondo liso.
-    texture = rng.integers(40, 200, (SIZE[1], SIZE[0], 3), dtype=np.uint8)
+    texture = rng.integers(40, 200, (size[1], size[0], 3), dtype=np.uint8)
     for _ in range(int(seconds * FPS)):
         frame = np.full_like(texture, value) if value is not None else texture.copy()
         if blur:
@@ -34,7 +35,7 @@ def write_video(path, *, seconds=12, brightness=1.0, blur=False, value=None):
 def test_good_video_has_no_warnings(tmp_path):
     result = review_video(write_video(tmp_path / "ok.mp4"))
     assert result["avisos"] == []
-    assert result["medidas"]["anchura"] == 320
+    assert result["medidas"]["anchura"] == 1920
     assert result["medidas"]["duracionS"] == pytest.approx(12, abs=0.5)
 
 
@@ -49,6 +50,15 @@ def test_good_video_has_no_warnings(tmp_path):
 )
 def test_detects_each_problem(tmp_path, options, warning):
     assert warning in review_video(write_video(tmp_path / "v.mp4", **options))["avisos"]
+
+
+def test_avisa_de_un_video_reenviado_por_whatsapp(tmp_path):
+    result = review_video(write_video(tmp_path / "v.mp4", size=(854, 480)))
+    assert result["avisos"] == ["BAJA_RESOLUCION"]
+
+
+def test_un_video_vertical_en_1080p_no_tiene_baja_resolucion(tmp_path):
+    assert review_video(write_video(tmp_path / "v.mp4", size=(1080, 1920)))["avisos"] == []
 
 
 def test_file_that_is_not_a_video_is_reported(tmp_path):

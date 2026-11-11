@@ -302,6 +302,20 @@ const MIGRATIONS: { id: string; sql: string }[] = [
         ADD COLUMN muestra_g double precision CHECK (muestra_g > 0);
     `,
   },
+  {
+    id: "009_fecha_grabacion",
+    sql: `
+      -- Cuándo se grabó cada vídeo, que no es cuándo llegó: el agricultor puede enviarlo días después.
+      -- Se guarda cada fuente aparte; vale la corregida a mano, si no la de los metadatos del vídeo
+      -- y si no la del archivo en el dispositivo desde el que se subió (menos fiable: copiar el vídeo la cambia).
+      ALTER TABLE videos
+        ADD COLUMN file_modified_at timestamptz,
+        ADD COLUMN metadata_recorded_at timestamptz,
+        ADD COLUMN recording_checked_at timestamptz,
+        ADD COLUMN manual_recorded_at timestamptz,
+        ADD COLUMN manual_recorded_by uuid REFERENCES users(id);
+    `,
+  },
 ];
 
 /** Aplica las migraciones pendientes. El bloqueo evita conflictos si arrancan varias copias. */
