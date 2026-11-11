@@ -6,6 +6,10 @@ import { AlertTriangle, ArrowLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { KilosPorDia } from "@/components/charts/KilosPorDia";
+import { MapaInvernadero } from "@/components/charts/MapaInvernadero";
+import { RendimientoSemanas } from "@/components/charts/RendimientoSemanas";
+import { TiempoMaduracion } from "@/components/charts/TiempoMaduracion";
 import {
   EmptyState,
   ErrorState,
@@ -114,8 +118,9 @@ function DailyPanel({ g }: { g: GreenhouseRow }) {
   // La previsión del agricultor solo aparece si alguien la ha apuntado.
   const showFarmer = g.daily.some((d) => d.farmer !== null);
   return (
-    <Panel title="Por día de recolección" description="Cada día se recoge una zona del invernadero. Lo que madura después de grabar se reparte según el calor de cada día; el del fin de semana, el lunes.">
-      <div className="overflow-x-auto">
+    <Panel title="Kilos por día" description="Cada día se recoge una zona del invernadero. Lo que madura después de grabar se reparte según el calor de cada día; el del fin de semana, el lunes.">
+      <KilosPorDia g={g} />
+      <div className="overflow-x-auto border-t border-line">
         <table className="data-table">
           <thead>
             <tr>
@@ -166,20 +171,24 @@ function WeatherPanel({ g }: { g: GreenhouseRow }) {
   const all = g.weather.days.flatMap((d) => d.hourlyTempC);
   const low = Math.min(...all);
   const high = Math.max(...all);
-  const change = Math.round((g.weather.factor - 1) * 100);
+  const hasDays = g.weather.days.length > 0;
   return (
     <Panel
-      title={`Meteorología en ${g.info.location.municipality}`}
-      description="Temperatura exterior hora a hora, de sábado (día de la grabación) a viernes. Cuando haya un sensor dentro del invernadero, se usará su temperatura."
+      title={`Tiempo y maduración en ${g.info.location.municipality}`}
+      description="Calor útil de cada día, de sábado (día de la grabación) a viernes, frente a lo normal. Es la temperatura exterior hora a hora; cuando haya un sensor dentro del invernadero, se usará la suya."
       actions={
         g.weather.source === "simulada"
           ? <Pill tone="warn">Simulada</Pill>
-          : g.weather.stale
-            ? <Pill tone="warn">Sin actualizar</Pill>
-            : <Pill tone="ok">Open-Meteo</Pill>
+          : g.weather.source === "sin_datos"
+            ? <Pill tone="neutral">Sin datos</Pill>
+            : g.weather.stale
+              ? <Pill tone="warn">Sin actualizar</Pill>
+              : <Pill tone="ok">Open-Meteo</Pill>
       }
     >
-      <div className="overflow-x-auto">
+      <TiempoMaduracion weather={g.weather} />
+      {hasDays && (
+      <div className="overflow-x-auto border-t border-line">
         <table className="data-table compact">
           <thead>
             <tr>
@@ -211,13 +220,12 @@ function WeatherPanel({ g }: { g: GreenhouseRow }) {
           </tbody>
         </table>
       </div>
+      )}
       <p className="border-t border-line px-5 py-3 text-sm text-muted">
-        Grados-día: calor útil hora a hora por encima de 10 °C. Esta semana suma {fmtDecimal(g.weather.weeklyDegreeDays)}, frente a{" "}
-        {fmtDecimal(g.weather.normalWeeklyDegreeDays)} de lo normal en estas fechas en {g.info.location.municipality}:{" "}
-        {change === 0
-          ? "la fruta madura a ritmo normal."
-          : `la fruta madura un ${Math.abs(change)} % más ${change > 0 ? "deprisa" : "despacio"}.`}{" "}
-        {g.weather.source === "simulada"
+        Grados-día: calor útil hora a hora por encima de 10 °C. Lo normal es lo de estas fechas en {g.info.location.municipality}.{" "}
+        {g.weather.source === "sin_datos"
+          ? ""
+          : g.weather.source === "simulada"
           ? "Open-Meteo no ha respondido: estos datos son simulados."
           : `Datos de Open-Meteo.com (CC BY 4.0) en la localización del invernadero; lo normal es la media de ${g.weather.normalsYears} años.${g.weather.stale ? " Open-Meteo no responde ahora: son los últimos datos guardados." : ""}`}
       </p>
@@ -286,9 +294,16 @@ export default function GreenhousePage() {
     const raf = requestAnimationFrame(() => setTarget(Number(match[1])));
     return () => cancelAnimationFrame(raf);
   }, [hasData]);
+  // Cada vez que se abre una hilera desde el mapa, aunque sea la misma, la fila se vuelve a abrir.
+  const [opened, setOpened] = useState(0);
   useEffect(() => {
     if (target !== null) document.getElementById(`hilera-${target}`)?.scrollIntoView({ block: "center" });
-  }, [target]);
+  }, [target, opened]);
+  const openHilera = (n: number) => {
+    window.history.replaceState(null, "", `#hilera-${n}`);
+    setTarget(n);
+    setOpened((k) => k + 1);
+  };
 
   const back = (
     <Link href={`/invernaderos?recoleccion=${encodeURIComponent(harvestId)}`} className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted transition-colors duration-150 hover:text-ink">
@@ -378,8 +393,9 @@ export default function GreenhousePage() {
           <WeatherPanel g={g} />
         </div>
 
-        <Panel title="Por hilera y tramo" description="Abre una hilera para ver sus tramos. No se da detalle por planta porque no hay marcadores físicos.">
-          <div className="overflow-x-auto">
+        <Panel title="Mapa del invernadero" description="Kilos por hilera y tramo. Pulsa una hilera en el mapa o ábrela en la tabla para ver sus tramos.">
+          <MapaInvernadero g={g} onSelect={openHilera} />
+          <div className="overflow-x-auto border-t border-line">
             <table className="data-table">
               <thead>
                 <tr>
@@ -393,7 +409,7 @@ export default function GreenhousePage() {
               <tbody>
                 {g.hileras.map((h) => (
                   <HileraRows
-                    key={`${h.n}-${target === h.n}`}
+                    key={`${h.n}-${target === h.n ? opened : "cerrada"}`}
                     hilera={h}
                     videos={g.videos.filter((v) => v.hilera === h.n)}
                     warned={g.warnedHileras.includes(h.n)}
@@ -404,6 +420,12 @@ export default function GreenhousePage() {
             </table>
           </div>
         </Panel>
+
+        {report && (
+          <Panel title="Rendimiento frente a semanas anteriores" description="Lo que ha dado este invernadero en cada recolección, para ver si produce más o menos que antes.">
+            <RendimientoSemanas report={report} greenhouseId={g.info.id} />
+          </Panel>
+        )}
 
         <div className="grid items-start gap-5 lg:grid-cols-2">
           <div id="estado-analisis" className="scroll-mt-16">
