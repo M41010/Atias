@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   addUpload,
   cancelUpload,
+  CHUNK_BYTES,
+  CLOUDFLARE_MAX_BODY_BYTES,
   type FarmerData,
   formatSize,
   fromServer,
@@ -60,6 +62,14 @@ describe("validateVideo", () => {
   it("explica que el formato no se admite cuando es un vídeo raro", () => {
     expect(validateVideo({ name: "clip.avi", type: "video/x-msvideo", size: MB })).toMatch(/formato/);
     expect(validateVideo({ name: "sin-extension", type: "", size: MB })).toMatch(/formato/);
+  });
+});
+
+describe("CHUNK_BYTES", () => {
+  it("cada trozo de la subida pasa por Cloudflare con margen", () => {
+    expect(CHUNK_BYTES).toBeLessThanOrEqual(CLOUDFLARE_MAX_BODY_BYTES * 0.9);
+    // Un vídeo de 8 GB no necesita un número absurdo de peticiones.
+    expect(Math.ceil(MAX_VIDEO_BYTES / CHUNK_BYTES)).toBeLessThanOrEqual(2000);
   });
 });
 

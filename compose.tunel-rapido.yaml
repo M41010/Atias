@@ -1,0 +1,25 @@
+# SOLO PARA PROBAR: túnel rápido de Cloudflare, sin cuenta ni dominio.
+#   docker compose -f compose.yaml -f compose.tunel-rapido.yaml up -d --build
+#   docker compose -f compose.yaml -f compose.tunel-rapido.yaml logs cloudflared   (busca *.trycloudflare.com)
+# La dirección es aleatoria y cambia cada vez que el túnel se reinicia: los enlaces enviados a los
+# agricultores dejarían de funcionar. Para la grabación real usa compose.tunel.yaml.
+# Mientras esté activo, cualquiera con la dirección llega a la web.
+services:
+  api:
+    environment:
+      ATIAS_DATOS_DEMO: "0"
+      ATIAS_COOKIE_SEGURA: "1"
+      ATIAS_PROXY_DE_CONFIANZA: cloudflare
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.7
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "--url", "http://web:3000"]
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    depends_on:
+      web:
+        condition: service_healthy

@@ -41,6 +41,14 @@ export type ServerVideo = {
 
 export const MAX_VIDEO_BYTES = 8 * 1024 ** 3;
 
+/** Límite del cuerpo de cada petición en Cloudflare (túnel o proxy), plan gratuito. */
+export const CLOUDFLARE_MAX_BODY_BYTES = 100 * 1000 * 1000;
+/**
+ * Tamaño de cada trozo de la subida: muy por debajo del límite de Cloudflare, y pequeño para
+ * que un corte de la conexión del móvil haga repetir poco.
+ */
+export const CHUNK_BYTES = 8 * 1024 * 1024;
+
 export const uploadKey = (hilera: number, lado: Side) => `${hilera}-${lado}`;
 
 /** Formatos que admite el servidor (api/src/uploads.ts, VIDEO_TYPES). */

@@ -11,6 +11,16 @@ import { createWeatherService, type WeatherConfig } from "./weather.js";
 
 const ANALYSIS_TIMEOUT_MS = 2000;
 
+/** Quién escribe la dirección real del cliente: nadie, un proxy con X-Forwarded-For o Cloudflare. */
+export type TrustedProxy = boolean | "cloudflare";
+
+/** Lee ATIAS_PROXY_DE_CONFIANZA: "1" proxy con X-Forwarded-For, "cloudflare" túnel; otro valor, ninguno. */
+export function parseTrustedProxy(value: string | undefined): TrustedProxy {
+  if (value === "1") return true;
+  if (value?.trim().toLowerCase() === "cloudflare") return "cloudflare";
+  return false;
+}
+
 /**
  * Cuánto mantiene la API abierta una conexión sin uso. La web reenvía /api por conexiones que
  * reutiliza; si la API cierra una justo cuando la web manda otra petición por ella, esa petición
@@ -61,12 +71,23 @@ export function createApp({
   /**
    * La web reenvía X-Forwarded-For tal como llega, así que el cliente podría inventarse su
    * dirección. Solo se cree si delante hay un proxy (HTTPS en la nube) que la escribe él mismo.
+   * Con "cloudflare" (túnel) se usa CF-Connecting-IP, que escribe Cloudflare y el cliente no
+   * puede cambiar; lo que diga X-Forwarded-For se ignora.
    */
-  trustedProxy?: boolean;
+  trustedProxy?: TrustedProxy;
 }): Express {
   const app = express();
   app.disable("x-powered-by");
   app.set("trust proxy", trustedProxy ? 1 : false);
+  if (trustedProxy === "cloudflare") {
+    app.use((req, _res, next) => {
+      const real = req.get("cf-connecting-ip")?.trim();
+      // Sin la cabecera (entrada directa desde este equipo) no se cree ninguna dirección.
+      if (real) req.headers["x-forwarded-for"] = real;
+      else delete req.headers["x-forwarded-for"];
+      next();
+    });
+  }
   const uploads = createUploadServer(pool, store, uploadLimits);
 
   // Las peticiones que cambian algo solo se aceptan desde la propia web, no desde otra página
@@ -228,7 +249,7 @@ export function createApp({
 
   app.use("/api/enlace", linkRoutes);
 
-  app.use("/api/auth", createAuthRouter(pool, limiter, secureCookies, trustedProxy));
+  app.use("/api/auth", createAuthRouter(pool, limiter, secureCookies, Boolean(trustedProxy)));
   app.use("/api/cooperativa", createCooperativeRouter(pool, store.directory, createWeatherService(pool, weather)));
 
   app.use((_req, res) => {

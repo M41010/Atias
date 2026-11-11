@@ -2,8 +2,8 @@
 
 import { type DetailedError, Upload as TusUpload } from "tus-js-client";
 import { UPLOADS_ENDPOINT } from "./serverApi";
+import { CHUNK_BYTES } from "./upload";
 
-const CHUNK_BYTES = 8 * 1024 * 1024;
 const RETRY_DELAYS_MS = [0, 1000, 3000, 5000, 10_000, 20_000, 30_000, 60_000];
 
 /** Código HTTP con que respondió el servidor, si llegó a responder. */
