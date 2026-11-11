@@ -125,6 +125,22 @@ describe("kilos a partir del conteo real", () => {
     expect(add(report.families.map((f) => f.forecast.kg))).toBe(report.forecast.kg);
     expect(add(report.dates.map((_, i) => add(report.greenhouses.map((g) => g.daily[i].atias))))).toBe(report.forecast.kg);
   });
+
+  it("al abrir una hilera, sus tramos en kilos enteros suman lo que dice la hilera", () => {
+    // Tres tramos de 1,5 kg: redondeados uno a uno serían 2 + 2 + 2 = 6 frente a los 5 de la hilera.
+    const tramos = [1, 2, 3].map(() => ({ maduros: 150, inmaduros: 37 }));
+    const g = greenhouse({ hileras: 1, tramos: 3, videos: [video(1, "A", tramos), video(1, "B", tramos)] });
+    const [hilera] = buildRealReport(field(g), DEFAULT_PARAMS, new Map(), true).greenhouses[0].hileras;
+    const add = (values: number[]) => values.reduce((a, b) => a + b, 0);
+    for (const range of ["observed", "forecast"] as const) {
+      for (const key of ["kg", "min", "max"] as const) {
+        const parts = hilera.tramos.map((t) => t[range][key]);
+        expect(parts.every(Number.isInteger)).toBe(true);
+        expect(add(parts)).toBe(hilera[range]?.[key]);
+      }
+    }
+    expect(hilera.observed?.kg).toBe(5);
+  });
 });
 
 describe("precisión", () => {

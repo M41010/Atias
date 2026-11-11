@@ -202,6 +202,7 @@ function currentParams(): Params {
 
 function roundRange(range: KgRange): KgRange {
   // Una décima: con datos reales un tramo puede tener pocos kilos y redondear a enteros los borraría.
+  // Para enseñarlos, wholeTramos los reparte luego en enteros a partir de la hilera.
   const r = (v: number) => Math.round(v * 10) / 10;
   return { kg: r(range.kg), min: r(range.min), max: r(range.max) };
 }
@@ -225,6 +226,22 @@ function buildHilera(h: Hilera, ripeningPct: number, factor: number): HileraRow 
   };
 }
 
+/** Reparte los kilos enteros de la hilera entre sus tramos: al abrirla, los tramos suman lo que dice la hilera. */
+function wholeTramos(tramos: TramoRow[], observed: KgRange, forecast: KgRange): TramoRow[] {
+  const split = (pick: (t: TramoRow) => KgRange, total: KgRange) => ({
+    kg: roundKeepingTotal(tramos.map((t) => pick(t).kg), total.kg),
+    min: roundKeepingTotal(tramos.map((t) => pick(t).min), total.min),
+    max: roundKeepingTotal(tramos.map((t) => pick(t).max), total.max),
+  });
+  const o = split((t) => t.observed, observed);
+  const f = split((t) => t.forecast, forecast);
+  return tramos.map((t, i) => ({
+    ...t,
+    observed: { kg: o.kg[i], min: o.min[i], max: o.max[i] },
+    forecast: { kg: f.kg[i], min: f.min[i], max: f.max[i] },
+  }));
+}
+
 /**
  * Kilos del invernadero en enteros, que es como se muestran. Cada hilera se redondea sin que cambie
  * la suma: así las hileras suman el invernadero, los invernaderos la familia y el total, y los días
@@ -243,7 +260,10 @@ function wholeKg(hileras: HileraRow[]): { hileras: HileraRow[]; observed: KgRang
   const at = (r: { kg: number[]; min: number[]; max: number[] }, i: number): KgRange => ({ kg: r.kg[i], min: r.min[i], max: r.max[i] });
   const out = hileras.map((h) => {
     const i = analyzed.indexOf(h);
-    return i < 0 ? h : { ...h, observed: at(rounded.observed, i), forecast: at(rounded.forecast, i) };
+    if (i < 0) return h;
+    const observed = at(rounded.observed, i);
+    const forecast = at(rounded.forecast, i);
+    return { ...h, observed, forecast, tramos: wholeTramos(h.tramos, observed, forecast) };
   });
   const done = out.filter((h) => h.observed && h.forecast);
   return {
@@ -379,7 +399,7 @@ function assemble(meta: ReportMeta, greenhouses: GreenhouseRow[], used: Params):
 
 // ---- Modo demostración: datos simulados ----
 
-function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestReport | null {
+export function buildDemoReport(id: string, params: Params, real: WeatherMap): HarvestReport | null {
   const harvest = HARVESTS.find((h) => h.id === id);
   if (!harvest) return null;
   const isLatest = id === DEMO_LATEST_ID;
