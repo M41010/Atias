@@ -1033,6 +1033,7 @@ describe("API", () => {
         muestra: { frutos: number; gramos: number } | null;
         previsiones: { agricultor: (number | null)[]; tecnico: (number | null)[] };
         real: (number | null)[];
+        realOrigen: ("erp" | "manual" | null)[];
         controles: { etiqueta: string; visibles: number; atias: { frutos: number | null; motivo: string | null } }[];
       }[];
     };
@@ -1072,6 +1073,7 @@ describe("API", () => {
       await pool.query("INSERT INTO daily_harvests (greenhouse_id, day, kg, source) VALUES ('inv-1', '2026-11-09', 500, 'erp')");
       assert.equal((await put("/real", { dias: [1, 110, 95, null, null] })).status, 204);
       assert.deepEqual((await inv1()).real, [500, 110, 95, null, null]);
+      assert.deepEqual((await inv1()).realOrigen, ["erp", "manual", "manual", null, null]);
     });
 
     it("guarda la ficha, la longitud de la hilera y la muestra de peso", async () => {
