@@ -17,7 +17,7 @@ import {
   verifyWrites,
 } from "./kilosImport";
 import type { FieldData, FieldGreenhouse } from "./serverApi";
-import { parseCsv, readXlsx } from "./xlsxRead";
+import { parseCsv, readSpreadsheet, readXlsx } from "./xlsxRead";
 
 const DAYS = ["2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20"];
 
@@ -341,6 +341,8 @@ describe("leer ficheros", () => {
     const rows = await readXlsx(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer);
     expect(rows[0]).toEqual(TEMPLATE_COLUMNS);
     expect(rows[1]).toEqual(["Invernadero 1", "16/11/2026", "lunes", 1234.5, null, 900]);
+    // La celda con formato de fecha llega como fecha, no como número de serie.
+    expect(rows[rows.length - 1].slice(0, 2)).toEqual(["Invernadero 2", "2026-11-18"]);
     const read = readTable(rows, DAYS);
     expect(read.ok).toBe(true);
     if (!read.ok) return;
@@ -352,7 +354,24 @@ describe("leer ficheros", () => {
     ]);
   });
 
+  it("conserva el número de fila de Excel con un título y filas vacías encima", async () => {
+    const buffer = await writeXlsxFile([
+      [{ value: "Kilos de la semana 47" }],
+      [null],
+      ["Invernadero", "Fecha", "Recogido kg"].map((value) => ({ value })),
+      [{ value: "inv 1" }, { value: "lunes" }, { value: 12.75, type: Number }],
+    ]).toBuffer();
+    const rows = await readXlsx(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer);
+    const read = readTable(rows, DAYS);
+    expect(read).toMatchObject({ ok: true, entries: [{ line: 4, greenhouse: "inv 1", day: "lunes", values: { real: 12.75 } }] });
+  });
+
   it("dice que no es un .xlsx si no lo es", async () => {
     await expect(readXlsx(new TextEncoder().encode("hola").buffer as ArrayBuffer)).rejects.toThrow("no es un .xlsx");
+  });
+
+  it("pide guardar como .xlsx o .csv los formatos que no lee", async () => {
+    const file = { name: "erp.xls", arrayBuffer: async () => new ArrayBuffer(8) };
+    await expect(readSpreadsheet(file)).rejects.toThrow("guárdalo como .xlsx o .csv");
   });
 });
