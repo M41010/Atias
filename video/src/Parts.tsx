@@ -66,7 +66,7 @@ export function NaveDraw({ progress, dot, size = 360 }: { progress: number; dot:
 }
 
 /** Logotipo: la nave central hace de A delante de «TIAS». */
-function Wordmark({ size }: { size: number }) {
+export function Wordmark({ size }: { size: number }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "baseline", fontFamily: FONT, fontSize: size, fontWeight: 800, fontStretch: "88%", letterSpacing: "0.06em", color: C.paper, lineHeight: 1 }}>
       <svg viewBox="15.5 19.5 17 13.5" style={{ height: "0.715em", width: "auto", marginRight: "0.06em" }} fill="none">
